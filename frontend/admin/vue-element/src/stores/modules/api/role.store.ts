@@ -1,4 +1,4 @@
-import { useAppUserStore } from "@/store";
+import { useAppUserStore } from "@/stores";
 
 import { defineStore } from "pinia";
 

@@ -1,11 +1,9 @@
 import { ref } from "vue";
 
-import { useAppUserStore } from "@/store";
-
 import { defineStore } from "pinia";
-import { i18n } from "@/i18n/setup";
 
-const t = i18n.global.t;
+import { useAppUserStore } from "@/stores";
+import { i18n } from "@/i18n";
 
 import {
   createDictEntryServiceClient,

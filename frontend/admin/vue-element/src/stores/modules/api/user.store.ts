@@ -1,6 +1,6 @@
 import { computed } from "vue";
 
-import { useAppUserStore } from "@/store";
+import { useAppUserStore } from "@/stores";
 
 import { defineStore } from "pinia";
 import { i18n } from "@/i18n/setup";

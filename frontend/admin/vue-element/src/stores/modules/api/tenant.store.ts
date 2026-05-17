@@ -1,9 +1,7 @@
 import { computed } from "vue";
-import { i18n } from "@/i18n/setup";
-
-const t = i18n.global.t;
-
 import { defineStore } from "pinia";
+
+import { i18n } from "@/i18n/setup";
 
 import {
   createTenantServiceClient,
@@ -14,6 +12,8 @@ import {
 } from "@/api/generated/admin/service/v1";
 import { makeOrderBy, makeQueryString, makeUpdateMask } from "@/utils/query";
 import { type Paging, requestClientRequestHandler } from "@/transport/rest";
+
+const t = i18n.global.t;
 
 export const useTenantStore = defineStore("tenant", () => {
   const service = createTenantServiceClient(requestClientRequestHandler);

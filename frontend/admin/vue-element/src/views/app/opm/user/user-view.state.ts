@@ -8,8 +8,7 @@ import type {
 import { useAppUserStore, useOrgUnitStore, useTenantStore, useUserListStore } from "@/stores";
 
 interface UserViewState {
-  loading: boolean; // 加载状态
-
+  loading: boolean; // 加载状
   currentTenantId: number | undefined; // 当前选中的租户ID
   currentOrgUnitId: number | undefined; // 当前选中的组织ID
 

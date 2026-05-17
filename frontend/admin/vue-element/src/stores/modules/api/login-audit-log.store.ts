@@ -1,10 +1,8 @@
 import { computed } from "vue";
-import { i18n } from "@/i18n/setup";
-
-const t = i18n.global.t;
-import { useAppUserStore } from "@/store";
-
 import { defineStore } from "pinia";
+
+import { useAppUserStore } from "@/stores";
+import { i18n } from "@/i18n";
 
 import {
   createLoginAuditLogServiceClient,
@@ -14,6 +12,8 @@ import {
 } from "@/api/generated/admin/service/v1";
 import { makeOrderBy, makeQueryString } from "@/utils/query";
 import { type Paging, requestClientRequestHandler } from "@/transport/rest";
+
+const t = i18n.global.t;
 
 export const useLoginAuditLogStore = defineStore("login-audit-log", () => {
   const service = createLoginAuditLogServiceClient(requestClientRequestHandler);

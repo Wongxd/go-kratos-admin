@@ -1,10 +1,8 @@
 import { computed } from "vue";
-import { i18n } from "@/i18n/setup";
-
-const t = i18n.global.t;
-import { useAppUserStore } from "@/store";
-
 import { defineStore } from "pinia";
+
+import { i18n } from "@/i18n";
+import { useAppUserStore } from "@/stores";
 
 import {
   createOrgUnitServiceClient,
@@ -14,6 +12,8 @@ import {
 } from "@/api/generated/admin/service/v1";
 import { makeOrderBy, makeQueryString, makeUpdateMask } from "@/utils/query";
 import { type Paging, requestClientRequestHandler } from "@/transport/rest";
+
+const t = i18n.global.t;
 
 export const useOrgUnitStore = defineStore("org-unit", () => {
   const service = createOrgUnitServiceClient(requestClientRequestHandler);

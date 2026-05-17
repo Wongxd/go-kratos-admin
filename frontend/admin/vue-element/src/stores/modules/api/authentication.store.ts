@@ -2,7 +2,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { DEFAULT_HOME_PATH, LOGIN_PATH } from "@/constants";
-import { resetAllStores, useAccessStore, useAppUserStore } from "@/store";
+import { resetAllStores, useAccessStore, useAppUserStore } from "@/stores";
 
 import { ElNotification } from "element-plus";
 import CryptoJS from "crypto-js";

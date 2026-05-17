@@ -1,10 +1,9 @@
-import { useAppUserStore } from "@/store";
-
 import { defineStore } from "pinia";
 
 import { createInternalMessageCategoryServiceClient } from "@/api/generated/admin/service/v1";
 import { makeOrderBy, makeQueryString, makeUpdateMask } from "@/utils/query";
 import { type Paging, requestClientRequestHandler } from "@/transport/rest";
+import { useAppUserStore } from "@/stores";
 
 export const useInternalMessageCategoryStore = defineStore("internal_message_category", () => {
   const service = createInternalMessageCategoryServiceClient(requestClientRequestHandler);
