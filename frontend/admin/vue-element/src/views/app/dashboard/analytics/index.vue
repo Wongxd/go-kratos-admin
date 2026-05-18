@@ -92,28 +92,28 @@ interface OverviewItem {
 
 const overviewItems = ref<OverviewItem[]>([
   {
-    icon: "i-svg:card",
+    icon: "i-svg:color_card",
     title: t("pages.dashboard.currentUserCount"),
     totalTitle: t("pages.dashboard.totalUserCount"),
     totalValue: 120_000,
     value: 2000,
   },
   {
-    icon: "i-svg:cake",
+    icon: "i-svg:color_cake",
     title: t("pages.dashboard.currentAccessCount"),
     totalTitle: t("pages.dashboard.totalAccessCount"),
     totalValue: 500_000,
     value: 20_000,
   },
   {
-    icon: "i-svg:download",
+    icon: "i-svg:color_download",
     title: t("pages.dashboard.currentDownloadCount"),
     totalTitle: t("pages.dashboard.totalDownloadCount"),
     totalValue: 120_000,
     value: 8000,
   },
   {
-    icon: "i-svg:bell",
+    icon: "i-svg:color_bell",
     title: t("pages.dashboard.currentUsageCount"),
     totalTitle: t("pages.dashboard.totalUsageCount"),
     totalValue: 50_000,
