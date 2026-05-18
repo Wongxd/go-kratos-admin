@@ -101,7 +101,7 @@ function createRequestClient(baseURL: string) {
   return client;
 }
 
-export const requestClient = createRequestClient("");
+export const requestClient = createRequestClient(import.meta.env.VITE_APP_API_URL);
 
 export const baseRequestClient = new RequestClient({ baseURL: "" });
 

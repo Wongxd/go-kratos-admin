@@ -481,7 +481,7 @@ const pagination = reactive(
 );
 // 分页相关的请求参数
 const request = props.contentConfig.request ?? {
-  pageName: "pageNum",
+  pageName: "page",
   limitName: "pageSize",
 };
 
@@ -898,7 +898,7 @@ function fetchPageData(formData: IObject = {}, isRestart = false) {
     .then((data) => {
       if (showPagination) {
         pagination.total = (data as any)?.total ?? 0;
-        pageData.value = (data as any)?.list ?? [];
+        pageData.value = (data as any)?.items ?? [];
       } else {
         pageData.value = Array.isArray(data) ? data : (data?.items ?? (data as any)?.data ?? []);
       }
