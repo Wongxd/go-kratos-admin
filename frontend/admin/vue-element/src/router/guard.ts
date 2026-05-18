@@ -2,7 +2,7 @@ import type { Router } from "vue-router";
 
 import { DEFAULT_HOME_PATH, LOGIN_PATH } from "@/constants";
 import { startProgress, stopProgress } from "@/utils";
-import { preferences } from "@/utils/preferences";
+import { preferences } from "@/core/preferences";
 
 import { accessRoutes, coreRouteNames } from "@/router/routes";
 import { useAccessStore, useAppUserStore, useAuthStore, useDictStore } from "@/stores";

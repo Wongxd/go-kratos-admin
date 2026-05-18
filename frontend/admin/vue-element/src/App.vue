@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { APP_PREFIX } from "@/constants";
-import { preferences, usePreferences } from "@/utils/preferences";
+import { preferences, usePreferences } from "@/core/preferences";
 
 const { isDark, getElementPlusLocale } = usePreferences();
 

@@ -4,7 +4,7 @@ import { defineStore } from "pinia";
 
 import { createPolicyEvaluationLogServiceClient } from "@/api/generated/admin/service/v1";
 import { makeOrderBy, makeQueryString } from "@/utils/query";
-import { type Paging, requestClientRequestHandler } from "@/transport/rest";
+import { type Paging, requestClientRequestHandler } from "@/core/transport/rest";
 
 export const usePolicyEvaluationLogStore = defineStore("policy-evaluation-log", () => {
   const service = createPolicyEvaluationLogServiceClient(requestClientRequestHandler);

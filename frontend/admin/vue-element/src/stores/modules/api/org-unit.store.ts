@@ -11,7 +11,7 @@ import {
   type identityservicev1_OrgUnit_Type as OrgUnit_Type,
 } from "@/api/generated/admin/service/v1";
 import { makeOrderBy, makeQueryString, makeUpdateMask } from "@/utils/query";
-import { type Paging, requestClientRequestHandler } from "@/transport/rest";
+import { type Paging, requestClientRequestHandler } from "@/core/transport/rest";
 
 const t = i18n.global.t;
 

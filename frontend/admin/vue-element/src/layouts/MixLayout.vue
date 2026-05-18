@@ -80,7 +80,7 @@ import { useLayout } from "./useLayout";
 import { useAccessStore } from "@/stores";
 import { isExternal } from "@/utils";
 import { translateRouteTitle } from "@/i18n";
-import { preferencesManager } from "@/utils/preferences";
+import { preferencesManager } from "@/core/preferences";
 
 import BaseLayout from "./BaseLayout.vue";
 import LayoutLogo from "./components/LayoutLogo.vue";

@@ -70,7 +70,7 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
 import { useAppUserStore, useAuthStore } from "@/stores";
-import { preferences, usePreferences } from "@/utils/preferences";
+import { preferences, usePreferences } from "@/core/preferences";
 
 // 导入子组件
 import CommandPalette from "@/components/CommandPalette/index.vue";

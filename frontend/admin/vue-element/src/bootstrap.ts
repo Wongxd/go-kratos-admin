@@ -13,7 +13,7 @@ import { setupI18n } from "@/i18n";
 import { setupRouter } from "@/router";
 import { initStores } from "@/stores/setup";
 import { registerGlobComp } from "@/registerGlobComp";
-import { initPreferences } from "@/utils/preferences";
+import { initPreferences } from "@/core/preferences";
 
 import App from "./App.vue";
 

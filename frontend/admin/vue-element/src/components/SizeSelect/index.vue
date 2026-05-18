@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { preferences, preferencesManager } from "@/utils/preferences";
+import { preferences, preferencesManager } from "@/core/preferences";
 
 const { t } = useI18n();
 

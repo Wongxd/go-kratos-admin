@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { createUserProfileServiceClient } from "@/api/generated/admin/service/v1";
 import { makeUpdateMask, omit } from "@/utils/query";
-import { requestClientRequestHandler } from "@/transport/rest";
+import { requestClientRequestHandler } from "@/core/transport/rest";
 
 export const useUserProfileStore = defineStore("user-profile", () => {
   const userProfileService = createUserProfileServiceClient(requestClientRequestHandler);

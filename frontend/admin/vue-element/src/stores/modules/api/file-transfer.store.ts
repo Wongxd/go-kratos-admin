@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { createFileTransferServiceClient } from "@/api/generated/admin/service/v1";
-import { requestClient, requestClientRequestHandler } from "@/transport/rest";
+import { requestClient, requestClientRequestHandler } from "@/core/transport/rest";
 
 export const useFileTransferStore = defineStore("file-transfer", () => {
   const service = createFileTransferServiceClient(requestClientRequestHandler);

@@ -3,19 +3,15 @@
  *
  * 整合布局状态、设备检测、菜单数据
  */
+import { computed, watchEffect } from "vue";
 import { useRoute } from "vue-router";
-import { useWindowSize } from "@vueuse/core";
-import { useAccessStore } from "@/stores";
-import { DeviceEnum } from "@/constants";
-import { usePreferences } from "@/utils/preferences";
-import { preferencesManager, preferences } from "@/utils/preferences";
 
-const DESKTOP_BREAKPOINT = 992;
+import { useAccessStore } from "@/stores";
+import { preferencesManager, usePreferences } from "@/core/preferences";
 
 export function useLayout() {
   const route = useRoute();
   const permissionStore = useAccessStore();
-  const { width } = useWindowSize();
   const { isMobile, sidebarCollapsed, appPreferences, tabbarPreferences, logoPreferences } =
     usePreferences();
 
@@ -23,16 +19,18 @@ export function useLayout() {
   // 设备检测
   // ============================================
 
-  const isDesktop = computed(() => width.value >= DESKTOP_BREAKPOINT);
+  const isDesktop = computed(() => !isMobile.value);
+
+  // ============================================
+  // 设备检测
+  // ============================================
 
   // 监听窗口变化，自动调整设备类型和侧边栏
   watchEffect(() => {
-    const device = isDesktop.value ? DeviceEnum.DESKTOP : DeviceEnum.MOBILE;
-
     // 更新 preferences 中的 isMobile
     if (isMobile.value) {
       preferencesManager.updatePreferences({
-        app: { isMobile: device === DeviceEnum.MOBILE },
+        app: { isMobile: isMobile.value },
       });
     }
 
@@ -55,7 +53,7 @@ export function useLayout() {
   const currentLayout = computed(() => appPreferences.value.layout);
   const isSidebarOpen = computed(() => !sidebarCollapsed.value);
   const showTagsView = computed(() => tabbarPreferences.value.enable);
-  const showSettings = computed(() => preferences.app.enablePreferences);
+  const showSettings = computed(() => appPreferences.value.enablePreferences);
   const showLogo = computed(() => logoPreferences.value.enable);
 
   const layoutClass = computed(() => ({

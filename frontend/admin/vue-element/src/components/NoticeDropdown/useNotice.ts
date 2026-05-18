@@ -6,7 +6,7 @@ import { useInternalMessageStore, useAppUserStore } from "@/stores";
 import { router } from "@/router";
 import type { internal_messageservicev1_InternalMessageRecipient as InternalMessageRecipient } from "@/api/generated/admin/service/v1";
 import { dateUtil } from "@/utils";
-import { globalSSEClient } from "@/transport/sse";
+import { globalSSEClient } from "@/core/transport/sse";
 
 const PAGE_SIZE = 5;
 

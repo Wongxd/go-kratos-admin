@@ -7,7 +7,7 @@ import {
   createApiServiceClient,
 } from "@/api/generated/admin/service/v1";
 import { makeOrderBy, makeQueryString, makeUpdateMask } from "@/utils/query";
-import { type Paging, requestClientRequestHandler } from "@/transport/rest";
+import { type Paging, requestClientRequestHandler } from "@/core/transport/rest";
 
 export const useApiStore = defineStore("api", () => {
   const service = createApiServiceClient(requestClientRequestHandler);

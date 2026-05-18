@@ -1,5 +1,5 @@
 import { useAuthStore, useAccessStore } from "@/stores";
-import { preferences } from "@/utils/preferences";
+import { preferences } from "@/core/preferences";
 
 import type { HttpResponse, Request } from "./types";
 import {

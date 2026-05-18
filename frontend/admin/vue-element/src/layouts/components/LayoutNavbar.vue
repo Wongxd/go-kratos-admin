@@ -14,8 +14,9 @@
 </template>
 
 <script setup lang="ts">
-import { preferencesManager } from "@/utils/preferences";
-import { usePreferences } from "@/utils/preferences";
+import { preferencesManager } from "@/core/preferences";
+import { usePreferences } from "@/core/preferences";
+
 import Hamburger from "@/components/Hamburger/index.vue";
 import Breadcrumb from "@/components/Breadcrumb/index.vue";
 

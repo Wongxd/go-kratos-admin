@@ -30,7 +30,7 @@ import path from "path-browserify";
 import type { MenuInstance } from "element-plus";
 import type { RouteRecordRaw } from "vue-router";
 
-import { usePreferences } from "@/utils/preferences";
+import { usePreferences } from "@/core/preferences";
 import { isExternal } from "@/utils";
 
 import LayoutSidebarItem from "./LayoutSidebarItem.vue";

@@ -16,9 +16,9 @@ import {
 import { i18n } from "@/i18n/setup";
 
 const t = i18n.global.t;
-import { globalSSEClient } from "@/transport/sse";
-import { requestClientRequestHandler } from "@/transport/rest";
-import { preferences } from "@/utils/preferences";
+import { globalSSEClient } from "@/core/transport/sse";
+import { requestClientRequestHandler } from "@/core/transport/rest";
+import { preferences } from "@/core/preferences";
 
 type RefreshTokenFunc = () => Promise<string> | string;
 

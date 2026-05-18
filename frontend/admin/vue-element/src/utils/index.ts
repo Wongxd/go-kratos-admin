@@ -17,7 +17,6 @@ export * from "./merge";
 export * from "./window";
 export * from "./nprogress";
 export * from "./tree";
-export * from "./storage";
 export * from "./inference";
 export * from "./date";
 

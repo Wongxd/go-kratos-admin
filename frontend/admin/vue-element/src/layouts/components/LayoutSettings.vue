@@ -187,7 +187,7 @@
 import { DocumentCopy, RefreshLeft, Check } from "@element-plus/icons-vue";
 
 import { SidebarColor } from "@/constants";
-import { usePreferences, preferencesManager, preferences } from "@/utils/preferences";
+import { usePreferences, preferencesManager, preferences } from "@/core/preferences";
 
 const { t } = useI18n();
 

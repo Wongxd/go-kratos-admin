@@ -13,7 +13,7 @@ import {
   type identityservicev1_User_Status as User_Status,
 } from "@/api/generated/admin/service/v1";
 import { makeOrderBy, makeQueryString, makeUpdateMask, omit } from "@/utils/query";
-import { type Paging, requestClientRequestHandler } from "@/transport/rest";
+import { type Paging, requestClientRequestHandler } from "@/core/transport/rest";
 
 export const useUserListStore = defineStore("user-list", () => {
   const service = createUserServiceClient(requestClientRequestHandler);

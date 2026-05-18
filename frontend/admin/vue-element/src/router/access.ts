@@ -2,9 +2,9 @@ import { ElMessage } from "element-plus";
 
 import { createAdminPortalServiceClient } from "@/api/generated/admin/service/v1";
 import { BasicLayout, Layout } from "@/layouts";
-import { requestClientRequestHandler } from "@/transport/rest";
+import { requestClientRequestHandler } from "@/core/transport/rest";
 import { generateAccessible } from "@/router/accessible";
-import { preferences } from "@/utils/preferences";
+import { preferences } from "@/core/preferences";
 
 import { i18n } from "@/i18n/setup";
 

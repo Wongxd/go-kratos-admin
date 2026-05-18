@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { createAdminPortalServiceClient } from "@/api/generated/admin/service/v1";
-import { requestClientRequestHandler } from "@/transport/rest";
+import { requestClientRequestHandler } from "@/core/transport/rest";
 
 export const useAdminPortalStore = defineStore("admin-portal", () => {
   const service = createAdminPortalServiceClient(requestClientRequestHandler);

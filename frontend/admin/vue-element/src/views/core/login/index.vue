@@ -88,7 +88,7 @@
 
 <script setup lang="ts">
 import logo from "@/assets/images/logo.png";
-import { preferences } from "@/utils/preferences";
+import { preferences } from "@/core/preferences";
 import ThemeSwitch from "@/components/ThemeSwitch/index.vue";
 
 type LayoutMap = "login" | "register" | "resetPwd";

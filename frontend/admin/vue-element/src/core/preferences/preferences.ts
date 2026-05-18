@@ -4,7 +4,7 @@ import { breakpointsTailwind, useBreakpoints, useDebounceFn } from "@vueuse/core
 
 import { defaultPreferences } from "./config";
 import { updateCSSVariables } from "./update-css-variables";
-import { StorageManager } from "@/utils/storage";
+import { StorageManager } from "@/core/storage";
 import { merge } from "@/utils/merge";
 import { isMacOs } from "@/utils/inference";
 

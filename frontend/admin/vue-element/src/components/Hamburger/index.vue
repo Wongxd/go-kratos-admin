@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { usePreferences } from "@/utils/preferences";
+import { usePreferences } from "@/core/preferences";
 
 defineProps({
   isActive: { type: Boolean, required: true },

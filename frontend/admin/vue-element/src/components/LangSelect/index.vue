@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { preferencesManager } from "@/utils/preferences";
+import { preferencesManager } from "@/core/preferences";
 import { loadLocaleMessages } from "@/i18n";
 
 defineProps({
