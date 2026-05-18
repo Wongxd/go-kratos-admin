@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { useAppUserStore } from "@/stores";
-import { i18n } from "@/i18n/setup";
+import { i18n } from "@/i18n";
 
 import {
   createPermissionGroupServiceClient,

@@ -1,19 +1,20 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref } from "vue";
 
-import { useVbenDrawer } from '@vben/common-ui';
-import { $t } from '@vben/locales';
+import { useVbenDrawer } from "@vben/common-ui";
 
-import { notification } from 'ant-design-vue';
+import { notification } from "ant-design-vue";
 
-import { useVbenForm } from '@/adapter/form';
+import { useVbenForm } from "@/adapter/form";
 import {
   tenantAuditStatusList,
   tenantStatusList,
   tenantTypeList,
   useTenantStore,
   useUserListStore,
-} from '@/stores';
+} from "@/stores";
+
+const { t } = useI18n();
 
 const tenantStore = useTenantStore();
 const userListStore = useUserListStore();
@@ -22,8 +23,8 @@ const data = ref();
 
 const getTitle = computed(() =>
   data.value?.create
-    ? $t('ui.modal.create', { moduleName: t('pages.tenant.moduleName') })
-    : $t('ui.modal.update', { moduleName: t('pages.tenant.moduleName') }),
+    ? $t("ui.modal.create", { moduleName: t("pages.tenant.moduleName") })
+    : $t("ui.modal.update", { moduleName: t("pages.tenant.moduleName") })
 );
 // const isCreate = computed(() => data.value?.create);
 
@@ -33,66 +34,66 @@ const [BaseForm, baseFormApi] = useVbenForm({
   commonConfig: {
     // 所有表单项
     componentProps: {
-      class: 'w-full',
+      class: "w-full",
     },
   },
   schema: [
     {
-      component: 'Input',
-      fieldName: 'name',
-      label: t('pages.tenant.name'),
+      component: "Input",
+      fieldName: "name",
+      label: t("pages.tenant.name"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
-      rules: 'required',
+      rules: "required",
     },
     {
-      component: 'Input',
-      fieldName: 'code',
-      label: t('pages.tenant.code'),
+      component: "Input",
+      fieldName: "code",
+      label: t("pages.tenant.code"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
-      rules: 'required',
+      rules: "required",
     },
     {
-      component: 'Select',
-      fieldName: 'type',
-      label: t('pages.tenant.type'),
-      defaultValue: 'PAID',
+      component: "Select",
+      fieldName: "type",
+      label: t("pages.tenant.type"),
+      defaultValue: "PAID",
       componentProps: {
-        placeholder: $t('ui.placeholder.select'),
+        placeholder: $t("ui.placeholder.select"),
         options: tenantTypeList,
         filterOption: (input: string, option: any) =>
           option.label.toLowerCase().includes(input.toLowerCase()),
         allowClear: true,
         showSearch: true,
       },
-      rules: 'selectRequired',
+      rules: "selectRequired",
     },
     {
-      component: 'Select',
-      fieldName: 'auditStatus',
-      label: t('pages.tenant.auditStatus'),
-      defaultValue: 'APPROVED',
+      component: "Select",
+      fieldName: "auditStatus",
+      label: t("pages.tenant.auditStatus"),
+      defaultValue: "APPROVED",
       componentProps: {
-        placeholder: $t('ui.placeholder.select'),
+        placeholder: $t("ui.placeholder.select"),
         options: tenantAuditStatusList,
         filterOption: (input: string, option: any) =>
           option.label.toLowerCase().includes(input.toLowerCase()),
         allowClear: true,
         showSearch: true,
       },
-      rules: 'selectRequired',
+      rules: "selectRequired",
     },
     {
-      component: 'Select',
-      fieldName: 'status',
-      defaultValue: 'ON',
-      label: $t('ui.table.status'),
-      rules: 'selectRequired',
+      component: "Select",
+      fieldName: "status",
+      defaultValue: "ON",
+      label: $t("ui.table.status"),
+      rules: "selectRequired",
       componentProps: {
         options: tenantStatusList,
         filterOption: (input: string, option: any) =>
@@ -102,114 +103,114 @@ const [BaseForm, baseFormApi] = useVbenForm({
       },
     },
     {
-      component: 'Textarea',
-      fieldName: 'remark',
-      label: $t('ui.table.remark'),
+      component: "Textarea",
+      fieldName: "remark",
+      label: $t("ui.table.remark"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
     },
 
     {
-      component: 'Divider',
-      fieldName: 'divider1',
+      component: "Divider",
+      fieldName: "divider1",
       hideLabel: true,
       dependencies: {
         show: (_values) => {
           return data.value?.create;
         },
-        triggerFields: ['type'],
+        triggerFields: ["type"],
       },
       renderComponentContent() {
         return {
-          default: () => t('pages.tenant.adminSetting'),
+          default: () => t("pages.tenant.adminSetting"),
         };
       },
     },
 
     {
-      component: 'Input',
-      fieldName: 'user.username',
-      label: t('pages.tenant.adminUserName'),
-      rules: 'required',
+      component: "Input",
+      fieldName: "user.username",
+      label: t("pages.tenant.adminUserName"),
+      rules: "required",
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
       dependencies: {
         show: (_values) => {
           return data.value?.create;
         },
-        triggerFields: ['type'],
+        triggerFields: ["type"],
       },
     },
 
     {
-      component: 'VbenInputPassword',
-      fieldName: 'password',
-      label: t('pages.tenant.adminPassword'),
-      rules: 'required',
+      component: "VbenInputPassword",
+      fieldName: "password",
+      label: t("pages.tenant.adminPassword"),
+      rules: "required",
       componentProps: {
         passwordStrength: true,
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
       },
       dependencies: {
         show: (_values) => {
           return data.value?.create;
         },
-        triggerFields: ['type'],
+        triggerFields: ["type"],
       },
     },
 
     {
-      component: 'VbenInputPassword',
-      fieldName: 'passwordConfirm',
-      label: t('pages.tenant.adminPasswordConfirm'),
-      rules: 'required',
+      component: "VbenInputPassword",
+      fieldName: "passwordConfirm",
+      label: t("pages.tenant.adminPasswordConfirm"),
+      rules: "required",
       componentProps: {
         passwordStrength: true,
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
       },
       dependencies: {
         show: (_values) => {
           return data.value?.create;
         },
-        triggerFields: ['type'],
+        triggerFields: ["type"],
       },
     },
 
     {
-      component: 'Input',
-      fieldName: 'user.mobile',
-      label: t('pages.tenant.adminMobile'),
-      rules: 'required',
+      component: "Input",
+      fieldName: "user.mobile",
+      label: t("pages.tenant.adminMobile"),
+      rules: "required",
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
       dependencies: {
         show: (_values) => {
           return data.value?.create;
         },
-        triggerFields: ['type'],
+        triggerFields: ["type"],
       },
     },
 
     {
-      component: 'Input',
-      fieldName: 'user.email',
-      label: t('pages.tenant.adminEmail'),
-      rules: 'required',
+      component: "Input",
+      fieldName: "user.email",
+      label: t("pages.tenant.adminEmail"),
+      rules: "required",
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
       dependencies: {
         show: (_values) => {
           return data.value?.create;
         },
-        triggerFields: ['type'],
+        triggerFields: ["type"],
       },
     },
   ],
@@ -221,7 +222,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-    console.log('onConfirm');
+    console.log("onConfirm");
 
     // 校验输入的数据
     const validate = await baseFormApi.validate();
@@ -236,9 +237,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     console.log(getTitle.value, values);
 
-    await (data.value?.create
-      ? createTenantWithAdminUser(values)
-      : updateTenant(values));
+    await (data.value?.create ? createTenantWithAdminUser(values) : updateTenant(values));
   },
 
   onOpenChange(isOpen: boolean) {
@@ -251,7 +250,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
       setLoading(false);
 
-      console.log('onOpenChange', data.value, data.value?.create);
+      console.log("onOpenChange", data.value, data.value?.create);
     }
   },
 });
@@ -281,12 +280,12 @@ function setLoading(loading: boolean) {
 // }
 
 async function createTenantWithAdminUser(values: any) {
-  console.log('createTenantWithAdminUser', values);
+  console.log("createTenantWithAdminUser", values);
 
   // 检查密码和确认密码是否一致
   if (values.password !== values.passwordConfirm) {
     notification.error({
-      message: t('pages.notification.password_mismatch'),
+      message: t("pages.notification.password_mismatch"),
     });
     setLoading(false);
     return;
@@ -297,7 +296,7 @@ async function createTenantWithAdminUser(values: any) {
     await tenantStore.tenantExists(values.code, values.name);
   } catch {
     notification.error({
-      message: t('pages.tenant.tenant_code_exists'),
+      message: t("pages.tenant.tenant_code_exists"),
     });
     setLoading(false);
     return;
@@ -308,7 +307,7 @@ async function createTenantWithAdminUser(values: any) {
     await userListStore.userExists(values.user.username);
   } catch {
     notification.error({
-      message: t('pages.tenant.notification.user_username_exists'),
+      message: t("pages.tenant.notification.user_username_exists"),
     });
     setLoading(false);
     return;
@@ -329,11 +328,11 @@ async function createTenantWithAdminUser(values: any) {
     });
 
     notification.success({
-      message: $t('ui.notification.create_success'),
+      message: $t("ui.notification.create_success"),
     });
   } catch {
     notification.error({
-      message: $t('ui.notification.create_failed'),
+      message: $t("ui.notification.create_failed"),
     });
   } finally {
     // 关闭窗口
@@ -343,17 +342,17 @@ async function createTenantWithAdminUser(values: any) {
 }
 
 async function updateTenant(values: any) {
-  console.log('updateTenant', values);
+  console.log("updateTenant", values);
 
   try {
     await tenantStore.updateTenant(data.value.row.id, values);
 
     notification.success({
-      message: $t('ui.notification.update_success'),
+      message: $t("ui.notification.update_success"),
     });
   } catch {
     notification.error({
-      message: $t('ui.notification.update_failed'),
+      message: $t("ui.notification.update_failed"),
     });
   } finally {
     // 关闭窗口

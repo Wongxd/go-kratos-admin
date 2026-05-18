@@ -8,7 +8,7 @@
       <div class="toolbar-left flex gap-y-2.5 gap-x-2 md:gap-x-3 flex-wrap">
         <template v-for="(btn, index) in toolbarLeftBtn" :key="index">
           <el-button
-            v-hasPerm="btn.perm ?? '*:*:*'"
+            v-access:code="btn.perm ?? '*:**'"
             v-bind="btn.attrs"
             :disabled="btn.name === 'delete' && removeIds.length === 0"
             @click="handleToolbar(btn.name)"
@@ -32,7 +32,7 @@
           </el-popover>
           <el-button
             v-else
-            v-hasPerm="btn.perm ?? '*:*:*'"
+            v-access:code="btn.perm ?? '*:**'"
             v-bind="btn.attrs"
             @click="handleToolbar(btn.name)"
           ></el-button>
@@ -161,7 +161,7 @@
               <template v-for="(btn, index) in tableToolbarBtn" :key="index">
                 <el-button
                   v-if="btn.render === undefined || btn.render(scope.row)"
-                  v-hasPerm="btn.perm ?? '*:*:*'"
+                  v-access:code="btn.perm ?? '*:**'"
                   v-bind="btn.attrs"
                   @click="
                     handleOperate({
@@ -322,7 +322,7 @@
 </template>
 
 <script setup lang="ts">
-import { hasPerm } from "@/utils/auth";
+import { useAccess } from "@/core/access";
 import { useDateFormat, useThrottleFn } from "@vueuse/core";
 import {
   genFileId,
@@ -372,6 +372,9 @@ const pk = props.contentConfig.pk ?? "id";
 // 权限名称前缀
 const authPrefix = computed(() => props.contentConfig.permPrefix);
 
+// 使用权限 Hook
+const { hasAccessByCodes } = useAccess();
+
 // 获取按钮权限标识
 function getButtonPerm(action: string): string | null {
   // 如果action已经包含完整路径(包含冒号)，则直接使用
@@ -387,7 +390,7 @@ function hasButtonPerm(action: string): boolean {
   const perm = getButtonPerm(action);
   // 如果没有设置权限标识，则默认具有权限
   if (!perm) return true;
-  return hasPerm(perm);
+  return hasAccessByCodes([perm]);
 }
 
 // 创建工具栏按钮

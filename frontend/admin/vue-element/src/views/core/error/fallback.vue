@@ -157,6 +157,21 @@ function refresh() {
 }
 </script>
 
+<style lang="scss">
+// 全局样式，不使用 scoped，让 SVG 可以继承 CSS 变量
+.fallback-container {
+  // 定义主题色变量，供 SVG 使用
+  --fallback-primary: #0066ff;
+  --fallback-foreground: #ffffff;
+}
+
+// 深色主题下的颜色
+.dark .fallback-container {
+  --fallback-primary: #409eff;
+  --fallback-foreground: #e5eaf3;
+}
+</style>
+
 <style lang="scss" scoped>
 .fallback-container {
   display: flex;
@@ -179,23 +194,12 @@ function refresh() {
   @media (min-width: 1024px) {
     width: 25%;
   }
-}
 
-.fallback-image svg {
-  width: 100%;
-  height: auto;
-}
-
-.fallback-image svg path,
-.fallback-image svg rect,
-.fallback-image svg circle,
-.fallback-image svg ellipse,
-.fallback-image svg polygon,
-.fallback-image svg polyline,
-.fallback-image svg line {
-  color: initial !important;
-  fill: attr(fill) !important;
-  stroke: attr(stroke) !important;
+  svg,
+  svg * {
+    fill: revert !important;
+    stroke: revert !important;
+  }
 }
 
 .fallback-content {

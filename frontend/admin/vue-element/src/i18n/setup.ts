@@ -73,7 +73,12 @@ function translateRouteTitle(title: string): string {
   return i18n.global.te(title) ? i18n.global.t(title) : title;
 }
 
+const $t = i18n.global.t;
+const $te = i18n.global.te;
+
 export {
+  $t,
+  $te,
   i18n,
   loadLocaleMessages,
   loadLocalesMap,
@@ -81,3 +86,7 @@ export {
   setupI18n,
   translateRouteTitle,
 };
+
+export { useI18n } from "vue-i18n";
+
+export type { Locale } from "vue-i18n";

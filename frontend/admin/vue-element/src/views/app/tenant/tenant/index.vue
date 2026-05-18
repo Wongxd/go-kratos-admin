@@ -1,16 +1,85 @@
+<template>
+  <div class="app-container">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :page-search-config="pageSearchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    />
+
+    <!-- 列表 -->
+    <PageContent
+      ref="contentRef"
+      :page-content-config="pageContentConfig"
+      @add-click="handleAddClick"
+      @edit-click="handleEditClick"
+    >
+      <!-- 类型 -->
+      <template #type="{ row }">
+        <ElTag :color="tenantTypeToColor(row.type)">
+          {{ tenantTypeToName(row.type) }}
+        </ElTag>
+      </template>
+
+      <!-- 审核状态 -->
+      <template #auditStatus="{ row }">
+        <ElTag :color="tenantAuditStatusToColor(row.auditStatus)">
+          {{ tenantAuditStatusToName(row.auditStatus) }}
+        </ElTag>
+      </template>
+
+      <!-- 状态 -->
+      <template #status="{ row }">
+        <ElTag :color="tenantStatusToColor(row.status)">
+          {{ tenantStatusToName(row.status) }}
+        </ElTag>
+      </template>
+
+      <!-- 操作 -->
+      <template #action="{ row }">
+        <ElButton link type="primary" :icon="Edit" @click.stop="handleEditClick(row)">
+          {{ $t("ui.button.edit") }}
+        </ElButton>
+        <ElPopconfirm
+          :title="$t('ui.text.do_you_want_delete', { moduleName: $t('routes.tenant.moduleName') })"
+          @confirm="handleDelete(row)"
+        >
+          <template #reference>
+            <ElButton link type="danger" :icon="Delete">
+              {{ $t("ui.button.delete") }}
+            </ElButton>
+          </template>
+        </ElPopconfirm>
+      </template>
+    </PageContent>
+
+    <!-- 新增弹窗 -->
+    <PageModal ref="addModalRef" :modal-config="addModalConfig" @submit-click="handleSubmitClick">
+      <!-- 分割线 -->
+      <template #divider1>
+        <ElDivider>{{ $t("routes.tenant.adminSetting") }}</ElDivider>
+      </template>
+    </PageModal>
+
+    <!-- 编辑弹窗 -->
+    <PageModal
+      ref="editModalRef"
+      :modal-config="editModalConfig"
+      @submit-click="handleSubmitClick"
+    />
+  </div>
+</template>
+
 <script lang="ts" setup>
-import type { VxeGridProps } from '@/adapter/vxe-table';
+import { ElTag, ElButton, ElPopconfirm, ElMessage, ElDivider } from "element-plus";
+import { Edit, Delete } from "@element-plus/icons-vue";
 
-import { h } from 'vue';
+import PageContent from "@/components/CURD/PageContent.vue";
+import PageSearch from "@/components/CURD/PageSearch.vue";
+import PageModal from "@/components/CURD/PageModal.vue";
+import usePage from "@/components/CURD/usePage";
 
-import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
-
-import { notification } from 'ant-design-vue';
-
-import { useVbenVxeGrid } from '@/adapter/vxe-table';
-import { type identityservicev1_Tenant as Tenant } from '@/api/generated/admin/service/v1';
-import { $t } from '@/locales';
 import {
   tenantAuditStatusList,
   tenantAuditStatusToColor,
@@ -22,254 +91,404 @@ import {
   tenantTypeToColor,
   tenantTypeToName,
   useTenantStore,
-} from '@/stores';
-
-import TenantDrawer from './tenant-drawer.vue';
+} from "@/stores";
+import type { identityservicev1_Tenant as Tenant } from "@/api/generated/admin/service/v1";
+import { $t } from "@/i18n";
 
 const tenantStore = useTenantStore();
 
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  // 控制表单是否显示折叠按钮
-  showCollapseButton: false,
-  // 按下回车时是否提交表单
-  submitOnEnter: true,
-  schema: [
+// 使用 CURD hook
+const {
+  searchRef,
+  contentRef,
+  addModalRef,
+  editModalRef,
+  handleQueryClick,
+  handleResetClick,
+  handleAddClick,
+  handleEditClick,
+  handleSubmitClick,
+} = usePage();
+
+// 搜索配置
+const pageSearchConfig = {
+  formItems: [
     {
-      component: 'Input',
-      fieldName: 'name',
-      label: t('pages.tenant.name'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("routes.tenant.name"),
+      prop: "name",
+      attrs: {
+        placeholder: $t("ui.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Input',
-      fieldName: 'code',
-      label: t('pages.tenant.code'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("routes.tenant.code"),
+      prop: "code",
+      attrs: {
+        placeholder: $t("ui.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Select',
-      fieldName: 'type',
-      label: t('pages.tenant.type'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        options: tenantTypeList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("routes.tenant.type"),
+      prop: "type",
+      attrs: {
+        placeholder: $t("ui.placeholder.select"),
+        clearable: true,
       },
+      options: tenantTypeList,
     },
     {
-      component: 'Select',
-      fieldName: 'auditStatus',
-      label: t('pages.tenant.auditStatus'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        options: tenantAuditStatusList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("routes.tenant.auditStatus"),
+      prop: "auditStatus",
+      attrs: {
+        placeholder: $t("ui.placeholder.select"),
+        clearable: true,
       },
+      options: tenantAuditStatusList,
     },
     {
-      component: 'Select',
-      fieldName: 'status',
-      label: $t('ui.table.status'),
-      componentProps: {
-        options: tenantStatusList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("ui.table.status"),
+      prop: "status",
+      attrs: {
+        placeholder: $t("ui.placeholder.select"),
+        clearable: true,
       },
+      options: tenantStatusList,
     },
   ],
 };
 
-const gridOptions: VxeGridProps<Tenant> = {
-  height: 'auto',
-  stripe: false,
-  toolbarConfig: {
-    custom: true,
-    export: true,
-    import: false,
-    refresh: true,
-    zoom: true,
+// 表格配置
+const pageContentConfig = {
+  table: {
+    border: true,
+    stripe: false,
   },
-  exportConfig: {},
-  pagerConfig: {
-    enabled: false,
-  },
-  rowConfig: {
-    isHover: true,
-  },
-
-  proxyConfig: {
-    ajax: {
-      query: async ({ page }, formValues) => {
-        console.log('query:', formValues);
-        return await tenantStore.listTenant(
-          {
-            page: page.currentPage,
-            pageSize: page.pageSize,
-          },
-          formValues,
-        );
+  indexAction: (query: any) => {
+    return tenantStore.listTenant(
+      {
+        page: query.page || 1,
+        pageSize: query.pageSize || 10,
       },
-    },
+      query
+    );
   },
-
+  props: {
+    list: "items",
+    total: "total",
+  },
   columns: [
-    { title: $t('ui.table.seq'), type: 'seq', width: 50 },
-    { title: t('pages.tenant.name'), field: 'name' },
-    { title: t('pages.tenant.code'), field: 'code' },
-    { title: t('pages.tenant.adminUserName'), field: 'adminUserName' },
+    { type: "index", label: $t("ui.table.seq"), width: 60 },
+    { prop: "name", label: $t("routes.tenant.name"), minWidth: 120 },
+    { prop: "code", label: $t("routes.tenant.code"), minWidth: 120 },
+    { prop: "adminUserName", label: $t("routes.tenant.adminUserName"), minWidth: 120 },
     {
-      title: t('pages.tenant.type'),
-      field: 'type',
-      slots: { default: 'type' },
-      width: 95,
+      prop: "type",
+      label: $t("routes.tenant.type"),
+      minWidth: 100,
+      slotName: "type",
     },
     {
-      title: t('pages.tenant.auditStatus'),
-      field: 'auditStatus',
-      slots: { default: 'audit-status' },
-      width: 95,
+      prop: "auditStatus",
+      label: $t("routes.tenant.auditStatus"),
+      minWidth: 100,
+      slotName: "auditStatus",
     },
     {
-      title: $t('ui.table.status'),
-      field: 'status',
-      slots: { default: 'status' },
-      width: 95,
+      prop: "status",
+      label: $t("ui.table.status"),
+      minWidth: 100,
+      slotName: "status",
     },
     {
-      title: $t('ui.table.createdAt'),
-      field: 'createdAt',
-      formatter: 'formatDateTime',
-      width: 140,
+      prop: "createdAt",
+      label: $t("ui.table.createdAt"),
+      minWidth: 160,
+      formatter: (row: any) => {
+        if (!row.createdAt) return "";
+        return new Date(row.createdAt).toLocaleString("zh-CN");
+      },
     },
-    { title: $t('ui.table.remark'), field: 'remark' },
+    { prop: "remark", label: $t("ui.table.remark"), minWidth: 150 },
     {
-      title: $t('ui.table.action'),
-      field: 'action',
-      fixed: 'right',
-      slots: { default: 'action' },
-      width: 90,
+      label: $t("ui.table.action"),
+      fixed: "right",
+      width: 150,
+      slotName: "action",
     },
   ],
 };
 
-const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
-
-const [Drawer, drawerApi] = useVbenDrawer({
-  // 连接抽离的组件
-  connectedComponent: TenantDrawer,
-
-  onOpenChange(isOpen: boolean) {
-    if (!isOpen) {
-      // 关闭时，重载表格数据
-      gridApi.reload();
-    }
+// 新增表单配置
+const addModalConfig = {
+  component: "drawer" as const,
+  drawer: {
+    title: $t("ui.modal.create", { moduleName: $t("routes.tenant.moduleName") }),
+    size: "600px",
   },
-});
+  form: {
+    labelWidth: "120px",
+  },
+  formItems: [
+    {
+      type: "input",
+      label: $t("routes.tenant.name"),
+      prop: "name",
+      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
+      attrs: {
+        placeholder: $t("ui.placeholder.input"),
+      },
+    },
+    {
+      type: "input",
+      label: $t("routes.tenant.code"),
+      prop: "code",
+      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
+      attrs: {
+        placeholder: $t("ui.placeholder.input"),
+      },
+    },
+    {
+      type: "select",
+      label: $t("routes.tenant.type"),
+      prop: "type",
+      initialValue: "PAID",
+      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
+      options: tenantTypeList,
+      attrs: {
+        placeholder: $t("ui.placeholder.select"),
+      },
+    },
+    {
+      type: "select",
+      label: $t("routes.tenant.auditStatus"),
+      prop: "auditStatus",
+      initialValue: "APPROVED",
+      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
+      options: tenantAuditStatusList,
+      attrs: {
+        placeholder: $t("ui.placeholder.select"),
+      },
+    },
+    {
+      type: "select",
+      label: $t("ui.table.status"),
+      prop: "status",
+      initialValue: "ON",
+      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
+      options: tenantStatusList,
+      attrs: {
+        placeholder: $t("ui.placeholder.select"),
+      },
+    },
+    {
+      type: "input",
+      label: $t("ui.table.remark"),
+      prop: "remark",
+      attrs: {
+        type: "textarea",
+        rows: 3,
+        placeholder: $t("ui.placeholder.input"),
+      },
+    },
+    // 管理员设置（仅新增时显示）
+    {
+      type: "custom",
+      label: "",
+      prop: "divider1",
+      slotName: "divider1",
+      hidden: true,
+    },
+    {
+      type: "input",
+      label: $t("routes.tenant.adminUserName"),
+      prop: "user.username",
+      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
+      attrs: {
+        placeholder: $t("ui.placeholder.input"),
+      },
+      hidden: true,
+    },
+    {
+      type: "input",
+      label: $t("routes.tenant.adminPassword"),
+      prop: "password",
+      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
+      attrs: {
+        type: "password",
+        showPassword: true,
+        placeholder: $t("ui.placeholder.input"),
+      },
+      hidden: true,
+    },
+    {
+      type: "input",
+      label: $t("routes.tenant.adminPasswordConfirm"),
+      prop: "passwordConfirm",
+      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
+      attrs: {
+        type: "password",
+        showPassword: true,
+        placeholder: $t("ui.placeholder.input"),
+      },
+      hidden: true,
+    },
+    {
+      type: "input",
+      label: $t("routes.tenant.adminMobile"),
+      prop: "user.mobile",
+      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
+      attrs: {
+        placeholder: $t("ui.placeholder.input"),
+      },
+      hidden: true,
+    },
+    {
+      type: "input",
+      label: $t("routes.tenant.adminEmail"),
+      prop: "user.email",
+      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
+      attrs: {
+        placeholder: $t("ui.placeholder.input"),
+      },
+      hidden: true,
+    },
+  ],
+  beforeSubmit: async (data: any) => {
+    // 检查密码和确认密码是否一致
+    if (data.password !== data.passwordConfirm) {
+      ElMessage.error($t("pages.notification.password_mismatch"));
+      throw new Error("Password mismatch");
+    }
 
-/* 打开模态窗口 */
-function openModal(create: boolean, row?: any) {
-  drawerApi.setData({
-    create,
-    row,
-  });
+    // 检查租户编码是否存在
+    try {
+      await tenantStore.tenantExists(data.code, data.name);
+    } catch {
+      ElMessage.error($t("pages.tenant.tenant_code_exists"));
+      throw new Error("Tenant code exists");
+    }
 
-  drawerApi.open();
-}
+    // 检查用户名是否存在
+    try {
+      // TODO: 需要实现用户存在性检查
+      // await userListStore.userExists(data.user.username);
+    } catch {
+      ElMessage.error($t("pages.tenant.notification.user_username_exists"));
+      throw new Error("User username exists");
+    }
 
-/* 创建 */
-function handleCreate() {
-  console.log('创建');
+    // 调用创建接口
+    await tenantStore.createTenantWithAdminUser({
+      tenant: {
+        name: data.name,
+        code: data.code,
+        type: data.type,
+        auditStatus: data.auditStatus,
+        status: data.status,
+        remark: data.remark,
+      },
+      user: data.user,
+      password: data.password,
+    });
+  },
+};
 
-  openModal(true);
-}
+// 编辑表单配置
+const editModalConfig = {
+  component: "drawer" as const,
+  drawer: {
+    title: $t("ui.modal.update", { moduleName: $t("routes.tenant.moduleName") }),
+    size: "600px",
+  },
+  form: {
+    labelWidth: "120px",
+  },
+  formItems: [
+    {
+      type: "input",
+      label: $t("routes.tenant.name"),
+      prop: "name",
+      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
+      attrs: {
+        placeholder: $t("ui.placeholder.input"),
+      },
+    },
+    {
+      type: "input",
+      label: $t("routes.tenant.code"),
+      prop: "code",
+      rules: [{ required: true, message: $t("ui.placeholder.input"), trigger: "blur" }],
+      attrs: {
+        placeholder: $t("ui.placeholder.input"),
+      },
+    },
+    {
+      type: "select",
+      label: $t("routes.tenant.type"),
+      prop: "type",
+      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
+      options: tenantTypeList,
+      attrs: {
+        placeholder: $t("ui.placeholder.select"),
+      },
+    },
+    {
+      type: "select",
+      label: $t("routes.tenant.auditStatus"),
+      prop: "auditStatus",
+      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
+      options: tenantAuditStatusList,
+      attrs: {
+        placeholder: $t("ui.placeholder.select"),
+      },
+    },
+    {
+      type: "select",
+      label: $t("ui.table.status"),
+      prop: "status",
+      rules: [{ required: true, message: $t("ui.placeholder.select"), trigger: "change" }],
+      options: tenantStatusList,
+      attrs: {
+        placeholder: $t("ui.placeholder.select"),
+      },
+    },
+    {
+      type: "input",
+      label: $t("ui.table.remark"),
+      prop: "remark",
+      attrs: {
+        type: "textarea",
+        rows: 3,
+        placeholder: $t("ui.placeholder.input"),
+      },
+    },
+  ],
+  beforeSubmit: async (data: any) => {
+    await tenantStore.updateTenant(data.id, data);
+  },
+};
 
-/* 编辑 */
-function handleEdit(row: any) {
-  console.log('编辑', row);
-  openModal(false, row);
-}
-
-/* 删除 */
-async function handleDelete(row: any) {
-  console.log('删除', row);
-
+// 处理删除
+async function handleDelete(row: Tenant) {
   try {
     await tenantStore.deleteTenant(row.id);
-
-    notification.success({
-      message: $t('ui.notification.delete_success'),
-    });
-
-    await gridApi.reload();
+    ElMessage.success($t("ui.notification.delete_success"));
+    contentRef.value?.fetchPageData({}, true);
   } catch {
-    notification.error({
-      message: $t('ui.notification.delete_failed'),
-    });
+    ElMessage.error($t("ui.notification.delete_failed"));
   }
 }
 </script>
 
-<template>
-  <Page auto-content-height>
-    <Grid :table-title="$t('menu.tenant.member')">
-      <template #toolbar-tools>
-        <a-button class="mr-2" type="primary" @click="handleCreate">
-          {{ t('pages.tenant.button.create') }}
-        </a-button>
-      </template>
-
-      <template #status="{ row }">
-        <a-tag :color="tenantStatusToColor(row.status)">
-          {{ tenantStatusToName(row.status) }}
-        </a-tag>
-      </template>
-      <template #type="{ row }">
-        <a-tag :color="tenantTypeToColor(row.type)">
-          {{ tenantTypeToName(row.type) }}
-        </a-tag>
-      </template>
-      <template #audit-status="{ row }">
-        <a-tag :color="tenantAuditStatusToColor(row.auditStatus)">
-          {{ tenantAuditStatusToName(row.auditStatus) }}
-        </a-tag>
-      </template>
-      <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: t('pages.tenant.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
-      </template>
-    </Grid>
-    <Drawer />
-  </Page>
-</template>
+<style lang="scss" scoped>
+.app-container {
+  padding: 20px;
+}
+</style>
