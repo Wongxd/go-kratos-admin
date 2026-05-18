@@ -6,8 +6,8 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm, z } from '#/adapter/form';
-import { enableBoolList, useDictStore } from '#/stores';
+import { useVbenForm, z } from '@/adapter/form';
+import { enableBoolList, useDictStore } from '@/stores';
 
 const dictStore = useDictStore();
 

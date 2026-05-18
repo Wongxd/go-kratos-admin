@@ -1,10 +1,10 @@
-﻿<template>
+<template>
   <div>
-    <h3 text-center m-0 mb-20px>{{ t("login.resetPassword") }}</h3>
+    <h3 text-center m-0 mb-20px>{{ t("core.resetPwd.resetPassword") }}</h3>
     <el-form ref="formRef" :model="model" :rules="rules" size="large">
       <!-- 用户名"-->
       <el-form-item prop="username">
-        <el-input v-model.trim="model.username" :placeholder="t('login.username')">
+        <el-input v-model.trim="model.username" :placeholder="t('core.login.username')">
           <template #prefix>
             <el-icon><User /></el-icon>
           </template>
@@ -12,14 +12,16 @@
       </el-form-item>
       <el-form-item>
         <el-button type="warning" class="w-full" @click="submit">
-          {{ t("login.resetPassword") }}
+          {{ t("core.resetPwd.resetPassword") }}
         </el-button>
       </el-form-item>
     </el-form>
 
     <div flex-center gap-10px>
-      <el-text size="default">{{ t("login.thinkOfPasswd") }}</el-text>
-      <el-link type="primary" underline="never" @click="toLogin">{{ t("login.login") }}</el-link>
+      <el-text size="default">{{ t("core.resetPwd.thinkOfPasswd") }}</el-text>
+      <el-link type="primary" underline="never" @click="toLogin">
+        {{ t("core.login.login") }}
+      </el-link>
     </div>
   </div>
 </template>
@@ -42,7 +44,7 @@ const rules = computed(() => {
       {
         required: true,
         trigger: "blur",
-        message: t("login.message.username.required"),
+        message: t("core.login.message.username.required"),
       },
     ],
   };

@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
 import {
   type permissionservicev1_ListPermissionGroupResponse as ListPermissionGroupResponse,
   type permissionservicev1_ListPermissionResponse as ListPermissionResponse,
-} from '@/api/generated/admin/service/v1';
-import { usePermissionGroupStore, usePermissionStore } from '#/stores';
+} from "@/api/generated/admin/service/v1";
+import { usePermissionGroupStore, usePermissionListStore } from "@/stores";
 
 /**
  * 权限视图状态接口
@@ -22,7 +22,7 @@ interface PermissionViewState {
 /**
  * 权限视图状态
  */
-export const usePermissionViewStore = defineStore('permission-view', {
+export const usePermissionViewStore = defineStore("permission-view", {
   state: (): PermissionViewState => ({
     currentGroupId: null,
     loading: false,
@@ -36,11 +36,7 @@ export const usePermissionViewStore = defineStore('permission-view', {
     /**
      * 获取分组列表
      */
-    async fetchGroupList(
-      currentPage: number,
-      pageSize: number,
-      formValues: any,
-    ) {
+    async fetchGroupList(currentPage: number, pageSize: number, formValues: any) {
       const permissionGroupStore = usePermissionGroupStore();
       this.loading = true;
       try {
@@ -49,11 +45,11 @@ export const usePermissionViewStore = defineStore('permission-view', {
             page: currentPage,
             pageSize,
           },
-          formValues,
+          formValues
         );
         return this.groupList;
       } catch (error) {
-        console.error('获取权限分组失败:', error);
+        console.error("获取权限分组失败:", error);
         this.resetGroupList();
       } finally {
         this.loading = false;
@@ -73,9 +69,9 @@ export const usePermissionViewStore = defineStore('permission-view', {
       groupId: null | number,
       currentPage: number,
       pageSize: number,
-      formValues: any,
+      formValues: any
     ) {
-      const permissionStore = usePermissionStore();
+      const permissionStore = usePermissionListStore();
       if (!groupId) {
         this.resetPermissionList();
         return this.permList;
@@ -91,7 +87,7 @@ export const usePermissionViewStore = defineStore('permission-view', {
           {
             ...formValues,
             group_id: groupId.toString(),
-          },
+          }
         );
       } catch (error) {
         console.error(`获取分组[${groupId}]的权限点失败:`, error);

@@ -6,8 +6,8 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm } from '#/adapter/form';
-import { enableBoolList, taskTypeList, useTaskStore } from '#/stores';
+import { useVbenForm } from '@/adapter/form';
+import { enableBoolList, taskTypeList, useTaskStore } from '@/stores';
 
 const taskStore = useTaskStore();
 

@@ -3,7 +3,7 @@
   <el-menu
     ref="menuRef"
     :default-active="activeMenuPath"
-    :collapse="!appStore.sidebar.opened"
+    :collapse="sidebarCollapsed"
     :background-color="menuThemeProps.backgroundColor"
     :text-color="menuThemeProps.textColor"
     :active-text-color="menuThemeProps.activeTextColor"
@@ -30,8 +30,7 @@ import path from "path-browserify";
 import type { MenuInstance } from "element-plus";
 import type { RouteRecordRaw } from "vue-router";
 
-import { SidebarColor } from "@/constants";
-import { useSettingsStore, useAppStore } from "@/stores";
+import { usePreferences } from "@/utils/preferences";
 import { isExternal } from "@/utils";
 
 import LayoutSidebarItem from "./LayoutSidebarItem.vue";
@@ -55,23 +54,15 @@ const props = defineProps({
 });
 
 const menuRef = ref<MenuInstance>();
-const settingsStore = useSettingsStore();
-const appStore = useAppStore();
 const currentRoute = useRoute();
+const { sidebarCollapsed, theme } = usePreferences();
 
 // 存储已展开的菜单项索引
 const expandedMenuIndexes = ref<string[]>([]);
 
-// 获取主题
-const theme = computed(() => settingsStore.theme);
-
-// 获取浅色主题下的侧边栏配色方案
-const sidebarColorScheme = computed(() => settingsStore.sidebarColorScheme);
-
 // 菜单主题属性
 const menuThemeProps = computed(() => {
-  const isDarkOrClassicBlue =
-    theme.value === "dark" || sidebarColorScheme.value === SidebarColor.CLASSIC_BLUE;
+  const isDarkOrClassicBlue = theme.value === "dark";
 
   return {
     backgroundColor: isDarkOrClassicBlue ? variables["menu-background"] : undefined,

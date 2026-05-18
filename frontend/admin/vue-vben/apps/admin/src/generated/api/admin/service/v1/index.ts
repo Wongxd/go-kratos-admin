@@ -946,6 +946,7 @@ export interface AuthenticationService {
   Login(request: authenticationservicev1_LoginRequest): Promise<authenticationservicev1_LoginResponse>;
   // 登出
   Logout(request: wellKnownEmpty): Promise<wellKnownEmpty>;
+  RegisterUser(request: authenticationservicev1_RegisterUserRequest): Promise<authenticationservicev1_RegisterUserResponse>;
   // 刷新认证令牌
   RefreshToken(request: authenticationservicev1_LoginRequest): Promise<authenticationservicev1_LoginResponse>;
   // 生成验证码
@@ -991,6 +992,23 @@ export function createAuthenticationServiceClient(
         service: "AuthenticationService",
         method: "Logout",
       }) as Promise<wellKnownEmpty>;
+    },
+    RegisterUser(request) { // eslint-disable-line @typescript-eslint/no-unused-vars
+      const path = `admin/v1/register`; // eslint-disable-line quotes
+      const body = JSON.stringify(request);
+      const queryParams: string[] = [];
+      let uri = path;
+      if (queryParams.length > 0) {
+        uri += `?${queryParams.join("&")}`
+      }
+      return handler({
+        path: uri,
+        method: "POST",
+        body,
+      }, {
+        service: "AuthenticationService",
+        method: "RegisterUser",
+      }) as Promise<authenticationservicev1_RegisterUserResponse>;
     },
     RefreshToken(request) { // eslint-disable-line @typescript-eslint/no-unused-vars
       const path = `admin/v1/refresh-token`; // eslint-disable-line quotes
@@ -1092,6 +1110,18 @@ export type authenticationservicev1_LoginResponse = {
 export type authenticationservicev1_TokenType =
   | "bearer"
   | "mac";
+export type authenticationservicev1_RegisterUserRequest = {
+  username: string | undefined;
+  password: string | undefined;
+  tenantCode: string | undefined;
+  email?: string;
+  client_type?: authenticationservicev1_ClientType;
+};
+
+export type authenticationservicev1_RegisterUserResponse = {
+  userId: number | undefined;
+};
+
 export type authenticationservicev1_GenerateCaptchaResponse = {
   captchaId: string | undefined;
   imageBase64: string | undefined;

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 import type {
   dictservicev1_DictEntryI18n as DictEntryI18n,
   dictservicev1_DictType as DictType,
@@ -12,10 +12,10 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm, z } from '#/adapter/form';
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { enableBoolList, useDictStore } from '#/stores';
-import { useDictViewStore } from '#/views/app/system/dict/dict-view.state';
+import { useVbenForm, z } from '@/adapter/form';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
+import { enableBoolList, useDictStore } from '@/stores';
+import { useDictViewStore } from '@/views/app/system/dict/dict-view.state';
 
 const dictStore = useDictStore();
 const dictViewStore = useDictViewStore();

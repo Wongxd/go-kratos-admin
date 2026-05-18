@@ -5,8 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSettingsStore } from "@/stores";
-import { SidebarColor, LayoutMode, ThemeMode } from "@/constants";
+import { usePreferences } from "@/utils/preferences";
 
 defineProps({
   isActive: { type: Boolean, required: true },
@@ -14,20 +13,16 @@ defineProps({
 
 const emit = defineEmits(["toggleClick"]);
 
-const settingsStore = useSettingsStore();
-const layout = computed(() => settingsStore.layout);
+const { appPreferences, isDark } = usePreferences();
 
 const hamburgerClass = computed(() => {
   // 如果暗黑主题
-  if (settingsStore.theme === ThemeMode.DARK) {
+  if (isDark) {
     return "hamburger--white";
   }
 
-  // 如果是混合布局 && 侧边栏配色方案是经典蓝
-  if (
-    layout.value === LayoutMode.MIX &&
-    settingsStore.sidebarColorScheme === SidebarColor.CLASSIC_BLUE
-  ) {
+  // 如果是混合布局，使用白色图标
+  if (appPreferences.value.layout === "mixed-nav") {
     return "hamburger--white";
   }
 

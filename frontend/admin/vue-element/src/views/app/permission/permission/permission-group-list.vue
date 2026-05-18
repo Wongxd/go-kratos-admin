@@ -1,24 +1,24 @@
 <script lang="ts" setup>
-import type { VxeGridListeners, VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridListeners, VxeGridProps } from '@/adapter/vxe-table';
 
 import { h, watch } from 'vue';
 
 import { useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
 import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
-import { isEqual } from '@vben/utils';
+import { isEqual } from '@/utils';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type permissionservicev1_PermissionGroup as PermissionGroup } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   statusList,
   statusToColor,
   statusToName,
   usePermissionGroupStore,
-} from '#/stores';
-import { usePermissionViewStore } from '#/views/app/permission/permission/permission-view.state';
+} from '@/stores';
+import { usePermissionViewStore } from '@/views/app/permission/permission/permission-view.state';
 
 import PermissionGroupDrawer from './permission-group-drawer.vue';
 

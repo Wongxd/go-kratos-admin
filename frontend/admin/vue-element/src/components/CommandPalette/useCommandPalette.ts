@@ -4,7 +4,7 @@
 import { ref, onMounted, onBeforeUnmount, toRaw } from "vue";
 import { RouteRecordRaw, LocationQueryRaw } from "vue-router";
 import router from "@/router";
-import { usePermissionStore } from "@/stores";
+import { useAccessStore } from "@/stores";
 import { isExternal } from "@/utils";
 
 /** 搜索项类型 */
@@ -21,7 +21,7 @@ const STORAGE_KEY = "menu_search_history";
 const MAX_HISTORY = 5;
 
 export function useCommandPalette() {
-  const permissionStore = usePermissionStore();
+  const accessStore = useAccessStore();
 
   // 状态
   const visible = ref(false);
@@ -188,7 +188,7 @@ export function useCommandPalette() {
   // ============================================
 
   onMounted(() => {
-    loadRoutes(permissionStore.routes);
+    loadRoutes(accessStore.accessRoutes);
     loadHistory();
     document.addEventListener("keydown", handleKeydown);
   });

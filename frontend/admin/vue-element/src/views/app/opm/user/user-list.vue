@@ -1,18 +1,18 @@
 <script lang="ts" setup>
-import type { VxeGridListeners, VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridListeners, VxeGridProps } from '@/adapter/vxe-table';
 
 import { h, watch } from 'vue';
 
 import { useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
 import { LucideFilePenLine, LucideInfo, LucideTrash2 } from '@vben/icons';
-import { isEqual } from '@vben/utils';
+import { isEqual } from '@/utils';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type identityservicev1_User as User } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
-import { router } from '#/router';
+import { $t } from '@/locales';
+import { router } from '@/router';
 import {
   genderToColor,
   genderToName,
@@ -22,9 +22,9 @@ import {
   userStatusToColor,
   userStatusToName,
   useUserListStore,
-} from '#/stores';
-import { getRandomColor } from '#/utils/color';
-import { useUserViewStore } from '#/views/app/opm/user/user-view.state';
+} from '@/stores';
+import { getRandomColor } from '@/utils/color';
+import { useUserViewStore } from '@/views/app/opm/user/user-view.state';
 
 import UserDrawer from './user-drawer.vue';
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { h } from 'vue';
 
@@ -8,14 +8,14 @@ import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type dictservicev1_Language } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   enableBoolToColor,
   enableBoolToName,
   useLanguageDataStore,
-} from '#/stores';
+} from '@/stores';
 
 import LanguageDrawer from './language-drawer.vue';
 

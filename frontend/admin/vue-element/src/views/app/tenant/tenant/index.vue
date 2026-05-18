@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { h } from 'vue';
 
@@ -8,9 +8,9 @@ import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type identityservicev1_Tenant as Tenant } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   tenantAuditStatusList,
   tenantAuditStatusToColor,
@@ -22,7 +22,7 @@ import {
   tenantTypeToColor,
   tenantTypeToName,
   useTenantStore,
-} from '#/stores';
+} from '@/stores';
 
 import TenantDrawer from './tenant-drawer.vue';
 

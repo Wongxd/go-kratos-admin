@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { h } from 'vue';
 
@@ -14,19 +14,19 @@ import {
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import {
   type taskservicev1_ControlTaskRequest_ControlType as ControlTaskRequest_ControlType,
   type taskservicev1_Task as Task,
 } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   enableList,
   taskTypeList,
   taskTypeToColor,
   taskTypeToName,
   useTaskStore,
-} from '#/stores';
+} from '@/stores';
 
 import TaskDrawer from './task-drawer.vue';
 

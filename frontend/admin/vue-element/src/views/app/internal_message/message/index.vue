@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { h } from 'vue';
 
@@ -8,9 +8,9 @@ import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type internal_messageservicev1_InternalMessage as InternalMessage } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   internalMessageStatusColor,
   internalMessageStatusLabel,
@@ -20,7 +20,7 @@ import {
   internalMessageTypeList,
   useInternalMessageCategoryStore,
   useInternalMessageStore,
-} from '#/stores';
+} from '@/stores';
 
 import InternalMessageDrawer from './internal-message-drawer.vue';
 

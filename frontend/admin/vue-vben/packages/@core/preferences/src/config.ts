@@ -31,7 +31,7 @@ const defaultPreferences: Preferences = {
   },
   copyright: {
     companyName: 'GoWind',
-    companySiteLink: 'https://www.gowind.dev',
+    companySiteLink: 'https://www.gowind.cloud',
     date: '2026',
     enable: true,
     icp: '',

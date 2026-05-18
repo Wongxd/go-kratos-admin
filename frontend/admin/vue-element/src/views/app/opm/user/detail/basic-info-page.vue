@@ -3,13 +3,13 @@ import { computed, ref } from 'vue';
 
 import { Page } from '@vben/common-ui';
 import { $t } from '@vben/locales';
-import { formatDateTime } from '@vben/utils';
+import { formatDateTime } from '@/utils';
 
 import { Avatar, Descriptions, DescriptionsItem } from 'ant-design-vue';
 
 import { type identityservicev1_User as User } from '@/api/generated/admin/service/v1';
-import { genderToColor, genderToName, useUserListStore } from '#/stores';
-import { getCharColor, getRandomColor } from '#/utils/color';
+import { genderToColor, genderToName, useUserListStore } from '@/stores';
+import { getCharColor, getRandomColor } from '@/utils/color';
 
 const props = defineProps({
   userId: { type: Number, default: undefined },

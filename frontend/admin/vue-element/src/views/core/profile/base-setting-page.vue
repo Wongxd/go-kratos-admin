@@ -8,8 +8,8 @@ import { $t } from '@vben/locales';
 
 import { Col, notification, Row } from 'ant-design-vue';
 
-import { useVbenForm } from '#/adapter/form';
-import { genderList, useUserProfileStore } from '#/stores';
+import { useVbenForm } from '@/adapter/form';
+import { genderList, useUserProfileStore } from '@/stores';
 
 const userProfileStore = useUserProfileStore();
 

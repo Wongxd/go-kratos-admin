@@ -1,10 +1,5 @@
-import { appConfig } from "@/settings";
-import { PLATFORM_TENANT_ID } from "@/constants";
 
-/**
- * 是否启用多租户
- */
-export const isTenantEnabled = () => appConfig.tenantEnabled;
+import { PLATFORM_TENANT_ID } from "@/constants";
 
 /**
  * 判断是否平台租户

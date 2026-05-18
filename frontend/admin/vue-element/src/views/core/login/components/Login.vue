@@ -35,40 +35,6 @@
         </el-form-item>
       </el-tooltip>
 
-      <!-- 验证码 -->
-      <el-form-item prop="captchaCode">
-        <div flex items-center gap-10px>
-          <el-input
-            v-model.trim="loginFormData.captchaCode"
-            :placeholder="t('core.login.captchaCode')"
-            clearable
-            class="flex-1"
-            @keyup.enter="handleLoginSubmit"
-          >
-            <template #prefix>
-              <div class="i-svg:captcha" />
-            </template>
-          </el-input>
-          <div cursor-pointer h-44px w-140px flex-center @click="getCaptcha">
-            <el-icon v-if="codeLoading" class="is-loading" size="20"><Loading /></el-icon>
-            <img
-              v-else-if="imageBase64"
-              border-rd-4px
-              w-full
-              h-full
-              block
-              object-cover
-              shadow="[0_0_0_1px_var(--el-border-color)_inset]"
-              :src="imageBase64"
-              alt="captchaCode"
-              title="点击刷新验证码"
-              @error="getCaptcha"
-            />
-            <el-text v-else type="info" size="small">点击获取验证码</el-text>
-          </div>
-        </div>
-      </el-form-item>
-
       <div class="flex-x-between w-full">
         <el-checkbox v-model="loginFormData.rememberMe">
           {{ t("core.login.rememberMe") }}
@@ -89,7 +55,7 @@
     <div flex-center gap-10px>
       <el-text size="default">{{ t("core.login.noAccount") }}</el-text>
       <el-link type="primary" underline="never" @click="toOtherForm('register')">
-        {{ t("core.login.reg") }}
+        {{ t("core.login.register") }}
       </el-link>
     </div>
 
@@ -126,20 +92,14 @@ const { t } = useI18n();
 const authStore = useAuthStore();
 const route = useRoute();
 
-onMounted(() => getCaptcha());
-
 const loginFormRef = ref<FormInstance>();
 const loading = ref(false);
 // 是否大写锁定
 const isCapsLock = ref(false);
-// 验证码图片 Base64
-const imageBase64 = ref();
 // 记住我
 const loginFormData = ref<any>({
   username: "admin",
   password: "123456",
-  captchaId: "",
-  captchaCode: "",
 });
 
 const loginRules = computed(() => {
@@ -163,28 +123,8 @@ const loginRules = computed(() => {
         trigger: "blur",
       },
     ],
-    captchaCode: [
-      {
-        required: true,
-        trigger: "blur",
-        message: t("core.login.message.captchaCode.required"),
-      },
-    ],
   };
 });
-
-// 获取验证码
-const codeLoading = ref(false);
-function getCaptcha() {
-  codeLoading.value = true;
-  authStore
-    .generateCaptcha()
-    .then((data) => {
-      loginFormData.value.captchaId = data.captchaId;
-      imageBase64.value = data.imageBase64;
-    })
-    .finally(() => (codeLoading.value = false));
-}
 
 /**
  * 登录提交
@@ -206,8 +146,7 @@ async function handleLoginSubmit() {
       await router.push(decodeURIComponent(redirectPath));
     });
   } catch {
-    // 登录失败，刷新验证码
-    getCaptcha();
+    // 登录失败处理
   } finally {
     loading.value = false;
   }

@@ -6,7 +6,7 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm, z } from '#/adapter/form';
+import { useVbenForm, z } from '@/adapter/form';
 import {
   type identityservicev1_OrgUnit as OrgUnit,
   type identityservicev1_Position as Position,
@@ -18,8 +18,8 @@ import {
   useRoleStore,
   userStatusList,
   useUserListStore,
-} from '#/stores';
-import { useUserViewStore } from '#/views/app/opm/user/user-view.state';
+} from '@/stores';
+import { useUserViewStore } from '@/views/app/opm/user/user-view.state';
 
 const userListStore = useUserListStore();
 const roleStore = useRoleStore();

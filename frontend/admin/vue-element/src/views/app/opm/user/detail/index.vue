@@ -8,9 +8,9 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { router } from '#/router';
-import { useUserListStore } from '#/stores';
-import { TabEnum } from '#/views/app/opm/user/detail/types';
+import { router } from '@/router';
+import { useUserListStore } from '@/stores';
+import { TabEnum } from '@/views/app/opm/user/detail/types';
 
 import ApiLogPage from './api-log-page.vue';
 import BasicInfoPage from './basic-info-page.vue';

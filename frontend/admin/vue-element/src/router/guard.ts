@@ -2,7 +2,7 @@ import type { Router } from "vue-router";
 
 import { DEFAULT_HOME_PATH, LOGIN_PATH } from "@/constants";
 import { startProgress, stopProgress } from "@/utils";
-import { defaultPreferences } from "@/settings";
+import { preferences } from "@/utils/preferences";
 
 import { accessRoutes, coreRouteNames } from "@/router/routes";
 import { useAccessStore, useAppUserStore, useAuthStore, useDictStore } from "@/stores";
@@ -21,7 +21,7 @@ function setupCommonGuard(router: Router) {
     to.meta.loaded = loadedPaths.has(to.path);
 
     // 页面加载进度条
-    if (!to.meta.loaded && defaultPreferences.enableProgress) {
+    if (!to.meta.loaded && preferences.app.enableProgress) {
       startProgress();
     }
     return true;
@@ -33,7 +33,7 @@ function setupCommonGuard(router: Router) {
     loadedPaths.add(to.path);
 
     // 关闭页面加载进度条
-    if (defaultPreferences.enableProgress) {
+    if (preferences.app.enableProgress) {
       stopProgress();
     }
   });

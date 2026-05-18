@@ -6,14 +6,14 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm } from '#/adapter/form';
+import { useVbenForm } from '@/adapter/form';
 import {
   tenantAuditStatusList,
   tenantStatusList,
   tenantTypeList,
   useTenantStore,
   useUserListStore,
-} from '#/stores';
+} from '@/stores';
 
 const tenantStore = useTenantStore();
 const userListStore = useUserListStore();

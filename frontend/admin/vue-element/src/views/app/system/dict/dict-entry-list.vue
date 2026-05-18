@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { h, watch } from 'vue';
 
@@ -8,14 +8,14 @@ import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type dictservicev1_DictEntry as DictEntry } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
-import { enableBoolToColor, enableBoolToName, useDictStore } from '#/stores';
+import { $t } from '@/locales';
+import { enableBoolToColor, enableBoolToName, useDictStore } from '@/stores';
 import {
   getEntryLabel,
   useDictViewStore,
-} from '#/views/app/system/dict/dict-view.state';
+} from '@/views/app/system/dict/dict-view.state';
 
 import DictEntryDrawer from './dict-entry-drawer.vue';
 

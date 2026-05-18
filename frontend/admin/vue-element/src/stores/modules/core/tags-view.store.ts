@@ -184,8 +184,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function delAllViews() {
     return new Promise((resolve) => {
-      const affixTags = visitedViews.value.filter((tag) => tag?.affix);
-      visitedViews.value = affixTags;
+      visitedViews.value = visitedViews.value.filter((tag) => tag?.affix);
       cachedViews.value = [];
       resolve({
         visitedViews: [...visitedViews.value],
@@ -196,8 +195,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function delAllVisitedViews() {
     return new Promise((resolve) => {
-      const affixTags = visitedViews.value.filter((tag) => tag?.affix);
-      visitedViews.value = affixTags;
+      visitedViews.value = visitedViews.value.filter((tag) => tag?.affix);
       resolve([...visitedViews.value]);
     });
   }

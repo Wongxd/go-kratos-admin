@@ -1,6 +1,6 @@
 /**
  * VxeTable 全局配置
- * @see https://vxetable.cn/v4.6/#/table/start/install
+ * @see https://vxetable.cn/v4.6/@/table/start/install
  */
 
 import VXETable from "vxe-table";

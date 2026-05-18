@@ -1,6 +1,14 @@
 {
   "themeToggle": "Theme Switch",
   "languageToggle": "Language Switch",
+  "sizeSelect": {
+    "tooltip": "Component Size",
+    "default": "Default",
+    "small": "Compact",
+    "message": {
+      "success": "Switch successful"
+    }
+  },
   "theme": {
     "light": "Light",
     "dark": "Dark",
@@ -24,6 +32,7 @@
   },
   "login": {
     "login": "Login",
+    "register": "Register",
     "username": "Username",
     "password": "Password",
     "captchaCode": "Captcha",

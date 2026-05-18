@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { Page, type VbenFormProps } from '@vben/common-ui';
 
 import dayjs from 'dayjs';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type auditservicev1_ApiAuditLog as ApiAuditLog } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   dataAccessAuditLogAccessTypeList,
   dataAccessAuditLogAccessTypeToColor,
@@ -16,7 +16,7 @@ import {
   successToColor,
   successToNameWithStatusCode,
   useDataAccessAuditLogStore,
-} from '#/stores';
+} from '@/stores';
 
 const dataAccessAuditLogStore = useDataAccessAuditLogStore();
 

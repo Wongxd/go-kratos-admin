@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { h } from 'vue';
 
@@ -9,9 +9,9 @@ import { IconifyIcon, LucideFilePenLine, LucideTrash2 } from '@vben/icons';
 import { Icon } from '@iconify/vue';
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type resourceservicev1_Menu as Menu } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   menuTypeToColor,
   menuTypeToName,
@@ -19,8 +19,8 @@ import {
   statusToColor,
   statusToName,
   useMenuStore,
-} from '#/stores';
-import { getRandomColor } from '#/utils/color';
+} from '@/stores';
+import { getRandomColor } from '@/utils/color';
 
 import MenuDrawer from './menu-drawer.vue';
 

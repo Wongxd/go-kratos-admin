@@ -1,6 +1,14 @@
 {
   "themeToggle": "主题切换",
   "languageToggle": "语言切换",
+  "sizeSelect": {
+    "tooltip": "组件尺寸",
+    "default": "默认",
+    "small": "紧凑",
+    "message": {
+      "success": "切换成功"
+    }
+  },
   "theme": {
     "light": "浅色",
     "dark": "深色",
@@ -24,6 +32,7 @@
   },
   "login": {
     "login": "登 录",
+    "register": "注 册",
     "username": "用户名",
     "password": "密码",
     "captchaCode": "验证码",

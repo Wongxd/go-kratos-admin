@@ -13,22 +13,24 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore, useLanguageStore, useSettingsStore, useThemeStore } from "@/stores";
-import { appConfig } from "@/settings";
-import { ComponentSize } from "@/constants";
+import { APP_PREFIX } from "@/constants";
+import { preferences, usePreferences } from "@/utils/preferences";
 
-const appStore = useAppStore();
-const languageStore = useLanguageStore();
-const settingsStore = useSettingsStore();
-const themeStore = useThemeStore();
+const { isDark, getElementPlusLocale } = usePreferences();
 
-const locale = computed(() => languageStore.getElementPlusLocale);
-const size = computed(() => appStore.size as ComponentSize);
-const showWatermark = computed(() => settingsStore.showWatermark);
-const watermarkContent = appConfig.name;
+const locale = computed(() => getElementPlusLocale.value);
+const showWatermark = computed(() => preferences.app.watermark);
+const watermarkContent = APP_PREFIX;
+
+/**
+ * 组件尺寸：根据紧凑模式动态切换
+ * compact=true → small（紧凑）
+ * compact=false → default（默认）
+ */
+const size = computed(() => (preferences.app.compact ? "small" : "default"));
 
 // 明亮/暗黑主题水印字体颜色适配
 const fontColor = computed(() => {
-  return themeStore.isDark ? "rgba(255, 255, 255, .15)" : "rgba(0, 0, 0, .15)";
+  return isDark.value ? "rgba(255, 255, 255, .15)" : "rgba(0, 0, 0, .15)";
 });
 </script>

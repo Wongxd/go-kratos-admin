@@ -56,7 +56,7 @@
 
     <!-- 系统设置 -->
     <div
-      v-if="defaultPreferences.showSettings"
+      v-if="preferences.app.enablePreferences"
       class="navbar-actions__item"
       @click="handleSettingsClick"
     >
@@ -69,9 +69,8 @@
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
-import { defaultPreferences } from "@/settings";
-import { DeviceEnum, SidebarColor, LayoutMode } from "@/constants";
-import { useAppStore, useSettingsStore, useAppUserStore, useAuthStore } from "@/stores";
+import { useAppUserStore, useAuthStore } from "@/stores";
+import { preferences, usePreferences } from "@/utils/preferences";
 
 // 导入子组件
 import CommandPalette from "@/components/CommandPalette/index.vue";
@@ -81,16 +80,18 @@ import LangSelect from "@/components/LangSelect/index.vue";
 import NoticeDropdown from "@/components/NoticeDropdown/index.vue";
 
 const { t } = useI18n();
-const appStore = useAppStore();
-const settingStore = useSettingsStore();
 const userStore = useAppUserStore();
 const authStore = useAuthStore();
+const { isMobile, appPreferences } = usePreferences();
 
 const route = useRoute();
 const router = useRouter();
 
 // 是否为桌面设备
-const isDesktop = computed(() => appStore.device === DeviceEnum.DESKTOP);
+const isDesktop = computed(() => !isMobile.value);
+
+// 注入设置面板可见性状态
+const settingsVisible = inject<Ref<boolean>>("settingsVisible", ref(false));
 
 /**
  * 打开个人中心页面
@@ -99,26 +100,21 @@ function handleProfileClick() {
   router.push({ name: "Profile" });
 }
 
-// 根据主题和侧边栏配色方案选择样式类
+// 根据主题和布局选择样式类
 const navbarActionsClass = computed(() => {
-  const { theme, sidebarColorScheme, layout } = settingStore;
+  const theme = preferences.theme.mode;
+  const layout = appPreferences.value.layout;
 
   // 暗黑主题下，所有布局都使用白色文字
-  if (theme === ThemeMode.DARK) {
+  if (theme === "dark") {
     return "navbar-actions--white-text";
   }
 
   // 明亮主题下
-  if (theme === ThemeMode.LIGHT) {
-    // 顶部布局和混合布局的顶部区域：
-    // - 如果侧边栏是经典蓝色，使用白色文字
-    // - 如果侧边栏是极简白色，使用深色文字
-    if (layout === LayoutMode.TOP || layout === LayoutMode.MIX) {
-      if (sidebarColorScheme === SidebarColor.CLASSIC_BLUE) {
-        return "navbar-actions--white-text";
-      } else {
-        return "navbar-actions--dark-text";
-      }
+  if (theme === "light") {
+    // 顶部布局和混合布局的顶部区域使用深色文字
+    if (layout === "header-nav" || layout === "mixed-nav") {
+      return "navbar-actions--dark-text";
     }
   }
 
@@ -145,7 +141,7 @@ function logout() {
  * 打开系统设置页面
  */
 function handleSettingsClick() {
-  settingStore.settingsVisible = true;
+  settingsVisible.value = true;
 }
 </script>
 

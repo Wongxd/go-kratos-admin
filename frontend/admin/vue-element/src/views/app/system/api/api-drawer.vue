@@ -6,8 +6,8 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm } from '#/adapter/form';
-import { methodList, useApiStore } from '#/stores';
+import { useVbenForm } from '@/adapter/form';
+import { methodList, useApiStore } from '@/stores';
 
 const apiStore = useApiStore();
 

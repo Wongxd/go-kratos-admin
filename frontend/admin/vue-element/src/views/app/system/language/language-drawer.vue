@@ -1,22 +1,20 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref } from "vue";
 
-import { useVbenDrawer } from '@vben/common-ui';
-import { $t } from '@vben/locales';
+import { useVbenDrawer } from "@vben/common-ui";
+import { $t } from "@vben/locales";
 
-import { notification } from 'ant-design-vue';
+import { notification } from "ant-design-vue";
 
-import { useVbenForm } from '#/adapter/form';
-import { useLanguageStore } from '#/stores';
+import { useVbenForm } from "@/adapter/form";
+import { useLanguageDataStore } from "@/stores";
 
-const languageStore = useLanguageStore();
+const languageStore = useLanguageDataStore();
 
 const data = ref();
 
 const getTitle = computed(() =>
-  data.value?.create
-    ? $t('page.language.button.create')
-    : $t('page.language.button.update'),
+  data.value?.create ? $t("page.language.button.create") : $t("page.language.button.update")
 );
 // const isCreate = computed(() => data.value?.create);
 
@@ -26,66 +24,66 @@ const [BaseForm, baseFormApi] = useVbenForm({
   commonConfig: {
     // 所有表单项
     componentProps: {
-      class: 'w-full',
+      class: "w-full",
     },
   },
   schema: [
     {
-      component: 'Input',
-      fieldName: 'languageName',
-      label: $t('page.language.languageName'),
-      rules: 'required',
+      component: "Input",
+      fieldName: "languageName",
+      label: $t("page.language.languageName"),
+      rules: "required",
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
     },
     {
-      component: 'Input',
-      fieldName: 'languageCode',
-      label: $t('page.language.languageCode'),
-      rules: 'required',
+      component: "Input",
+      fieldName: "languageCode",
+      label: $t("page.language.languageCode"),
+      rules: "required",
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
     },
     {
-      component: 'Input',
-      fieldName: 'nativeName',
-      label: $t('page.language.nativeName'),
-      rules: 'required',
+      component: "Input",
+      fieldName: "nativeName",
+      label: $t("page.language.nativeName"),
+      rules: "required",
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
     },
     {
-      component: 'InputNumber',
-      fieldName: 'sortOrder',
+      component: "InputNumber",
+      fieldName: "sortOrder",
       defaultValue: 1,
-      label: $t('ui.table.sortOrder'),
+      label: $t("ui.table.sortOrder"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
     },
     {
-      component: 'Switch',
-      fieldName: 'isEnabled',
+      component: "Switch",
+      fieldName: "isEnabled",
       defaultValue: true,
-      label: $t('page.language.isEnabled'),
+      label: $t("page.language.isEnabled"),
       componentProps: {
-        class: 'w-auto',
+        class: "w-auto",
       },
     },
     {
-      component: 'Switch',
-      fieldName: 'isDefault',
+      component: "Switch",
+      fieldName: "isDefault",
       defaultValue: false,
-      label: $t('page.language.isDefault'),
+      label: $t("page.language.isDefault"),
       componentProps: {
-        class: 'w-auto',
+        class: "w-auto",
       },
     },
   ],
@@ -97,7 +95,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-    console.log('onConfirm');
+    console.log("onConfirm");
 
     // 校验输入的数据
     const validate = await baseFormApi.validate();
@@ -120,14 +118,14 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
       notification.success({
         message: data.value?.create
-          ? $t('ui.notification.create_success')
-          : $t('ui.notification.update_success'),
+          ? $t("ui.notification.create_success")
+          : $t("ui.notification.update_success"),
       });
     } catch {
       notification.error({
         message: data.value?.create
-          ? $t('ui.notification.create_failed')
-          : $t('ui.notification.update_failed'),
+          ? $t("ui.notification.create_failed")
+          : $t("ui.notification.update_failed"),
       });
     } finally {
       // 关闭窗口
@@ -148,7 +146,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
       setLoading(false);
 
-      console.log('onOpenChange', data.value, data.value?.create);
+      console.log("onOpenChange", data.value, data.value?.create);
     }
   },
 });

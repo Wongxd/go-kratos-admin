@@ -1,6 +1,6 @@
 <template>
-  <!-- 布局大小 -->
-  <el-tooltip :content="t('sizeSelect.tooltip')" effect="dark" placement="bottom">
+  <!-- 组件尺寸切换 -->
+  <el-tooltip :content="t('core.sizeSelect.tooltip')" effect="dark" placement="bottom">
     <el-dropdown trigger="click" @command="handleSizeChange">
       <div class="size-trigger">
         <div class="i-svg:size" />
@@ -10,7 +10,7 @@
           <el-dropdown-item
             v-for="item of sizeOptions"
             :key="item.value"
-            :disabled="appStore.size == item.value"
+            :disabled="getCurrentSize() === item.value"
             :command="item.value"
           >
             {{ item.label }}
@@ -22,22 +22,27 @@
 </template>
 
 <script setup lang="ts">
-import { ComponentSize } from "@/constants";
-import { useAppStore } from "@/stores";
+import { preferences, preferencesManager } from "@/utils/preferences";
 
 const { t } = useI18n();
-const sizeOptions = computed(() => {
-  return [
-    { label: t("sizeSelect.default"), value: ComponentSize.DEFAULT },
-    { label: t("sizeSelect.large"), value: ComponentSize.LARGE },
-    { label: t("sizeSelect.small"), value: ComponentSize.SMALL },
-  ];
-});
 
-const appStore = useAppStore();
-function handleSizeChange(size: string) {
-  appStore.changeSize(size);
-  ElMessage.success(t("sizeSelect.message.success"));
+const sizeOptions = computed(() => [
+  { label: t("core.sizeSelect.default"), value: "default" as const },
+  { label: t("core.sizeSelect.small"), value: "small" as const },
+]);
+
+/**
+ * 获取当前组件尺寸
+ */
+function getCurrentSize(): "default" | "small" {
+  return preferences.app.compact ? "small" : "default";
+}
+
+function handleSizeChange(size: "default" | "small") {
+  preferencesManager.updatePreferences({
+    app: { compact: size === "small" },
+  });
+  ElMessage.success(t("core.sizeSelect.message.success"));
 }
 </script>
 

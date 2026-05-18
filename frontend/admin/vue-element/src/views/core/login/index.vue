@@ -51,14 +51,23 @@
           </div>
           <div class="auth-panel__meta">
             <div class="auth-panel__title-row">
-              <span class="auth-panel__title">{{ appConfig.title }}</span>
+              <span class="auth-panel__title">{{ preferences.app.name }}</span>
             </div>
-            <div v-if="appConfig.version || tenantEnabled" class="auth-panel__version-row">
+            <div
+              v-if="preferences.app.version || preferences.app.enableTenant"
+              class="auth-panel__version-row"
+            >
               <el-text size="small" type="info">{{ t("core.brand.version") }}</el-text>
-              <el-tag v-if="appConfig.version" size="small" effect="light" round>
-                {{ `v${appConfig.version}` }}
+              <el-tag v-if="preferences.app.version" size="small" effect="light" round>
+                {{ `v${preferences.app.version}` }}
               </el-tag>
-              <el-tag v-if="tenantEnabled" type="success" size="small" effect="light" round>
+              <el-tag
+                v-if="preferences.app.enableTenant"
+                type="success"
+                size="small"
+                effect="light"
+                round
+              >
                 {{ t("core.login.brand.multiTenant") }}
               </el-tag>
             </div>
@@ -79,15 +88,13 @@
 
 <script setup lang="ts">
 import logo from "@/assets/images/logo.png";
-import { appConfig } from "@/settings";
+import { preferences } from "@/utils/preferences";
 import ThemeSwitch from "@/components/ThemeSwitch/index.vue";
 
 type LayoutMap = "login" | "register" | "resetPwd";
 
 const { t } = useI18n();
 const component = ref<LayoutMap>("login");
-
-const tenantEnabled = appConfig.tenantEnabled;
 
 const formComponents = {
   login: defineAsyncComponent(() => import("./components/Login.vue")),

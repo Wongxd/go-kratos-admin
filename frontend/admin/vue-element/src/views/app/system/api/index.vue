@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { h } from 'vue';
 
@@ -8,10 +8,10 @@ import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type resourceservicev1_Api as Api } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
-import { methodList, useApiStore } from '#/stores';
+import { $t } from '@/locales';
+import { methodList, useApiStore } from '@/stores';
 
 import ApiDrawer from './api-drawer.vue';
 

@@ -1,28 +1,23 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from "@/adapter/vxe-table";
 
-import { h, watch } from 'vue';
+import { h, watch } from "vue";
 
-import { useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
-import { isEqual } from '@vben/utils';
+import { useVbenDrawer, type VbenFormProps } from "@vben/common-ui";
+import { LucideFilePenLine, LucideTrash2 } from "@vben/icons";
+import { isEqual } from "@/utils";
 
-import { notification } from 'ant-design-vue';
+import { notification } from "ant-design-vue";
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { type permissionservicev1_Permission as Permission } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
-import {
-  statusList,
-  statusToColor,
-  statusToName,
-  usePermissionStore,
-} from '#/stores';
-import { usePermissionViewStore } from '#/views/app/permission/permission/permission-view.state';
+import { useVbenVxeGrid } from "@/adapter/vxe-table";
+import { type permissionservicev1_Permission as Permission } from "@/api/generated/admin/service/v1";
+import { $t } from "@/locales";
+import { statusList, statusToColor, statusToName, usePermissionListStore } from "@/stores";
+import { usePermissionViewStore } from "@/views/app/permission/permission/permission-view.state";
 
-import PermissionDrawer from './permission-drawer.vue';
+import PermissionDrawer from "./permission-drawer.vue";
 
-const permissionStore = usePermissionStore();
+const permissionStore = usePermissionListStore();
 const permissionViewStore = usePermissionViewStore();
 
 const formOptions: VbenFormProps = {
@@ -34,30 +29,30 @@ const formOptions: VbenFormProps = {
   submitOnEnter: true,
   schema: [
     {
-      component: 'Input',
-      fieldName: 'name',
-      label: $t('page.permission.name'),
+      component: "Input",
+      fieldName: "name",
+      label: $t("page.permission.name"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
     },
     {
-      component: 'Input',
-      fieldName: 'code',
-      label: $t('page.permission.code'),
+      component: "Input",
+      fieldName: "code",
+      label: $t("page.permission.code"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
     },
     {
-      component: 'Select',
-      fieldName: 'status',
-      label: $t('ui.table.status'),
+      component: "Select",
+      fieldName: "status",
+      label: $t("ui.table.status"),
       componentProps: {
         options: statusList,
-        placeholder: $t('ui.placeholder.select'),
+        placeholder: $t("ui.placeholder.select"),
         filterOption: (input: string, option: any) =>
           option.label.toLowerCase().includes(input.toLowerCase()),
         allowClear: true,
@@ -85,22 +80,18 @@ const gridOptions: VxeGridProps<Permission> = {
   },
 
   stripe: true,
-  height: 'auto',
+  height: "auto",
 
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
-        console.log(
-          'permission list query:',
-          formValues,
-          permissionViewStore.currentGroupId,
-        );
+        console.log("permission list query:", formValues, permissionViewStore.currentGroupId);
 
         return await permissionViewStore.fetchPermissionList(
           permissionViewStore.currentGroupId,
           page.currentPage,
           page.pageSize,
-          formValues,
+          formValues
         );
       },
     },
@@ -108,29 +99,29 @@ const gridOptions: VxeGridProps<Permission> = {
 
   columns: [
     {
-      title: $t('page.permission.name'),
-      field: 'name',
-      fixed: 'left',
-      align: 'left',
+      title: $t("page.permission.name"),
+      field: "name",
+      fixed: "left",
+      align: "left",
     },
     {
-      title: $t('page.permission.code'),
-      field: 'code',
-      fixed: 'left',
-      align: 'left',
+      title: $t("page.permission.code"),
+      field: "code",
+      fixed: "left",
+      align: "left",
     },
-    { title: $t('page.permission.groupName'), field: 'groupName' },
+    { title: $t("page.permission.groupName"), field: "groupName" },
     {
-      title: $t('ui.table.status'),
-      field: 'status',
-      slots: { default: 'status' },
+      title: $t("ui.table.status"),
+      field: "status",
+      slots: { default: "status" },
       width: 90,
     },
     {
-      title: $t('ui.table.action'),
-      field: 'action',
-      fixed: 'right',
-      slots: { default: 'action' },
+      title: $t("ui.table.action"),
+      field: "action",
+      fixed: "right",
+      slots: { default: "action" },
       width: 90,
     },
   ],
@@ -160,50 +151,50 @@ function openDrawer(create: boolean, row?: any) {
 
 /* 创建 */
 function handleCreate() {
-  console.log('创建');
+  console.log("创建");
 
   openDrawer(true);
 }
 
 /* 编辑 */
 function handleEdit(row: any) {
-  console.log('编辑', row);
+  console.log("编辑", row);
   openDrawer(false, row);
 }
 
 /* 删除 */
 async function handleDelete(row: any) {
-  console.log('删除', row);
+  console.log("删除", row);
 
   try {
     await permissionStore.deletePermission(row.id);
 
     notification.success({
-      message: $t('ui.notification.delete_success'),
+      message: $t("ui.notification.delete_success"),
     });
 
     await gridApi.reload();
   } catch {
     notification.error({
-      message: $t('ui.notification.delete_failed'),
+      message: $t("ui.notification.delete_failed"),
     });
   }
 }
 
 /* 同步权限 */
 async function handleSyncPermissions() {
-  console.log('同步');
+  console.log("同步");
 
   try {
     await permissionStore.syncPermissions();
     permissionViewStore.reloadGroupList();
 
     notification.success({
-      message: $t('ui.notification.sync_success'),
+      message: $t("ui.notification.sync_success"),
     });
   } catch {
     notification.error({
-      message: $t('ui.notification.sync_failed'),
+      message: $t("ui.notification.sync_failed"),
     });
   }
 }
@@ -216,7 +207,7 @@ watch(
     }
     permissionViewStore.needReloadPermissionList = false;
     gridApi.reload();
-  },
+  }
 );
 </script>
 
@@ -224,7 +215,7 @@ watch(
   <Grid :table-title="$t('menu.permission.permission')">
     <template #toolbar-tools>
       <a-button class="mr-2" type="primary" @click="handleCreate">
-        {{ $t('page.permission.button.create') }}
+        {{ $t("page.permission.button.create") }}
       </a-button>
       <a-popconfirm
         :cancel-text="$t('ui.button.cancel')"
@@ -237,7 +228,7 @@ watch(
         @confirm="() => handleSyncPermissions()"
       >
         <a-button type="primary" danger class="mr-2">
-          {{ $t('page.permission.button.syncPermissions') }}
+          {{ $t("page.permission.button.syncPermissions") }}
         </a-button>
       </a-popconfirm>
     </template>
@@ -247,11 +238,7 @@ watch(
       </a-tag>
     </template>
     <template #action="{ row }">
-      <a-button
-        type="link"
-        :icon="h(LucideFilePenLine)"
-        @click.stop="handleEdit(row)"
-      />
+      <a-button type="link" :icon="h(LucideFilePenLine)" @click.stop="handleEdit(row)" />
       <a-popconfirm
         :cancel-text="$t('ui.button.cancel')"
         :ok-text="$t('ui.button.ok')"

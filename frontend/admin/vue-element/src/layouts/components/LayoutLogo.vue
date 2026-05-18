@@ -4,7 +4,7 @@
       <router-link :key="+collapse" class="wh-full flex-center" to="/">
         <img :src="logo" class="w20px h20px" />
         <span v-if="!collapse" class="title">
-          {{ appConfig.title }}
+          {{ preferences.app.name }}
         </span>
       </router-link>
     </transition>
@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import { appConfig } from "@/settings";
+import { preferences } from "@/utils/preferences";
 import logo from "@/assets/images/logo.png";
 
 defineProps({

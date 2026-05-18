@@ -7,8 +7,8 @@ import { StorageManager } from '@vben-core/shared/cache';
 
 import { notification } from 'ant-design-vue';
 
-import { EditorType } from '#/adapter/component/Editor';
-import { useVbenForm } from '#/adapter/form';
+import { EditorType } from '@/adapter/component/Editor';
+import { useVbenForm } from '@/adapter/form';
 import {
   type internal_messageservicev1_InternalMessage as InternalMessage,
   type internal_messageservicev1_SendMessageRequest as SendMessageRequest,
@@ -18,7 +18,7 @@ import {
   internalMessageTypeList,
   useInternalMessageCategoryStore,
   useInternalMessageStore,
-} from '#/stores';
+} from '@/stores';
 
 const internalMessageStore = useInternalMessageStore();
 const internalMessageCategoryStore = useInternalMessageCategoryStore();

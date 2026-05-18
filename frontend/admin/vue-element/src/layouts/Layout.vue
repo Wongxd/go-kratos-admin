@@ -18,6 +18,12 @@ import Settings from "./components/LayoutSettings.vue";
 const route = useRoute();
 const { currentLayout, showSettings } = useLayout();
 
+// 设置面板可见性（全局状态）
+const settingsVisible = ref(false);
+
+// 提供给子组件使用
+provide("settingsVisible", settingsVisible);
+
 const currentLayoutComponent = computed(() => {
   const override = route.meta?.layout as LayoutMode | undefined;
   const layout = override ?? currentLayout.value;

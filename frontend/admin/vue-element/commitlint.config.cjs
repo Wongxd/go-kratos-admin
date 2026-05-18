@@ -3,7 +3,7 @@ module.exports = {
   extends: ["@commitlint/config-conventional"],
   // 自定义规则
   rules: {
-    // @see https://commitlint.js.org/#/reference-rules
+    // @see https://commitlint.js.org/@/reference-rules
 
     // 提交类型枚举，git提交type必须是以下类型
     "type-enum": [

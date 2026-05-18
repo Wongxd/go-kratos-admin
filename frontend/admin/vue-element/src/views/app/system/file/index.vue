@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { h } from 'vue';
 
@@ -8,15 +8,15 @@ import { LucideFileDownload, LucideTrash2 } from '@vben/icons';
 
 import { notification, Upload } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type storageservicev1_File as File } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   ossProviderColor,
   ossProviderLabel,
   useFileStore,
   useFileTransferStore,
-} from '#/stores';
+} from '@/stores';
 
 import FileDrawer from './file-drawer.vue';
 

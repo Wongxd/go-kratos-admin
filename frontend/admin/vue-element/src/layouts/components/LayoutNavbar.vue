@@ -14,16 +14,19 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from "@/stores";
+import { preferencesManager } from "@/utils/preferences";
+import { usePreferences } from "@/utils/preferences";
 import Hamburger from "@/components/Hamburger/index.vue";
 import Breadcrumb from "@/components/Breadcrumb/index.vue";
 
-const appStore = useAppStore();
+const { sidebarCollapsed } = usePreferences();
 
-const isSidebarOpened = computed(() => appStore.sidebar.opened);
+const isSidebarOpened = computed(() => !sidebarCollapsed.value);
 
 function toggleSideBar() {
-  appStore.toggleSidebar();
+  preferencesManager.updatePreferences({
+    sidebar: { collapsed: !sidebarCollapsed.value },
+  });
 }
 </script>
 

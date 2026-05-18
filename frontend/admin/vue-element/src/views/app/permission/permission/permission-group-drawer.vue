@@ -6,12 +6,12 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm } from '#/adapter/form';
+import { useVbenForm } from '@/adapter/form';
 import {
   buildPermissionGroupTree,
   statusList,
   usePermissionGroupStore,
-} from '#/stores';
+} from '@/stores';
 
 const permissionGroupStore = usePermissionGroupStore();
 

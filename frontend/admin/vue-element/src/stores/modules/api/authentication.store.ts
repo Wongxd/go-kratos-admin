@@ -18,7 +18,7 @@ import { i18n } from "@/i18n/setup";
 const t = i18n.global.t;
 import { globalSSEClient } from "@/transport/sse";
 import { requestClientRequestHandler } from "@/transport/rest";
-import { defaultPreferences } from "@/settings";
+import { preferences } from "@/utils/preferences";
 
 type RefreshTokenFunc = () => Promise<string> | string;
 
@@ -199,6 +199,14 @@ export const useAuthStore = defineStore("auth", () => {
     await _doLogout(redirect);
   }
 
+  async function register(username: string, password: string) {
+    return await authnService.RegisterUser({
+      username,
+      password: encryptPassword(password),
+      tenantCode: "master",
+    });
+  }
+
   async function generateCaptcha() {
     return await authnService.GenerateCaptcha({});
   }
@@ -303,7 +311,7 @@ export const useAuthStore = defineStore("auth", () => {
       accessStore.setIsAccessChecked(false);
       accessStore.setAccessCodes([]);
 
-      if (defaultPreferences.loginExpiredMode === "modal" && accessStore.isAccessChecked) {
+      if (preferences.app.loginExpiredMode === "modal" && accessStore.isAccessChecked) {
         accessStore.setLoginExpired(true);
       } else {
         // 非 modal 模式直接登出并跳转登录页
@@ -490,5 +498,6 @@ export const useAuthStore = defineStore("auth", () => {
     startRefreshTimer,
     getUserPermissionCodes,
     generateCaptcha,
+    register,
   };
 });

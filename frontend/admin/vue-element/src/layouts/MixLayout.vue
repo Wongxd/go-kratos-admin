@@ -19,9 +19,10 @@
           >
             <el-menu-item v-for="item in topMenuItems" :key="item.path" :index="item.path">
               <template v-if="item.meta">
-                <MenuIcon :icon="item.meta.icon" />
+                <!-- eslint-disable-next-line vue/no-deprecated-filter -->
+                <MenuIcon :icon="item.meta.icon as string | undefined" />
                 <span v-if="item.meta.title" class="ml-1">
-                  {{ translateRouteTitle(item.meta.title) }}
+                  {{ translateRouteTitle(item.meta.title as string) }}
                 </span>
               </template>
             </el-menu-item>
@@ -73,12 +74,14 @@
 <script setup lang="ts">
 import type { LocationQueryRaw, RouteRecordRaw } from "vue-router";
 import { useWindowSize } from "@vueuse/core";
+import { ElIcon } from "element-plus";
+
 import { useLayout } from "./useLayout";
-import { useAppStore, useSettingsStore } from "@/stores";
+import { useAccessStore } from "@/stores";
 import { isExternal } from "@/utils";
 import { translateRouteTitle } from "@/i18n";
-import { SidebarColor } from "@/constants";
-import { ElIcon } from "element-plus";
+import { preferencesManager } from "@/utils/preferences";
+
 import BaseLayout from "./BaseLayout.vue";
 import LayoutLogo from "./components/LayoutLogo.vue";
 import LayoutToolbar from "./components/LayoutToolbar.vue";
@@ -115,24 +118,22 @@ const route = useRoute();
 const router = useRouter();
 const { width } = useWindowSize();
 
-const appStore = useAppStore();
-const permissionStore = usePermissionStore();
-const settingsStore = useSettingsStore();
+const accessStore = useAccessStore();
 
 const { showTagsView, showLogo, isSidebarOpen, toggleSidebar, sideMenuRoutes, activeTopMenuPath } =
   useLayout();
 
 const isLogoCollapsed = computed(() => width.value < 768);
 
-// 是否使用深色菜单配色（暗色主题或经典蓝侧边栏）
-const useMenuColors = computed(
-  () =>
-    settingsStore.theme === "dark" || settingsStore.sidebarColorScheme === SidebarColor.CLASSIC_BLUE
-);
+// 是否使用深色菜单配色（暗色主题）
+const useMenuColors = computed(() => {
+  const { theme } = preferencesManager.getPreferences();
+  return theme.mode === "dark";
+});
 
 // 顶部菜单项（处理单子菜单显示优化）
 const topMenuItems = computed(() => {
-  const routes = permissionStore.routes.filter((item) => !item.meta?.hidden);
+  const routes = accessStore.accessRoutes.filter((item) => !item.meta?.hidden);
 
   return routes.map((route) => {
     // alwaysShow 或无子菜单，直接返回
@@ -170,18 +171,15 @@ function resolvePath(routePath: string) {
   return `${activeTopMenuPath.value}/${routePath}`;
 }
 
-// 从路径提取顶级菜单路径
-function extractTopMenuPath(path: string): string {
-  return path.split("/").filter(Boolean).length > 1 ? path.match(/^\/[^/]+/)?.[0] || "/" : "/";
-}
-
 // 顶部菜单点击
 function handleTopMenuSelect(menuPath: string) {
   if (menuPath === activeTopMenuPath.value) return;
 
-  appStore.activeTopMenu(menuPath);
-  permissionStore.setMixLayoutSideMenus(menuPath);
-  navigateToFirstMenu(permissionStore.mixLayoutSideMenus);
+  // 跳转到该顶级菜单下的第一个子菜单
+  const topMenu = accessStore.accessRoutes.find((route) => route.path === menuPath);
+  if (topMenu?.children?.length) {
+    navigateToFirstMenu(topMenu.children as RouteRecordRaw[]);
+  }
 }
 
 // 导航到第一个可访问菜单
@@ -203,24 +201,7 @@ function navigateToFirstMenu(menus: RouteRecordRaw[]) {
 }
 
 // 监听路由变化，同步顶部菜单状态
-watch(
-  () => route.path,
-  (newPath) => {
-    const topMenuPath = extractTopMenuPath(newPath);
-    const isTopMenuChanged = topMenuPath !== activeTopMenuPath.value;
-
-    if (isTopMenuChanged) {
-      appStore.activeTopMenu(topMenuPath);
-    }
-
-    // 切换布局（如左侧 -> 混合）时，activeTopMenuPath 可能已是正确值，
-    // 但 mixLayoutSideMenus 仍为空，需要补一次初始化。
-    if (isTopMenuChanged || permissionStore.mixLayoutSideMenus.length === 0) {
-      permissionStore.setMixLayoutSideMenus(topMenuPath);
-    }
-  },
-  { immediate: true }
-);
+// activeTopMenuPath 和 sideMenuRoutes 会自动根据路由计算，无需手动同步
 </script>
 
 <style lang="scss" scoped>

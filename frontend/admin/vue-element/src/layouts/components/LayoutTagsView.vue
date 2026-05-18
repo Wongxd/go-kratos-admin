@@ -71,7 +71,7 @@
 import { useRoute, useRouter, type RouteRecordRaw } from "vue-router";
 import { resolve } from "path-browserify";
 import { translateRouteTitle } from "@/i18n";
-import { usePermissionStore, useTagsViewStore } from "@/stores";
+import { useAccessStore, useTagsViewStore } from "@/stores";
 
 interface ContextMenu {
   visible: boolean;
@@ -83,7 +83,7 @@ const router = useRouter();
 const route = useRoute();
 
 // 状态管理
-const permissionStore = usePermissionStore();
+const accessStore = useAccessStore();
 const tagsViewStore = useTagsViewStore();
 
 const { visitedViews } = storeToRefs(tagsViewStore);
@@ -162,7 +162,7 @@ const extractAffixTags = (routes: RouteRecordRaw[], basePath = "/"): TagView[] =
  * 初始化固定标签
  */
 const initAffixTags = () => {
-  const affixTags = extractAffixTags(permissionStore.routes);
+  const affixTags = extractAffixTags(accessStore.accessRoutes);
 
   affixTags.forEach((tag) => {
     if (tag.name) {

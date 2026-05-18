@@ -36,25 +36,46 @@
 
         <div class="config-item flex-x-between">
           <span class="text-xs">{{ t("settings.showTagsView") }}</span>
-          <el-switch v-model="settingsStore.showTagsView" />
+          <el-switch
+            v-model="preferences.tabbar.enable"
+            @change="
+              (value) =>
+                preferencesManager.updatePreferences({ tabbar: { enable: value as boolean } })
+            "
+          />
         </div>
 
         <div class="config-item flex-x-between">
           <span class="text-xs">{{ t("settings.showAppLogo") }}</span>
-          <el-switch v-model="settingsStore.showAppLogo" />
+          <el-switch
+            v-model="preferences.logo.enable"
+            @change="
+              (value) =>
+                preferencesManager.updatePreferences({ logo: { enable: value as boolean } })
+            "
+          />
         </div>
 
         <div class="config-item flex-x-between">
           <span class="text-xs">{{ t("settings.showWatermark") }}</span>
-          <el-switch v-model="settingsStore.showWatermark" />
+          <el-switch v-model="preferences.app.watermark" />
         </div>
 
         <div class="config-item flex-x-between">
           <span class="text-xs">{{ t("settings.pageSwitchingAnimation") }}</span>
-          <el-select v-model="settingsStore.pageSwitchingAnimation" style="width: 150px">
+          <el-select
+            v-model="preferences.transition.name"
+            style="width: 150px"
+            @change="
+              (value) =>
+                preferencesManager.updatePreferences({
+                  transition: { name: value as string },
+                })
+            "
+          >
             <el-option
-              v-for="(item, key) in pageSwitchingAnimationOptions"
-              :key
+              v-for="item in pageSwitchingAnimationOptions"
+              :key="item.value"
               :label="t(`settings.${item.value}`)"
               :value="item.value"
             />
@@ -63,12 +84,12 @@
 
         <div class="config-item flex-x-between">
           <span class="text-xs">灰色模式</span>
-          <el-switch v-model="settingsStore.grayMode" />
+          <el-switch v-model="preferences.app.colorGrayMode" />
         </div>
 
         <div class="config-item flex-x-between">
           <span class="text-xs">色弱模式</span>
-          <el-switch v-model="settingsStore.colorWeak" />
+          <el-switch v-model="preferences.app.colorWeakMode" />
         </div>
 
         <div v-if="!isDark" class="config-item flex-x-between">
@@ -104,7 +125,7 @@
                   'layout-item',
                   item.className,
                   {
-                    'is-active': settingsStore.layout === item.value,
+                    'is-active': preferences.app.layout === item.value,
                   },
                 ]"
                 @click="handleLayoutChange(item.value)"
@@ -112,14 +133,14 @@
               >
                 <!-- 布局预览图标 -->
                 <div class="layout-preview">
-                  <div v-if="item.value !== LayoutMode.LEFT" class="layout-header"></div>
-                  <div v-if="item.value !== LayoutMode.TOP" class="layout-sidebar"></div>
+                  <div v-if="item.value !== 'sidebar-nav'" class="layout-header"></div>
+                  <div v-if="item.value !== 'header-nav'" class="layout-sidebar"></div>
                   <div class="layout-main"></div>
                 </div>
                 <!-- 布局名称 -->
                 <div class="layout-name">{{ item.label }}</div>
                 <!-- 选中状态指示器 -->
-                <div v-if="settingsStore.layout === item.value" class="layout-check">
+                <div v-if="preferences.app.layout === item.value" class="layout-check">
                   <el-icon><Check /></el-icon>
                 </div>
               </div>
@@ -165,13 +186,18 @@
 <script setup lang="ts">
 import { DocumentCopy, RefreshLeft, Check } from "@element-plus/icons-vue";
 
+import { SidebarColor } from "@/constants";
+import { usePreferences, preferencesManager, preferences } from "@/utils/preferences";
+
 const { t } = useI18n();
-import { LayoutMode, PageSwitchingAnimationOptions, SidebarColor, ThemeMode } from "@/constants";
-import { useSettingsStore, useThemeStore } from "@/stores";
-import { themeColorPresets } from "@/settings";
 
 // 页面切换动画选项
-const pageSwitchingAnimationOptions: Record<string, OptionItem> = PageSwitchingAnimationOptions;
+const pageSwitchingAnimationOptions: Record<string, any> = {
+  none: { value: "none", label: "无动画" },
+  fade: { value: "fade", label: "淡入淡出" },
+  "fade-slide": { value: "fade-slide", label: "平滑切换" },
+  "fade-scale": { value: "fade-scale", label: "缩放切换" },
+};
 
 // 按钮图标
 const copyIcon = markRaw(DocumentCopy);
@@ -183,55 +209,77 @@ const resetLoading = ref(false);
 
 // 布局选项配置
 interface LayoutOption {
-  value: LayoutMode;
+  value: LayoutType;
   label: string;
   className: string;
 }
 
 const layoutOptions: LayoutOption[] = [
-  { value: LayoutMode.LEFT, label: t("settings.leftLayout"), className: "left" },
-  { value: LayoutMode.TOP, label: t("settings.topLayout"), className: "top" },
-  { value: LayoutMode.MIX, label: t("settings.mixLayout"), className: "mix" },
+  { value: "sidebar-nav", label: t("settings.leftLayout"), className: "left" },
+  { value: "header-nav", label: t("settings.topLayout"), className: "top" },
+  { value: "mixed-nav", label: t("settings.mixLayout"), className: "mix" },
 ];
 
-// 使用统一的颜色预设配置（复制为可变数组以兼容组件 prop）
-const colorPresets = [...themeColorPresets];
+// 颜色预设（用于颜色选择器）
+const colorPresets = [
+  "#4080FF",
+  "#1890FF",
+  "#409EFF",
+  "#FA8C16",
+  "#722ED1",
+  "#13C2C2",
+  "#52C41A",
+  "#F5222D",
+  "#2F54EB",
+  "#EB2F96",
+];
 
-const settingsStore = useSettingsStore();
-const themeStore = useThemeStore();
+const { isDark } = usePreferences();
 
-const isDark = ref<boolean>(themeStore.isDark);
-const sidebarColor = ref(settingsStore.sidebarColorScheme);
+// 注入设置面板可见性状态
+const settingsVisible = inject<Ref<boolean>>("settingsVisible", ref(false));
+
+// TODO: 以下字段需要在 preferences 中添加对应字段后迁移
+// - sidebarColorScheme
+// - themeColor
+// 暂时使用固定值
+const SIDEBAR_COLOR_SCHEME = "minimal-white"; // 固定为极简白色
+const THEME_COLOR = "#409eff"; // 固定为主题蓝色
+
+const sidebarColor = ref(SIDEBAR_COLOR_SCHEME);
 
 const selectedThemeColor = computed({
-  get: () => settingsStore.themeColor,
-  set: (value) => {
-    settingsStore.themeColor = value;
+  get: () => THEME_COLOR,
+  set: () => {
+    // TODO: 后续迁移到 preferences 后实现
+    console.warn("主题颜色修改功能暂未实现");
   },
 });
 
 const drawerVisible = computed({
-  get: () => settingsStore.settingsVisible,
-  set: (value) => (settingsStore.settingsVisible = value),
+  get: () => settingsVisible.value,
+  set: (value) => (settingsVisible.value = value),
 });
 
 /**
  * 处理主题切换
  *
- * @param isDark 是否启用暗黑模式
+ * @param value 是否启用暗黑模式
  */
-const handleThemeChange = (isDark: string | number | boolean) => {
-  const newTheme = isDark ? ThemeMode.DARK : ThemeMode.LIGHT;
-  themeStore.setTheme(newTheme);
+const handleThemeChange = (value: string | number | boolean) => {
+  preferencesManager.updatePreferences({
+    theme: { mode: value ? "dark" : "light" },
+  });
 };
 
 /**
  * 更改侧边栏颜色
  *
- * @param val 颜色方案名称
+ * @param _val 颜色方案名称
  */
-const changeSidebarColor = (val: any) => {
-  settingsStore.sidebarColorScheme = val;
+const changeSidebarColor = () => {
+  // TODO: 后续迁移到 preferences 后实现
+  console.warn("侧边栏颜色修改功能暂未实现");
 };
 
 /**
@@ -239,10 +287,12 @@ const changeSidebarColor = (val: any) => {
  *
  * @param layout - 布局模式
  */
-const handleLayoutChange = (layout: LayoutMode) => {
-  if (settingsStore.layout === layout) return;
+const handleLayoutChange = (layout: LayoutType) => {
+  if (preferences.app.layout === layout) return;
 
-  settingsStore.layout = layout;
+  preferencesManager.updatePreferences({
+    app: { layout },
+  });
 };
 
 /**
@@ -277,12 +327,11 @@ const handleResetSettings = async () => {
   resetLoading.value = true;
 
   try {
-    settingsStore.resetSettings();
-    themeStore.resetTheme();
+    // 重置 preferences
+    preferencesManager.resetPreferences();
 
-    // 同步更新本地状态"
-    isDark.value = themeStore.isDark;
-    sidebarColor.value = settingsStore.sidebarColorScheme;
+    // 同步更新本地状态
+    sidebarColor.value = SIDEBAR_COLOR_SCHEME;
 
     ElMessage.success(t("settings.resetSuccess"));
   } catch {
@@ -300,16 +349,16 @@ const generateSettingsCode = (): string => {
     title: "pkg.name",
     version: "pkg.version",
     showSettings: true,
-    showTagsView: settingsStore.showTagsView,
-    showAppLogo: settingsStore.showAppLogo,
-    layout: `LayoutMode.${settingsStore.layout.toUpperCase()}`,
-    theme: `ThemeMode.${themeStore.themeMode.toUpperCase()}`,
+    showTagsView: preferences.tabbar.enable,
+    showAppLogo: preferences.logo.enable,
+    layout: `"${preferences.app.layout}"`,
+    theme: `ThemeMode.${isDark.value ? "DARK" : "LIGHT"}`,
     size: "ComponentSize.DEFAULT",
     language: "LanguageEnum.ZH_CN",
-    themeColor: `"${settingsStore.themeColor}"`,
-    showWatermark: settingsStore.showWatermark,
+    themeColor: `"${THEME_COLOR}"`,
+    showWatermark: preferences.app.watermark,
     watermarkContent: "pkg.name",
-    sidebarColorScheme: `SidebarColor.${settingsStore.sidebarColorScheme.toUpperCase().replace("-", "_")}`,
+    sidebarColorScheme: `SidebarColor.${SIDEBAR_COLOR_SCHEME.toUpperCase().replace("-", "_")}`,
   };
 
   return `const defaultSettings: AppSettings = {
@@ -333,7 +382,7 @@ const generateSettingsCode = (): string => {
  * 关闭抽屉前的回调
  */
 const handleCloseDrawer = () => {
-  settingsStore.settingsVisible = false;
+  settingsVisible.value = false;
 };
 </script>
 

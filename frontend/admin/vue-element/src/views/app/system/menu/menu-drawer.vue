@@ -10,7 +10,7 @@ import lucide from '@iconify/json/json/lucide.json';
 import { addCollection } from '@iconify/vue';
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm } from '#/adapter/form';
+import { useVbenForm } from '@/adapter/form';
 import {
   buildMenuTree,
   isButton,
@@ -19,7 +19,7 @@ import {
   menuTypeList,
   statusList,
   useMenuStore,
-} from '#/stores';
+} from '@/stores';
 
 const menuStore = useMenuStore();
 

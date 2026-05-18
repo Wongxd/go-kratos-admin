@@ -4,7 +4,7 @@ import { createAdminPortalServiceClient } from "@/api/generated/admin/service/v1
 import { BasicLayout, Layout } from "@/layouts";
 import { requestClientRequestHandler } from "@/transport/rest";
 import { generateAccessible } from "@/router/accessible";
-import { defaultPreferences } from "@/settings";
+import { preferences } from "@/utils/preferences";
 
 import { i18n } from "@/i18n/setup";
 
@@ -27,7 +27,7 @@ async function generateAccess(options: GenerateMenuAndRoutesOptions) {
     Layout,
   };
 
-  return await generateAccessible(defaultPreferences.accessMode, {
+  return await generateAccessible(preferences.app.accessMode, {
     ...options,
     fetchMenuListAsync: async () => {
       const loadingMessage = ElMessage({

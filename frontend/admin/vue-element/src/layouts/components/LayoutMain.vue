@@ -19,13 +19,13 @@
 
 <script setup lang="ts">
 import { type RouteLocationNormalized } from "vue-router";
-import { useSettingsStore, useTagsViewStore } from "@/stores";
+import { useTagsViewStore } from "@/stores";
+import { preferences, usePreferences } from "@/utils/preferences";
 import variables from "@/styles/variables.module.scss";
 import Error404 from "@/views/core/error/404.vue";
 
 const { cachedViews } = toRefs(useTagsViewStore());
-
-const settingsStore = useSettingsStore();
+const { tabbarPreferences } = usePreferences();
 
 // 当前组件
 const wrapperMap = new Map<string, Component>();
@@ -62,7 +62,7 @@ const currentComponent = (component: Component, route: RouteLocationNormalized) 
 };
 
 const appMainHeight = computed(() => {
-  if (settingsStore.showTagsView) {
+  if (tabbarPreferences.value.enable) {
     return `calc(100vh - ${variables["navbar-height"]} - ${variables["tags-view-height"]})`;
   } else {
     return `calc(100vh - ${variables["navbar-height"]})`;
@@ -71,7 +71,7 @@ const appMainHeight = computed(() => {
 
 // 页面切换动画名称
 const transitionName = computed(() => {
-  return settingsStore.pageSwitchingAnimation ?? "";
+  return preferences.transition.name ?? "";
 });
 </script>
 

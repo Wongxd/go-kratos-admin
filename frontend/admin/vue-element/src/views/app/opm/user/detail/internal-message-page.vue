@@ -1,18 +1,18 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { Page, type VbenFormProps } from '@vben/common-ui';
 
 import dayjs from 'dayjs';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type internal_messageservicev1_InternalMessageRecipient as InternalMessageRecipient } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   internalMessageRecipientStatusColor,
   internalMessageRecipientStatusLabel,
   useInternalMessageStore,
-} from '#/stores';
+} from '@/stores';
 
 const props = defineProps({
   userId: { type: Number, default: undefined },

@@ -4,9 +4,9 @@
     <template #dropdown>
       <el-dropdown-menu>
         <el-dropdown-item
-          v-for="item in languageStore.availableLanguages"
+          v-for="item in availableLanguages"
           :key="item.code"
-          :disabled="languageStore.currentLanguage === item.code"
+          :disabled="locale === item.code"
           :command="item.code"
         >
           {{ item.name }}
@@ -17,7 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { useLanguageStore } from "@/stores";
+import { preferencesManager } from "@/utils/preferences";
+import { loadLocaleMessages } from "@/i18n";
 
 defineProps({
   size: {
@@ -26,8 +27,13 @@ defineProps({
   },
 });
 
-const languageStore = useLanguageStore();
 const { locale, t } = useI18n();
+
+// 可用语言列表
+const availableLanguages = [
+  { code: "zh-cn" as SupportedLanguagesType, name: "简体中文", locale: "zh-CN" },
+  { code: "en-US" as SupportedLanguagesType, name: "English", locale: "en-US" },
+];
 
 /**
  * 处理语言切换
@@ -35,7 +41,18 @@ const { locale, t } = useI18n();
  * @param lang  语言（zh-cn、en-US）
  */
 async function handleLanguageChange(lang: SupportedLanguagesType) {
-  await languageStore.setLanguage(lang);
+  // 更新 i18n
+  await loadLocaleMessages(lang);
+
+  // 更新 HTML lang 属性
+  document.documentElement.lang = lang;
+
+  // 更新 preferences
+  preferencesManager.updatePreferences({
+    app: { locale: lang },
+  });
+
+  // 同步更新 vue-i18n
   locale.value = lang;
 
   ElMessage.success(t("common.langSelect.message.success"));

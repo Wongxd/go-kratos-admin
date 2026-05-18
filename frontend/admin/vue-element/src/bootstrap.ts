@@ -13,11 +13,24 @@ import { setupI18n } from "@/i18n";
 import { setupRouter } from "@/router";
 import { initStores } from "@/stores/setup";
 import { registerGlobComp } from "@/registerGlobComp";
+import { initPreferences } from "@/utils/preferences";
 
 import App from "./App.vue";
 
 async function bootstrap(namespace: string) {
   const app = createApp(App);
+
+  // 初始化偏好设置
+  await initPreferences({
+    namespace,
+    overrides: {
+      app: {
+        name: import.meta.env.VITE_APP_TITLE || "GoWind Admin",
+        version: import.meta.env.VITE_APP_VERSION || "0.0.0",
+        enableTenant: import.meta.env.VITE_APP_TENANT_ENABLED === "true",
+      },
+    },
+  });
 
   // 注册全局组件
   registerGlobComp(app);

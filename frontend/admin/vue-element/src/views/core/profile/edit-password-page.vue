@@ -4,8 +4,8 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm } from '#/adapter/form';
-import { useUserProfileStore } from '#/stores';
+import { useVbenForm } from '@/adapter/form';
+import { useUserProfileStore } from '@/stores';
 
 const userProfileStore = useUserProfileStore();
 

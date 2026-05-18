@@ -58,6 +58,21 @@ export const STORAGE_KEYS = {
   GRAY_MODE: `${APP_PREFIX}:ui:gray_mode`,
   COLOR_WEAK: `${APP_PREFIX}:ui:color_weak`,
 
+  // ===== 偏好设置 =====
+  PREFERENCE_APP: `${APP_PREFIX}:preference:app`,
+  PREFERENCE_THEME: `${APP_PREFIX}:preference:theme`,
+  PREFERENCE_SIDEBAR: `${APP_PREFIX}:preference:sidebar`,
+  PREFERENCE_TABBAR: `${APP_PREFIX}:preference:tabbar`,
+  PREFERENCE_NAVIGATION: `${APP_PREFIX}:preference:navigation`,
+  PREFERENCE_HEADER: `${APP_PREFIX}:preference:header`,
+  PREFERENCE_BREADCRUMB: `${APP_PREFIX}:preference:breadcrumb`,
+  PREFERENCE_TRANSITION: `${APP_PREFIX}:preference:transition`,
+  PREFERENCE_WIDGET: `${APP_PREFIX}:preference:widget`,
+  PREFERENCE_LOGO: `${APP_PREFIX}:preference:logo`,
+  PREFERENCE_FOOTER: `${APP_PREFIX}:preference:footer`,
+  PREFERENCE_SHORTCUT_KEYS: `${APP_PREFIX}:preference:shortcut_keys`,
+  PREFERENCE_COPYRIGHT: `${APP_PREFIX}:preference:copyright`,
+
   // ===== 应用状态 =====
   DEVICE: `${APP_PREFIX}:app:device`,
   SIZE: `${APP_PREFIX}:app:size`,

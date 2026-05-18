@@ -5,35 +5,46 @@
  */
 import { useRoute } from "vue-router";
 import { useWindowSize } from "@vueuse/core";
-import { useAppStore, usePermissionStore, useSettingsStore } from "@/stores";
+import { useAccessStore } from "@/stores";
 import { DeviceEnum } from "@/constants";
-import { defaultPreferences } from "@/settings";
+import { usePreferences } from "@/utils/preferences";
+import { preferencesManager, preferences } from "@/utils/preferences";
 
 const DESKTOP_BREAKPOINT = 992;
 
 export function useLayout() {
   const route = useRoute();
-  const appStore = useAppStore();
-  const settingsStore = useSettingsStore();
-  const permissionStore = usePermissionStore();
+  const permissionStore = useAccessStore();
   const { width } = useWindowSize();
+  const { isMobile, sidebarCollapsed, appPreferences, tabbarPreferences, logoPreferences } =
+    usePreferences();
 
   // ============================================
   // 设备检测
   // ============================================
 
   const isDesktop = computed(() => width.value >= DESKTOP_BREAKPOINT);
-  const isMobile = computed(() => appStore.device === DeviceEnum.MOBILE);
 
   // 监听窗口变化，自动调整设备类型和侧边栏
   watchEffect(() => {
     const device = isDesktop.value ? DeviceEnum.DESKTOP : DeviceEnum.MOBILE;
-    appStore.toggleDevice(device);
 
+    // 更新 preferences 中的 isMobile
+    if (isMobile.value) {
+      preferencesManager.updatePreferences({
+        app: { isMobile: device === DeviceEnum.MOBILE },
+      });
+    }
+
+    // 根据设备类型自动展开/收起侧边栏
     if (isDesktop.value) {
-      appStore.openSideBar();
+      preferencesManager.updatePreferences({
+        sidebar: { hidden: false },
+      });
     } else {
-      appStore.closeSideBar();
+      preferencesManager.updatePreferences({
+        sidebar: { hidden: true },
+      });
     }
   });
 
@@ -41,17 +52,17 @@ export function useLayout() {
   // 布局状态
   // ============================================
 
-  const currentLayout = computed(() => settingsStore.layout);
-  const isSidebarOpen = computed(() => appStore.sidebar.opened);
-  const showTagsView = computed(() => settingsStore.showTagsView);
-  const showSettings = computed(() => defaultPreferences.showSettings);
-  const showLogo = computed(() => settingsStore.showAppLogo);
+  const currentLayout = computed(() => appPreferences.value.layout);
+  const isSidebarOpen = computed(() => !sidebarCollapsed.value);
+  const showTagsView = computed(() => tabbarPreferences.value.enable);
+  const showSettings = computed(() => preferences.app.enablePreferences);
+  const showLogo = computed(() => logoPreferences.value.enable);
 
   const layoutClass = computed(() => ({
-    hideSidebar: !appStore.sidebar.opened,
-    openSidebar: appStore.sidebar.opened,
-    mobile: appStore.device === DeviceEnum.MOBILE,
-    [`layout-${settingsStore.layout}`]: true,
+    hideSidebar: sidebarCollapsed.value,
+    openSidebar: !sidebarCollapsed.value,
+    mobile: isMobile.value,
+    [`layout-${appPreferences.value.layout}`]: true,
   }));
 
   // ============================================
@@ -59,13 +70,31 @@ export function useLayout() {
   // ============================================
 
   /** 路由列表（左侧/顶部菜单） */
-  const routes = computed(() => permissionStore.routes);
+  const routes = computed(() => permissionStore.accessRoutes);
 
-  /** 混合布局侧边菜单 */
-  const sideMenuRoutes = computed(() => permissionStore.mixLayoutSideMenus);
+  /** 混合布局侧边菜单（根据顶级菜单路径动态计算） */
+  const sideMenuRoutes = computed(() => {
+    const topMenuPath = activeTopMenuPath.value;
+    // 从所有路由中找到匹配的顶级菜单
+    const topMenu = permissionStore.accessRoutes.find((route) => route.path === topMenuPath);
 
-  /** 顶部菜单激活路径 */
-  const activeTopMenuPath = computed(() => appStore.activeTopMenuPath);
+    if (!topMenu?.children) {
+      return [];
+    }
+
+    // 过滤掉隐藏的菜单
+    return topMenu.children.filter((child) => !child.meta?.hidden);
+  });
+
+  /** 顶部菜单激活路径（仅混合布局使用） */
+  const activeTopMenuPath = computed(() => {
+    const path = route.path;
+    // 提取第一段路径作为顶级菜单
+    // /system/user → /system
+    // /dashboard → /dashboard
+    const segments = path.split("/").filter(Boolean);
+    return segments.length > 0 ? `/${segments[0]}` : "/";
+  });
 
   /** 当前激活菜单 */
   const activeMenu = computed(() => {
@@ -78,11 +107,15 @@ export function useLayout() {
   // ============================================
 
   function toggleSidebar() {
-    appStore.toggleSidebar();
+    preferencesManager.updatePreferences({
+      sidebar: { collapsed: !sidebarCollapsed.value },
+    });
   }
 
   function closeSidebar() {
-    appStore.closeSideBar();
+    preferencesManager.updatePreferences({
+      sidebar: { collapsed: true },
+    });
   }
 
   return {

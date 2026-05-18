@@ -6,13 +6,13 @@ import { $t } from '@vben/locales';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenForm } from '#/adapter/form';
+import { useVbenForm } from '@/adapter/form';
 import {
   orgUnitStatusList,
   orgUnitTypeList,
   useOrgUnitStore,
   useUserListStore,
-} from '#/stores';
+} from '@/stores';
 
 const orgUnitStore = useOrgUnitStore();
 const userListStore = useUserListStore();

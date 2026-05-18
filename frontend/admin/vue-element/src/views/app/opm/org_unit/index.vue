@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps } from '@/adapter/vxe-table';
 
 import { h } from 'vue';
 
@@ -8,9 +8,9 @@ import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
 
 import { notification } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '@/adapter/vxe-table';
 import { type identityservicev1_OrgUnit as OrgUnit } from '@/api/generated/admin/service/v1';
-import { $t } from '#/locales';
+import { $t } from '@/locales';
 import {
   orgUnitStatusToColor,
   orgUnitStatusToName,
@@ -19,7 +19,7 @@ import {
   orgUnitTypeToName,
   statusList,
   useOrgUnitStore,
-} from '#/stores';
+} from '@/stores';
 
 import OrgDrawer from './org-drawer.vue';
 

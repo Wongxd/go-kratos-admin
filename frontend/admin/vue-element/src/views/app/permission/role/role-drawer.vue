@@ -1,24 +1,24 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref } from "vue";
 
-import { useVbenDrawer } from '@vben/common-ui';
-import { $t } from '@vben/locales';
+import { useVbenDrawer } from "@vben/common-ui";
+import { $t } from "@vben/locales";
 
-import { notification } from 'ant-design-vue';
+import { notification } from "ant-design-vue";
 
-import { useVbenForm } from '#/adapter/form';
-import { type permissionservicev1_PermissionGroup as PermissionGroup } from '@/api/generated/admin/service/v1';
+import { useVbenForm } from "@/adapter/form";
+import { type permissionservicev1_PermissionGroup as PermissionGroup } from "@/api/generated/admin/service/v1";
 import {
   buildPermissionTree,
   statusList,
   usePermissionGroupStore,
-  usePermissionStore,
+  usePermissionListStore,
   useRoleStore,
-} from '#/stores';
-import { deepClone, filterNumbers } from '#/utils';
+} from "@/stores";
+import { deepClone, filterNumbers } from "@/utils";
 
 const roleStore = useRoleStore();
-const permissionStore = usePermissionStore();
+const permissionStore = usePermissionListStore();
 const permissionGroupStore = usePermissionGroupStore();
 
 const data = ref();
@@ -26,8 +26,8 @@ const groups = ref<PermissionGroup[]>([]);
 
 const getTitle = computed(() =>
   data.value?.create
-    ? $t('ui.modal.create', { moduleName: $t('page.role.moduleName') })
-    : $t('ui.modal.update', { moduleName: $t('page.role.moduleName') }),
+    ? $t("ui.modal.create", { moduleName: $t("page.role.moduleName") })
+    : $t("ui.modal.update", { moduleName: $t("page.role.moduleName") })
 );
 // const isCreate = computed(() => data.value?.create);
 
@@ -37,86 +37,83 @@ const [BaseForm, baseFormApi] = useVbenForm({
   commonConfig: {
     // 所有表单项
     componentProps: {
-      class: 'w-full',
+      class: "w-full",
     },
   },
   schema: [
     {
-      component: 'Input',
-      fieldName: 'name',
-      label: $t('page.role.name'),
+      component: "Input",
+      fieldName: "name",
+      label: $t("page.role.name"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
-      rules: 'required',
+      rules: "required",
     },
     {
-      component: 'Input',
-      fieldName: 'code',
-      label: $t('page.role.code'),
+      component: "Input",
+      fieldName: "code",
+      label: $t("page.role.code"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
-      rules: 'required',
+      rules: "required",
     },
     {
-      component: 'InputNumber',
-      fieldName: 'sortOrder',
+      component: "InputNumber",
+      fieldName: "sortOrder",
       defaultValue: 1,
-      label: $t('ui.table.sortOrder'),
+      label: $t("ui.table.sortOrder"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
-      rules: 'required',
+      rules: "required",
     },
     {
-      component: 'RadioGroup',
-      fieldName: 'status',
-      label: $t('ui.table.status'),
-      defaultValue: 'ON',
-      rules: 'selectRequired',
+      component: "RadioGroup",
+      fieldName: "status",
+      label: $t("ui.table.status"),
+      defaultValue: "ON",
+      rules: "selectRequired",
       componentProps: {
-        optionType: 'button',
-        buttonStyle: 'solid',
-        class: 'flex flex-wrap', // 如果选项过多，可以添加class来自动折叠
+        optionType: "button",
+        buttonStyle: "solid",
+        class: "flex flex-wrap", // 如果选项过多，可以添加class来自动折叠
         options: statusList,
       },
     },
     {
-      component: 'Textarea',
-      fieldName: 'description',
-      label: $t('ui.table.description'),
+      component: "Textarea",
+      fieldName: "description",
+      label: $t("ui.table.description"),
       componentProps: {
-        placeholder: $t('ui.placeholder.input'),
+        placeholder: $t("ui.placeholder.input"),
         allowClear: true,
       },
     },
     {
-      component: 'ApiTree',
-      fieldName: 'permissions',
+      component: "ApiTree",
+      fieldName: "permissions",
       componentProps: {
-        title: $t('page.role.permissions'),
+        title: $t("page.role.permissions"),
         showSearch: true,
         treeDefaultExpandAll: false,
-        loadingSlot: 'suffixIcon',
-        childrenField: 'children',
-        labelField: 'title',
-        valueField: 'key',
-        resultField: 'items',
+        loadingSlot: "suffixIcon",
+        childrenField: "children",
+        labelField: "title",
+        valueField: "key",
+        resultField: "items",
         api: async () => {
-          const groupData = await permissionGroupStore.listPermissionGroup(
-            undefined,
-            {
-              status: 'ON',
-            },
-          );
+          const groupData = await permissionGroupStore.listPermissionGroup(undefined, {
+            status: "ON",
+          });
           groups.value = groupData.items ?? [];
 
           return await permissionStore.listPermission(undefined, {
-            status: 'ON',
+            status: "ON",
           });
         },
         afterFetch: (data: any) => {
@@ -133,7 +130,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
 
   async onConfirm() {
-    console.log('onConfirm');
+    console.log("onConfirm");
 
     // 校验输入的数据
     const validate = await baseFormApi.validate();
@@ -165,14 +162,14 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
       notification.success({
         message: data.value?.create
-          ? $t('ui.notification.create_success')
-          : $t('ui.notification.update_success'),
+          ? $t("ui.notification.create_success")
+          : $t("ui.notification.update_success"),
       });
     } catch {
       notification.error({
         message: data.value?.create
-          ? $t('ui.notification.create_failed')
-          : $t('ui.notification.update_failed'),
+          ? $t("ui.notification.create_failed")
+          : $t("ui.notification.update_failed"),
       });
     } finally {
       drawerApi.close();
