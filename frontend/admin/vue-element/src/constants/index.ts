@@ -67,11 +67,6 @@ export const STORAGE_KEYS = {
 } as const;
 
 /**
- * 存储键名类型
- */
-export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
-
-/**
  * @zh_CN 登录页面 url 地址
  */
 export const LOGIN_PATH = "/login";
@@ -80,3 +75,5 @@ export const LOGIN_PATH = "/login";
  * @zh_CN 默认首页地址
  */
 export const DEFAULT_HOME_PATH = "/analytics";
+
+export * from "./settings";

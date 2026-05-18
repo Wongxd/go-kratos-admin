@@ -1,7 +1,7 @@
 import { createI18n, Locale } from "vue-i18n";
 import { App } from "vue";
 
-import { LoadMessageFn, LocaleSetupOptions, SupportedLanguagesType } from "@/i18n/types";
+import { LoadMessageFn, LocaleSetupOptions } from "@/i18n/types";
 import { loadLocalesMap, loadLocalesMapFromDir } from "@/i18n/utils";
 
 const i18n = createI18n({

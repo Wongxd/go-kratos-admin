@@ -166,7 +166,7 @@
 import { DocumentCopy, RefreshLeft, Check } from "@element-plus/icons-vue";
 
 const { t } = useI18n();
-import { LayoutMode, PageSwitchingAnimationOptions, SidebarColor, ThemeMode } from "@/enums";
+import { LayoutMode, PageSwitchingAnimationOptions, SidebarColor, ThemeMode } from "@/constants";
 import { useSettingsStore } from "@/stores";
 import { themeColorPresets } from "@/settings";
 

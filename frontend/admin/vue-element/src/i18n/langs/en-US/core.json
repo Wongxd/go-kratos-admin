@@ -1,6 +1,11 @@
 {
   "themeToggle": "Theme Switch",
   "languageToggle": "Language Switch",
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto"
+  },
   "title": "Enterprise Management System",
   "subtitle": "Providing secure, efficient, and scalable management solutions to empower enterprise digital transformation and business growth.",
   "features": {

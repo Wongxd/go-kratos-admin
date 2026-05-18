@@ -1,9 +1,8 @@
+import { ThemeMode } from "@/constants";
+
 /**
  * 应用设置相关类型定义
  */
-
-import type { ThemeMode } from "@/enums";
-
 export interface AppSettings {
   title: string;
   version: string;

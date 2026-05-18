@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { useSettingsStore } from "@/stores";
-import { ThemeMode, SidebarColor, LayoutMode } from "@/enums/settings";
+import { SidebarColor, LayoutMode, ThemeMode } from "@/constants";
 
 defineProps({
   isActive: { type: Boolean, required: true },

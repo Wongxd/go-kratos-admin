@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { useAppStore, useSettingsStore } from "@/stores";
 import { appConfig } from "@/settings";
-import { ThemeMode, ComponentSize } from "@/enums";
+import { ComponentSize, ThemeMode } from "@/constants";
 
 const appStore = useAppStore();
 const settingsStore = useSettingsStore();

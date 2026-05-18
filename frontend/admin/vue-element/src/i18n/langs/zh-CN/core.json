@@ -1,6 +1,11 @@
 {
   "themeToggle": "主题切换",
   "languageToggle": "语言切换",
+  "theme": {
+    "light": "浅色",
+    "dark": "深色",
+    "auto": "自动"
+  },
   "title": "企业级管理系统",
   "subtitle": "提供安全、高效、可扩展的管理解决方案，助力企业数字化转型与业务增长。",
   "features": {

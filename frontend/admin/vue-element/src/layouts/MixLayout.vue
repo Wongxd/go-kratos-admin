@@ -77,7 +77,7 @@ import { useLayout } from "./useLayout";
 import { useAppStore, useSettingsStore } from "@/stores";
 import { isExternal } from "@/utils";
 import { translateRouteTitle } from "@/i18n";
-import { SidebarColor } from "@/enums/settings";
+import { SidebarColor } from "@/constants";
 import { ElIcon } from "element-plus";
 import BaseLayout from "./BaseLayout.vue";
 import LayoutLogo from "./components/LayoutLogo.vue";

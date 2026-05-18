@@ -1,4 +1,4 @@
-import { type ComputedRef, type MaybeRef } from "vue";
+import type { ComputedRef, MaybeRef } from "vue";
 
 declare global {
   /**
@@ -104,3 +104,5 @@ declare global {
 
   type EmitType = (name: Name, ...args: any[]) => void;
 }
+
+export {};

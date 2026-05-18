@@ -6,7 +6,7 @@
 import { useRoute } from "vue-router";
 import { useWindowSize } from "@vueuse/core";
 import { useAppStore, usePermissionStore, useSettingsStore } from "@/stores";
-import { DeviceEnum } from "@/enums/settings";
+import { DeviceEnum } from "@/constants";
 import { defaultPreferences } from "@/settings";
 
 const DESKTOP_BREAKPOINT = 992;

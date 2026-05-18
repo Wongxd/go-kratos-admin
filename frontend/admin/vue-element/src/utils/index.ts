@@ -17,5 +17,6 @@ export * from "./merge";
 export * from "./window";
 export * from "./nprogress";
 export * from "./tree";
+export * from "./storage";
 
 export { default as cloneDeep } from "lodash.clonedeep";

@@ -2,8 +2,7 @@
  * 应用配置
  */
 
-import { LayoutMode, ComponentSize, SidebarColor, ThemeMode } from "@/enums";
-import type { SupportedLanguagesType } from "@/i18n/types";
+import { LayoutMode, ComponentSize, SidebarColor, ThemeMode } from "@/constants";
 
 const env = import.meta.env;
 const { pkg } = __APP_INFO__;

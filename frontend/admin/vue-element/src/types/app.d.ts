@@ -21,3 +21,5 @@ declare global {
    */
   type ThemeModeType = "auto" | "dark" | "light";
 }
+
+export {};

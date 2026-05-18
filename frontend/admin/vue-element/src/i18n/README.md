@@ -28,7 +28,7 @@ src/i18n/
 │           ├── order.json
 │           └── ...
 ├── setup.ts                  # i18n 初始化配置
-├── types.ts                  # 类型定义
+├── storage.types.ts                  # 类型定义
 └── utils.ts                  # 工具函数
 ```
 

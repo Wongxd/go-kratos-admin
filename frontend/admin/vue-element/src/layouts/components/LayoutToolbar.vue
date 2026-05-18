@@ -55,7 +55,11 @@
     </div>
 
     <!-- 系统设置 -->
-    <div v-if="defaultPreferences.showSettings" class="navbar-actions__item" @click="handleSettingsClick">
+    <div
+      v-if="defaultPreferences.showSettings"
+      class="navbar-actions__item"
+      @click="handleSettingsClick"
+    >
       <div class="i-svg:setting" />
     </div>
   </div>
@@ -64,8 +68,9 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+
 import { defaultPreferences } from "@/settings";
-import { DeviceEnum, SidebarColor, ThemeMode, LayoutMode } from "@/enums/settings";
+import { DeviceEnum, SidebarColor, LayoutMode } from "@/constants";
 import { useAppStore, useSettingsStore, useAppUserStore, useAuthStore } from "@/stores";
 
 // 导入子组件

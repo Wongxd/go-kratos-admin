@@ -1,5 +1,5 @@
-import { SidebarColor, ThemeMode } from "@/enums";
-import type { LayoutMode } from "@/enums";
+import { SidebarColor, ThemeMode } from "@/constants";
+import type { LayoutMode } from "@/constants";
 import { applyTheme, generateThemeColors, toggleDarkMode, toggleSidebarColor } from "@/utils/theme";
 import { STORAGE_KEYS } from "@/constants";
 import { defaultPreferences } from "@/settings";
@@ -16,7 +16,10 @@ export const useSettingsStore = defineStore("setting", () => {
   );
 
   // 布局
-  const layout = useStorage<LayoutMode>(STORAGE_KEYS.LAYOUT, defaultPreferences.layout as LayoutMode);
+  const layout = useStorage<LayoutMode>(
+    STORAGE_KEYS.LAYOUT,
+    defaultPreferences.layout as LayoutMode
+  );
   const sidebarColorScheme = useStorage(
     STORAGE_KEYS.SIDEBAR_COLOR_SCHEME,
     defaultPreferences.sidebarColorScheme

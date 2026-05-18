@@ -1,9 +1,3 @@
-/**
- * 支持的语言类型
- * 与应用使用的语言值保持一致
- */
-export type SupportedLanguagesType = "zh-cn" | "en-US";
-
 export type LoadMessageFn = (
   lang: SupportedLanguagesType
 ) => Promise<Record<string, string> | undefined>;

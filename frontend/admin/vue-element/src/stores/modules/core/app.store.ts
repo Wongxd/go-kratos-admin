@@ -1,11 +1,10 @@
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import en from "element-plus/es/locale/lang/en";
 
-import { DeviceEnum, SidebarStatus } from "@/enums";
+import { DeviceEnum, SidebarStatus } from "@/constants";
 import { STORAGE_KEYS } from "@/constants";
 import { defaultPreferences } from "@/settings";
 import { loadLocaleMessages } from "@/i18n/setup";
-import type { SupportedLanguagesType } from "@/i18n/types";
 
 export const useAppStore = defineStore("app", () => {
   const device = useStorage(STORAGE_KEYS.DEVICE, DeviceEnum.DESKTOP);

@@ -1,5 +1,5 @@
-import { ThemeMode } from "@/enums";
 import { hexToRgb, rgbToHex } from "./color";
+import { ThemeMode } from "@/constants";
 
 /**
  * 加深颜色值

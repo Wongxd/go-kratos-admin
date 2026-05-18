@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ComponentSize } from "@/enums/settings";
+import { ComponentSize } from "@/constants";
 import { useAppStore } from "@/stores";
 
 const { t } = useI18n();

@@ -137,3 +137,5 @@ declare global {
     RouteRecordStringComponent,
   };
 }
+
+export {};
