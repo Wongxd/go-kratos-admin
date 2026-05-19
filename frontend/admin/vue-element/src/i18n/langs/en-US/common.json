@@ -127,5 +127,17 @@
   "validation": {
     "required": "Please input",
     "selectRequired": "Please select"
+  },
+  "dateRange": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "lastWeek": "Last Week",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month"
+  },
+  "switch": {
+    "active": "On",
+    "inactive": "Off"
   }
 }

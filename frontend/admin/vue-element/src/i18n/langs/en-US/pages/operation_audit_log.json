@@ -1,0 +1,12 @@
+{
+  "moduleName": "Operation Audit Log",
+  "username": "Username",
+  "resourceType": "Resource Type",
+  "action": "Action Type",
+  "ipAddress": "IP Address",
+  "success": "Success",
+  "createdAt": "Created At",
+  "resourceId": "Resource ID",
+  "requestId": "Request ID",
+  "geoLocation": "Geo Location"
+}

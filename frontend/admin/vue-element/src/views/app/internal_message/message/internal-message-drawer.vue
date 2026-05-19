@@ -1,233 +1,236 @@
+<template>
+  <ElDrawer
+    v-model="visible"
+    :title="title"
+    size="800px"
+    append-to-body
+    destroy-on-close
+    @close="handleClose"
+  >
+    <ElForm ref="formRef" :model="formData" :rules="formRules" label-width="120px">
+      <ElRow :gutter="20">
+        <ElCol :span="12">
+          <ElFormItem :label="$t('pages.internal_message.status')" prop="status">
+            <ElSelect
+              v-model="formData.status"
+              :placeholder="$t('common.placeholder.select')"
+              style="width: 100%"
+            >
+              <ElOption
+                v-for="item in statusOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </ElSelect>
+          </ElFormItem>
+        </ElCol>
+        <ElCol :span="12">
+          <ElFormItem :label="$t('pages.internal_message.type')" prop="type">
+            <ElSelect
+              v-model="formData.type"
+              :placeholder="$t('common.placeholder.select')"
+              style="width: 100%"
+            >
+              <ElOption
+                v-for="item in typeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </ElSelect>
+          </ElFormItem>
+        </ElCol>
+      </ElRow>
+
+      <ElFormItem :label="$t('pages.internal_message.categoryId')" prop="categoryId">
+        <ElTreeSelect
+          v-model="formData.categoryId"
+          :data="categoryTreeData"
+          :props="{ label: 'name', children: 'children' }"
+          :placeholder="$t('common.placeholder.select')"
+          node-key="id"
+          check-strictly
+          default-expand-all
+          filterable
+          clearable
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.internal_message.title')" prop="title">
+        <ElInput v-model="formData.title" :placeholder="$t('common.placeholder.input')" clearable />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.internal_message.content')" prop="content">
+        <!-- TODO: 集成富文本编辑器 -->
+        <ElInput
+          v-model="formData.content"
+          type="textarea"
+          :placeholder="$t('common.placeholder.input')"
+          :rows="10"
+        />
+      </ElFormItem>
+    </ElForm>
+
+    <template #footer>
+      <div class="drawer-footer">
+        <ElButton @click="handleClose">{{ $t("common.button.cancel") }}</ElButton>
+        <ElButton type="primary" :loading="loading" @click="handleSubmit">
+          {{ $t("common.button.confirm") }}
+        </ElButton>
+      </div>
+    </template>
+  </ElDrawer>
+</template>
+
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { ref, reactive, computed } from "vue";
 
-import { useVbenDrawer } from '@vben/common-ui';
-import { $t } from '@vben/locales';
-import { StorageManager } from '@vben-core/shared/cache';
-
-import { notification } from 'ant-design-vue';
-
-import { EditorType } from '@/adapter/component/Editor';
-import { useVbenForm } from '@/adapter/form';
-import {
-  type internal_messageservicev1_InternalMessage as InternalMessage,
-  type internal_messageservicev1_SendMessageRequest as SendMessageRequest,
-} from '@/api/generated/admin/service/v1';
 import {
   internalMessageStatusList,
   internalMessageTypeList,
   useInternalMessageCategoryStore,
   useInternalMessageStore,
-} from '@/stores';
+} from "@/stores";
+import { $t } from "@/i18n";
+
+const emit = defineEmits(["success"]);
 
 const internalMessageStore = useInternalMessageStore();
 const internalMessageCategoryStore = useInternalMessageCategoryStore();
 
-const storageManager = new StorageManager({
-  prefix: 'internal_message',
+const visible = ref(false);
+const loading = ref(false);
+const formRef = ref<FormInstance>();
+const isCreate = ref(true);
+const currentId = ref<number | undefined>();
+
+// 分类树数据
+const categoryTreeData = ref<any[]>([]);
+
+// 表单数据
+const formData = reactive({
+  status: "DRAFT",
+  type: "NOTIFICATION",
+  categoryId: undefined as number | undefined,
+  title: "",
+  content: "",
 });
 
-const storageKeyMessage = 'message';
+// 表单验证规则
+const formRules: FormRules = {
+  status: [{ required: true, message: $t("common.validation.selectRequired"), trigger: "change" }],
+  type: [{ required: true, message: $t("common.validation.selectRequired"), trigger: "change" }],
+  categoryId: [
+    { required: true, message: $t("common.validation.selectRequired"), trigger: "change" },
+  ],
+  title: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+};
 
-const data = ref();
+// 状态选项
+const statusOptions = computed(() => internalMessageStatusList.value);
 
-const getTitle = computed(() =>
-  data.value?.create
-    ? t('pages.internalMessage.drawer.create')
-    : t('pages.internalMessage.drawer.update'),
+// 类型选项
+const typeOptions = computed(() => internalMessageTypeList.value);
+
+// 标题
+const title = computed(() =>
+  isCreate.value
+    ? $t("pages.internal_message.drawer.create")
+    : $t("pages.internal_message.drawer.update")
 );
 
-const [BaseForm, baseFormApi] = useVbenForm({
-  showDefaultActions: false,
-  commonConfig: {
-    formItemClass: 'col-span-2 md:col-span-1',
-  },
-  wrapperClass: 'grid-cols-2 gap-x-4',
-
-  schema: [
-    {
-      component: 'Select',
-      fieldName: 'status',
-      label: t('pages.internalMessage.status'),
-      defaultValue: 'DRAFT',
-      componentProps: {
-        class: 'w-full',
-        placeholder: $t('ui.placeholder.select'),
-        options: internalMessageStatusList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        showSearch: true,
-      },
-      rules: 'selectRequired',
-    },
-    {
-      component: 'Select',
-      fieldName: 'type',
-      label: t('pages.internalMessage.type'),
-      defaultValue: 'NOTIFICATION',
-      componentProps: {
-        class: 'w-full',
-        placeholder: $t('ui.placeholder.select'),
-        options: internalMessageTypeList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        showSearch: true,
-      },
-      rules: 'selectRequired',
-    },
-    {
-      component: 'ApiTreeSelect',
-      fieldName: 'categoryId',
-      label: t('pages.internalMessage.categoryId'),
-      rules: 'selectRequired',
-      formItemClass: 'col-span-2 md:col-span-2',
-      componentProps: {
-        class: 'w-full',
-        placeholder: $t('ui.placeholder.select'),
-        numberToString: true,
-        showSearch: true,
-        treeDefaultExpandAll: true,
-        childrenField: 'children',
-        labelField: 'name',
-        valueField: 'id',
-        treeNodeFilterProp: 'label',
-        api: async () => {
-          const result =
-            await internalMessageCategoryStore.listInternalMessageCategory(
-              undefined,
-              {
-                is_enabled: 'true',
-              },
-            );
-          return result.items;
-        },
-      },
-    },
-    {
-      component: 'Input',
-      fieldName: 'title',
-      label: t('pages.internalMessage.title'),
-      rules: 'required',
-      formItemClass: 'col-span-2 md:col-span-2',
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-    {
-      component: 'Editor',
-      fieldName: 'content',
-      defaultValue: '',
-      label: t('pages.internalMessage.content'),
-      formItemClass: 'col-span-2 md:col-span-2',
-      componentProps: {
-        height: '100%',
-        placeholder: $t('ui.editor.please_input_content'),
-        editorType: EditorType.RICH_TEXT,
-        uploadImage: handleUploadImage,
-      },
-    },
-  ],
-});
-
-const [Drawer, drawerApi] = useVbenDrawer({
-  onCancel() {
-    drawerApi.close();
-  },
-
-  async onConfirm() {
-    console.log('onConfirm');
-
-    // 校验输入的数据
-    const validate = await baseFormApi.validate();
-    if (!validate.valid) {
-      return;
-    }
-
-    setLoading(true);
-
-    // 获取表单数据
-    const values = await baseFormApi.getValues();
-
-    console.log(getTitle.value, values);
-
-    try {
-      await (data.value?.create
-        ? internalMessageStore.sendMessage({
-            ...values,
-            targetAll: true,
-          } as SendMessageRequest)
-        : internalMessageStore.updateMessage(data.value.row.id, values));
-
-      notification.success({
-        message: data.value?.create
-          ? $t('ui.notification.create_success')
-          : $t('ui.notification.update_success'),
-      });
-    } catch {
-      notification.error({
-        message: data.value?.create
-          ? $t('ui.notification.create_failed')
-          : $t('ui.notification.update_failed'),
-      });
-    } finally {
-      // 关闭窗口
-      drawerApi.close();
-      setLoading(false);
-    }
-  },
-
-  onOpenChange(isOpen: boolean) {
-    if (isOpen) {
-      onOpenDrawer();
-    } else {
-      onCloseDrawer();
-    }
-  },
-});
-
-function onOpenDrawer() {
-  // 获取传入的数据
-  data.value = drawerApi.getData<Record<string, any>>();
-
-  if (data.value?.create) {
-    data.value.row = storageManager.getItem<InternalMessage>(storageKeyMessage);
-  }
-
-  // 为表单赋值
-  baseFormApi.setValues(data.value?.row);
-
-  setLoading(false);
-
-  console.log('onOpenDrawer', data.value);
-}
-
-async function onCloseDrawer() {
-  if (data.value?.create) {
-    // 获取表单数据
-    const values = await baseFormApi.getValues();
-    storageManager.setItem(storageKeyMessage, values);
+// 加载分类树
+async function loadCategoryTree() {
+  try {
+    const result = await internalMessageCategoryStore.listInternalMessageCategory(undefined, {
+      is_enabled: "true",
+    });
+    categoryTreeData.value = result.items || [];
+  } catch (error) {
+    console.error("加载分类树失败", error);
   }
 }
 
-function setLoading(loading: boolean) {
-  drawerApi.setState({ confirmLoading: loading });
+// 重置表单
+function resetForm() {
+  formData.status = "DRAFT";
+  formData.type = "NOTIFICATION";
+  formData.categoryId = undefined;
+  formData.title = "";
+  formData.content = "";
+  formRef.value?.clearValidate();
 }
 
-async function handleUploadImage(file: File): Promise<string> {
-  console.log('Upload image:', file);
+// 打开抽屉
+async function open(row?: any) {
+  visible.value = true;
+  await loadCategoryTree();
+
+  if (row) {
+    isCreate.value = false;
+    currentId.value = row.id;
+    Object.assign(formData, row);
+  } else {
+    isCreate.value = true;
+    currentId.value = undefined;
+    resetForm();
+  }
+}
+
+// 关闭抽屉
+function handleClose() {
+  visible.value = false;
+  resetForm();
+}
+
+// 提交表单
+async function handleSubmit() {
+  if (!formRef.value) return;
 
   try {
-    return '';
+    await formRef.value.validate();
+    loading.value = true;
+
+    if (isCreate.value) {
+      await internalMessageStore.sendMessage({
+        ...formData,
+        targetAll: true,
+      });
+      ElMessage.success($t("common.notification.createSuccess"));
+    } else {
+      await internalMessageStore.updateMessage(currentId.value!, formData);
+      ElMessage.success($t("common.notification.updateSuccess"));
+    }
+
+    emit("success");
+    handleClose();
   } catch (error) {
-    console.error('Image upload failed:', error);
-    return '';
+    if (error !== false) {
+      // 非表单验证错误
+      ElMessage.error(
+        isCreate.value
+          ? $t("common.notification.createFailed")
+          : $t("common.notification.updateFailed")
+      );
+    }
+  } finally {
+    loading.value = false;
   }
 }
+
+// 暴露方法
+defineExpose({
+  open,
+});
 </script>
 
-<template>
-  <Drawer :title="getTitle" class="w-full max-w-[800px]">
-    <BaseForm class="mx-4" />
-  </Drawer>
-</template>
+<style lang="scss" scoped>
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+</style>

@@ -1,210 +1,173 @@
+<template>
+  <div class="app-container h-full flex flex-1 flex-col">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :search-config="searchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    />
+
+    <!-- 列表 -->
+    <PageContent
+      ref="contentRef"
+      :content-config="contentConfig"
+      @operate-click="handleOperateClick"
+    >
+      <!-- 状态 -->
+      <template #isEnabled="{ row }">
+        <ElTag size="small" effect="dark" round :color="enableBoolToColor(row.isEnabled)">
+          {{ enableBoolToName(row.isEnabled) }}
+        </ElTag>
+      </template>
+    </PageContent>
+
+    <!-- 抽屉 -->
+    <InternalMessageCategoryDrawer ref="drawerRef" @success="handleSuccess" />
+  </div>
+</template>
+
 <script lang="ts" setup>
-import type { VxeGridProps } from '@/adapter/vxe-table';
+import { ElMessageBox, ElMessage, ElTag } from "element-plus";
 
-import { h } from 'vue';
+import PageContent from "@/components/CURD/PageContent.vue";
+import PageSearch from "@/components/CURD/PageSearch.vue";
+import usePage from "@/components/CURD/usePage";
+import type { ISearchConfig, IContentConfig } from "@/components/CURD/types";
 
-import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
+import { enableBoolToColor, enableBoolToName, useInternalMessageCategoryStore } from "@/stores";
+import { $t } from "@/i18n";
 
-import { notification } from 'ant-design-vue';
-
-import { useVbenVxeGrid } from '@/adapter/vxe-table';
-import { type internal_messageservicev1_InternalMessageCategory as InternalMessageCategory } from '@/api/generated/admin/service/v1';
-import { $t } from '@/locales';
-import {
-  enableBoolToColor,
-  enableBoolToName,
-  useInternalMessageCategoryStore,
-} from '@/stores';
-
-import InternalMessageCategoryDrawer from './internal-message-category-drawer.vue';
+import InternalMessageCategoryDrawer from "./internal-message-category-drawer.vue";
 
 const internalMessageCategoryStore = useInternalMessageCategoryStore();
 
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  // 控制表单是否显示折叠按钮
-  showCollapseButton: false,
-  // 按下回车时是否提交表单
-  submitOnEnter: true,
-  schema: [
+// 使用 CURD hook
+const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
+
+// 抽屉引用
+const drawerRef = ref<InstanceType<typeof InternalMessageCategoryDrawer>>();
+
+// 搜索配置
+const searchConfig: ISearchConfig = {
+  grid: true, // 启用 Grid 布局
+  formItems: [
     {
-      component: 'Input',
-      fieldName: 'name',
-      label: t('pages.internalMessageCategory.name'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("pages.internal_message_category.name"),
+      prop: "name",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Input',
-      fieldName: 'code',
-      label: t('pages.internalMessageCategory.code'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("pages.internal_message_category.code"),
+      prop: "code",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
   ],
 };
 
-const gridOptions: VxeGridProps<InternalMessageCategory> = {
-  toolbarConfig: {
-    custom: true,
-    export: true,
-    // import: true,
-    refresh: true,
-    zoom: true,
+// 表格配置
+const contentConfig: IContentConfig = {
+  permPrefix: "sys:internal_message_category", // 消息分类权限前缀
+  toolbarRight: ["add"], // 右侧自定义按钮
+  defaultToolbar: ["refresh", "exports", "filter"], // 右侧默认工具栏
+  table: {
+    border: true,
+    stripe: false,
   },
-  exportConfig: {},
-  pagerConfig: {
-    enabled: false,
-  },
-  rowConfig: {
-    isHover: true,
-  },
-  height: 'auto',
-
-  proxyConfig: {
-    ajax: {
-      query: async ({ page }, formValues) => {
-        console.log('query:', formValues);
-        return await internalMessageCategoryStore.listInternalMessageCategory(
-          {
-            page: page.currentPage,
-            pageSize: page.pageSize,
-          },
-          formValues,
-        );
+  pagination: false, // 禁用分页
+  indexAction: async (query: any) => {
+    const { page, pageSize, ...queryParams } = query;
+    const result = await internalMessageCategoryStore.listInternalMessageCategory(
+      {
+        page: page || 1,
+        pageSize: pageSize || 10,
       },
-    },
+      queryParams
+    );
+    return {
+      items: result.items || [],
+      total: result.total || 0,
+    };
   },
-
   columns: [
+    { prop: "name", label: $t("pages.internal_message_category.name"), minWidth: 150 },
+    { prop: "code", label: $t("pages.internal_message_category.code"), minWidth: 150 },
+    { prop: "sortOrder", label: $t("common.table.sortOrder"), width: 70 },
     {
-      title: t('pages.internalMessageCategory.name'),
-      field: 'name',
-    },
-    {
-      title: t('pages.internalMessageCategory.code'),
-      field: 'code',
-    },
-    { title: $t('ui.table.sortOrder'), field: 'sortOrder', width: 70 },
-    {
-      title: $t('ui.table.status'),
-      field: 'isEnabled',
-      slots: { default: 'isEnabled' },
+      prop: "isEnabled",
+      label: $t("common.table.status"),
       width: 95,
+      slotName: "isEnabled",
     },
     {
-      title: $t('ui.table.createdAt'),
-      field: 'createdAt',
-      formatter: 'formatDateTime',
-      width: 140,
+      prop: "createdAt",
+      label: $t("common.table.createdAt"),
+      width: 160,
+      template: "date",
+      dateFormat: "YYYY-MM-DD HH:mm:ss",
     },
-    { title: $t('ui.table.remark'), field: 'remark' },
+    { prop: "remark", label: $t("common.table.remark"), minWidth: 150 },
     {
-      title: $t('ui.table.action'),
-      field: 'action',
-      fixed: 'right',
-      slots: { default: 'action' },
-      width: 90,
+      prop: "action",
+      label: $t("common.table.action"),
+      fixed: "right",
+      width: 150,
+      template: "tool",
+      action: [
+        { name: "edit", text: $t("common.button.edit") },
+        { name: "delete", text: $t("common.button.delete"), attrs: { type: "danger" } },
+      ],
     },
   ],
 };
 
-const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
+// 处理操作列点击
+const handleOperateClick = async (data: any) => {
+  const { name, row } = data;
 
-const [Drawer, drawerApi] = useVbenDrawer({
-  // 连接抽离的组件
-  connectedComponent: InternalMessageCategoryDrawer,
-
-  onOpenChange(isOpen: boolean) {
-    if (!isOpen) {
-      // 关闭时，重载表格数据
-      gridApi.reload();
+  if (name === "edit") {
+    drawerRef.value?.open(row);
+  } else if (name === "delete") {
+    try {
+      await ElMessageBox.confirm(
+        $t("common.confirm.do_you_want_delete", {
+          moduleName: $t("pages.internal_message_category.moduleName"),
+        }),
+        $t("common.title.confirm"),
+        {
+          confirmButtonText: $t("common.button.confirm"),
+          cancelButtonText: $t("common.button.cancel"),
+          type: "warning",
+        }
+      );
+      await internalMessageCategoryStore.deleteInternalMessageCategory(row.id);
+      ElMessage.success($t("common.notification.delete_success"));
+      contentRef.value?.fetchPageData({}, true);
+    } catch {
+      // 用户取消
     }
-  },
-});
-
-/* 打开模态窗口 */
-function openDrawer(create: boolean, row?: any) {
-  drawerApi.setData({
-    create,
-    row,
-  });
-
-  drawerApi.open();
-}
-
-/* 创建 */
-function handleCreate() {
-  console.log('创建');
-
-  openDrawer(true);
-}
-
-/* 编辑 */
-function handleEdit(row: any) {
-  console.log('编辑', row);
-  openDrawer(false, row);
-}
-
-/* 删除 */
-async function handleDelete(row: any) {
-  console.log('删除', row);
-
-  try {
-    await internalMessageCategoryStore.deleteInternalMessageCategory(row.id);
-
-    notification.success({
-      message: $t('ui.notification.delete_success'),
-    });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.delete_failed'),
-    });
   }
-}
+};
+
+// 处理成功回调
+const handleSuccess = () => {
+  contentRef.value?.fetchPageData({}, true);
+};
 </script>
 
-<template>
-  <Page auto-content-height>
-    <Grid :table-title="$t('menu.internalMessage.internalMessageCategory')">
-      <template #toolbar-tools>
-        <a-button class="mr-2" type="primary" @click="handleCreate">
-          {{ t('pages.internalMessageCategory.button.create') }}
-        </a-button>
-      </template>
-      <template #isEnabled="{ row }">
-        <a-tag :color="enableBoolToColor(row.isEnabled)">
-          {{ enableBoolToName(row.isEnabled) }}
-        </a-tag>
-      </template>
-      <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: t('pages.internalMessageCategory.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
-      </template>
-    </Grid>
-    <Drawer />
-  </Page>
-</template>
+<style lang="scss" scoped>
+.app-container {
+  padding: 20px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+</style>

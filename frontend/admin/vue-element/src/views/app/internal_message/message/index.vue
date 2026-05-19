@@ -1,16 +1,47 @@
+<template>
+  <div class="app-container h-full flex flex-1 flex-col">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :search-config="searchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    />
+
+    <!-- 列表 -->
+    <PageContent
+      ref="contentRef"
+      :content-config="contentConfig"
+      @operate-click="handleOperateClick"
+    >
+      <!-- 状态 -->
+      <template #status="{ row }">
+        <ElTag size="small" effect="dark" round :color="internalMessageStatusColor(row.status)">
+          {{ internalMessageStatusLabel(row.status) }}
+        </ElTag>
+      </template>
+
+      <!-- 类型 -->
+      <template #type="{ row }">
+        <ElTag size="small" effect="dark" round :color="internalMessageTypeColor(row.type)">
+          {{ internalMessageTypeLabel(row.type) }}
+        </ElTag>
+      </template>
+    </PageContent>
+
+    <!-- 抽屉 -->
+    <InternalMessageDrawer ref="drawerRef" @success="handleSuccess" />
+  </div>
+</template>
+
 <script lang="ts" setup>
-import type { VxeGridProps } from '@/adapter/vxe-table';
+import { ElMessageBox, ElMessage, ElTag } from "element-plus";
 
-import { h } from 'vue';
+import PageContent from "@/components/CURD/PageContent.vue";
+import PageSearch from "@/components/CURD/PageSearch.vue";
+import usePage from "@/components/CURD/usePage";
+import type { ISearchConfig, IContentConfig } from "@/components/CURD/types";
 
-import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
-
-import { notification } from 'ant-design-vue';
-
-import { useVbenVxeGrid } from '@/adapter/vxe-table';
-import { type internal_messageservicev1_InternalMessage as InternalMessage } from '@/api/generated/admin/service/v1';
-import { $t } from '@/locales';
 import {
   internalMessageStatusColor,
   internalMessageStatusLabel,
@@ -20,249 +51,180 @@ import {
   internalMessageTypeList,
   useInternalMessageCategoryStore,
   useInternalMessageStore,
-} from '@/stores';
+} from "@/stores";
+import { $t } from "@/i18n";
 
-import InternalMessageDrawer from './internal-message-drawer.vue';
+import InternalMessageDrawer from "./internal-message-drawer.vue";
 
 const internalMessageStore = useInternalMessageStore();
 const internalMessageCategoryStore = useInternalMessageCategoryStore();
 
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  // 控制表单是否显示折叠按钮
-  showCollapseButton: false,
-  // 按下回车时是否提交表单
-  submitOnEnter: true,
-  schema: [
+// 使用 CURD hook
+const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
+
+// 抽屉引用
+const drawerRef = ref<InstanceType<typeof InternalMessageDrawer>>();
+
+// 搜索配置
+const searchConfig: ISearchConfig = {
+  grid: true, // 启用 Grid 布局
+  formItems: [
     {
-      component: 'Input',
-      fieldName: 'title',
-      label: t('pages.internalMessage.title'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("pages.internal_message.title"),
+      prop: "title",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Select',
-      fieldName: 'status',
-      label: t('pages.internalMessage.status'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        options: internalMessageStatusList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        showSearch: true,
+      type: "select",
+      label: $t("pages.internal_message.status"),
+      prop: "status",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
       },
+      options: internalMessageStatusList.value,
     },
     {
-      component: 'Select',
-      fieldName: 'type',
-      label: t('pages.internalMessage.type'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        options: internalMessageTypeList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        showSearch: true,
+      type: "select",
+      label: $t("pages.internal_message.type"),
+      prop: "type",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
       },
+      options: internalMessageTypeList.value,
     },
     {
-      component: 'ApiTreeSelect',
-      fieldName: 'category_id',
-      label: t('pages.internalMessage.categoryId'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        numberToString: true,
-        showSearch: true,
-        treeDefaultExpandAll: true,
-        childrenField: 'children',
-        labelField: 'name',
-        valueField: 'id',
-        treeNodeFilterProp: 'label',
-        api: async () => {
-          const result =
-            await internalMessageCategoryStore.listInternalMessageCategory(
-              undefined,
-              {
-                is_enabled: 'true',
-              },
-            );
-          return result.items;
+      type: "api-tree-select",
+      label: $t("pages.internal_message.categoryId"),
+      prop: "category_id",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
+        nodeKey: "id",
+        props: {
+          label: "name",
+          children: "children",
         },
+        defaultExpandAll: true,
+      },
+      api: async () => {
+        const result = await internalMessageCategoryStore.listInternalMessageCategory(undefined, {
+          is_enabled: "true",
+        });
+        return result.items || [];
       },
     },
   ],
 };
 
-const gridOptions: VxeGridProps<InternalMessage> = {
-  toolbarConfig: {
-    custom: true,
-    export: true,
-    // import: true,
-    refresh: true,
-    zoom: true,
+// 表格配置
+const contentConfig: IContentConfig = {
+  permPrefix: "sys:internal_message", // 内部消息权限前缀
+  toolbarRight: ["add"], // 右侧自定义按钮
+  defaultToolbar: ["refresh", "exports", "filter"], // 右侧默认工具栏
+  table: {
+    border: true,
+    stripe: false,
   },
-  height: 'auto',
-  exportConfig: {},
-  pagerConfig: {
-    enabled: false,
-  },
-  rowConfig: {
-    isHover: true,
-  },
-  stripe: true,
-
-  proxyConfig: {
-    ajax: {
-      query: async ({ page }, formValues) => {
-        console.log('query:', formValues);
-
-        return await internalMessageStore.listMessage(
-          {
-            page: page.currentPage,
-            pageSize: page.pageSize,
-          },
-          formValues,
-        );
+  pagination: false, // 禁用分页
+  indexAction: async (query: any) => {
+    const { page, pageSize, ...queryParams } = query;
+    const result = await internalMessageStore.listMessage(
+      {
+        page: page || 1,
+        pageSize: pageSize || 10,
       },
-    },
+      queryParams
+    );
+    return {
+      items: result.items || [],
+      total: result.total || 0,
+    };
   },
-
   columns: [
+    { prop: "title", label: $t("pages.internal_message.title"), minWidth: 200 },
+    { prop: "categoryName", label: $t("pages.internal_message.categoryName"), minWidth: 150 },
     {
-      title: t('pages.internalMessage.title'),
-      field: 'title',
+      prop: "status",
+      label: $t("pages.internal_message.status"),
+      width: 120,
+      slotName: "status",
     },
     {
-      title: t('pages.internalMessage.categoryName'),
-      field: 'categoryName',
+      prop: "type",
+      label: $t("pages.internal_message.type"),
+      width: 120,
+      slotName: "type",
+    },
+    { prop: "senderName", label: $t("pages.internal_message.senderName"), minWidth: 120 },
+    {
+      prop: "createdAt",
+      label: $t("common.table.createdAt"),
+      width: 160,
+      template: "date",
+      dateFormat: "YYYY-MM-DD HH:mm:ss",
     },
     {
-      title: t('pages.internalMessage.status'),
-      field: 'status',
-      slots: { default: 'status' },
-    },
-    {
-      title: t('pages.internalMessage.type'),
-      field: 'type',
-      slots: { default: 'type' },
-    },
-    {
-      title: t('pages.internalMessage.senderName'),
-      field: 'senderName',
-    },
-    {
-      title: $t('ui.table.createdAt'),
-      field: 'createdAt',
-      formatter: 'formatDateTime',
-      width: 140,
-    },
-    {
-      title: $t('ui.table.action'),
-      field: 'action',
-      fixed: 'right',
-      slots: { default: 'action' },
-      width: 90,
+      prop: "action",
+      label: $t("common.table.action"),
+      fixed: "right",
+      width: 150,
+      template: "tool",
+      action: [
+        { name: "edit", text: $t("common.button.edit") },
+        { name: "delete", text: $t("common.button.delete"), attrs: { type: "danger" } },
+      ],
     },
   ],
 };
 
-const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
+// 处理操作列点击
+const handleOperateClick = async (data: any) => {
+  const { name, row } = data;
 
-const [Drawer, drawerApi] = useVbenDrawer({
-  // 连接抽离的组件
-  connectedComponent: InternalMessageDrawer,
-
-  onOpenChange(isOpen: boolean) {
-    if (!isOpen) {
-      // 关闭时，重载表格数据
-      gridApi.reload();
+  if (name === "edit") {
+    drawerRef.value?.open(row);
+  } else if (name === "delete") {
+    try {
+      await ElMessageBox.confirm(
+        $t("common.confirm.do_you_want_delete", {
+          moduleName: $t("pages.internal_message.moduleName"),
+        }),
+        $t("common.title.confirm"),
+        {
+          confirmButtonText: $t("common.button.confirm"),
+          cancelButtonText: $t("common.button.cancel"),
+          type: "warning",
+        }
+      );
+      await internalMessageStore.deleteMessage(row.id);
+      ElMessage.success($t("common.notification.delete_success"));
+      contentRef.value?.fetchPageData({}, true);
+    } catch {
+      // 用户取消
     }
-  },
-});
-
-/* 打开模态窗口 */
-function openDrawer(create: boolean, row?: any) {
-  drawerApi.setData({
-    create,
-    row,
-  });
-
-  drawerApi.open();
-}
-
-/* 创建 */
-function handleCreate() {
-  console.log('创建');
-  openDrawer(true);
-}
-
-/* 编辑 */
-function handleEdit(row: any) {
-  console.log('编辑', row);
-  openDrawer(false, row);
-}
-
-/* 删除 */
-async function handleDelete(row: any) {
-  console.log('删除', row);
-
-  try {
-    await internalMessageStore.deleteMessage(row.id);
-
-    notification.success({
-      message: $t('ui.notification.delete_success'),
-    });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.delete_failed'),
-    });
   }
-}
+};
+
+// 处理成功回调
+const handleSuccess = () => {
+  contentRef.value?.fetchPageData({}, true);
+};
 </script>
 
-<template>
-  <Page auto-content-height>
-    <Grid :table-title="$t('menu.internalMessage.internalMessage')">
-      <template #toolbar-tools>
-        <a-button class="mr-2" type="primary" @click="handleCreate">
-          {{ t('pages.internalMessage.button.create') }}
-        </a-button>
-      </template>
-      <template #status="{ row }">
-        <a-tag :color="internalMessageStatusColor(row.status)">
-          {{ internalMessageStatusLabel(row.status) }}
-        </a-tag>
-      </template>
-      <template #type="{ row }">
-        <a-tag :color="internalMessageTypeColor(row.type)">
-          {{ internalMessageTypeLabel(row.type) }}
-        </a-tag>
-      </template>
-      <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: t('pages.internalMessage.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
-      </template>
-    </Grid>
-    <Drawer />
-  </Page>
-</template>
+<style lang="scss" scoped>
+.app-container {
+  padding: 20px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+</style>

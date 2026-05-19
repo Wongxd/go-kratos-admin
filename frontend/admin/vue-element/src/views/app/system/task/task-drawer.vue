@@ -1,269 +1,326 @@
+<template>
+  <ElDrawer
+    v-model="visible"
+    :title="title"
+    size="600px"
+    :close-on-click-modal="false"
+    :append-to-body="true"
+    :destroy-on-close="true"
+    @close="handleClose"
+  >
+    <ElForm
+      ref="formRef"
+      :model="formData"
+      :rules="formRules"
+      label-width="140px"
+      class="drawer-form"
+    >
+      <!-- 基本信息 -->
+      <ElDivider content-position="left">{{ $t("common.section.basic") }}</ElDivider>
+
+      <ElFormItem :label="$t('pages.task.type')" prop="type">
+        <ElSelect
+          v-model="formData.type"
+          :placeholder="$t('common.placeholder.select')"
+          filterable
+          clearable
+          style="width: 100%"
+        >
+          <ElOption
+            v-for="item in taskTypeList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </ElSelect>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.task.typeName')" prop="typeName">
+        <ElSelect
+          v-model="formData.typeName"
+          :placeholder="$t('common.placeholder.select')"
+          filterable
+          clearable
+          style="width: 100%"
+        >
+          <ElOption
+            v-for="item in typeNameOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </ElSelect>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.task.taskPayload')" prop="taskPayload">
+        <ElInput
+          v-model="formData.taskPayload"
+          type="textarea"
+          :rows="3"
+          :placeholder="$t('common.placeholder.input')"
+        />
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="formData.type === 'PERIODIC'"
+        :label="$t('pages.task.cronSpec')"
+        prop="cronSpec"
+      >
+        <ElInput
+          v-model="formData.cronSpec"
+          :placeholder="$t('common.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.task.taskOptionsMaxRetry')" prop="taskOptions.maxRetry">
+        <ElInputNumber
+          v-model="formData.taskOptions.maxRetry"
+          :min="0"
+          :placeholder="$t('common.placeholder.input')"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="['DELAY', 'WAIT_RESULT'].includes(formData.type)"
+        :label="$t('pages.task.taskOptionsTimeout')"
+        prop="taskOptions.timeout"
+      >
+        <ElInputNumber
+          v-model="formData.taskOptions.timeout"
+          :min="0"
+          :placeholder="$t('common.placeholder.input')"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="formData.type === 'DELAY'"
+        :label="$t('pages.task.taskOptionsDeadline')"
+        prop="taskOptions.deadline"
+      >
+        <ElDatePicker
+          v-model="formData.taskOptions.deadline"
+          type="datetime"
+          :placeholder="$t('common.placeholder.input')"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="formData.type === 'DELAY'"
+        :label="$t('pages.task.taskOptionsProcessIn')"
+        prop="taskOptions.processIn"
+      >
+        <ElDatePicker
+          v-model="formData.taskOptions.processIn"
+          type="datetime"
+          :placeholder="$t('common.placeholder.input')"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="formData.type === 'DELAY'"
+        :label="$t('pages.task.taskOptionsProcessAt')"
+        prop="taskOptions.processAt"
+      >
+        <ElDatePicker
+          v-model="formData.taskOptions.processAt"
+          type="datetime"
+          :placeholder="$t('common.placeholder.input')"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.task.enable')" prop="enable">
+        <ElRadioGroup v-model="formData.enable">
+          <ElRadioButton :value="true">{{ $t("enum.enable.true") }}</ElRadioButton>
+          <ElRadioButton :value="false">{{ $t("enum.enable.false") }}</ElRadioButton>
+        </ElRadioGroup>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('common.table.remark')" prop="remark">
+        <ElInput
+          v-model="formData.remark"
+          type="textarea"
+          :rows="3"
+          :placeholder="$t('common.placeholder.input')"
+        />
+      </ElFormItem>
+    </ElForm>
+
+    <template #footer>
+      <div class="drawer-footer">
+        <ElButton @click="handleClose">{{ $t("common.button.cancel") }}</ElButton>
+        <ElButton type="primary" :loading="submitLoading" @click="handleSubmit">
+          {{ $t("common.button.confirm") }}
+        </ElButton>
+      </div>
+    </template>
+  </ElDrawer>
+</template>
+
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from "vue";
+import { ElMessage } from "element-plus";
 
-import { useVbenDrawer } from '@vben/common-ui';
-import { $t } from '@vben/locales';
+import { taskTypeList, useTaskStore } from "@/stores";
+import { $t } from "@/i18n";
 
-import { notification } from 'ant-design-vue';
-
-import { useVbenForm } from '@/adapter/form';
-import { enableBoolList, taskTypeList, useTaskStore } from '@/stores';
+const emit = defineEmits<{
+  success: [];
+}>();
 
 const taskStore = useTaskStore();
 
-const data = ref();
+const visible = ref(false);
+const submitLoading = ref(false);
+const isCreate = ref(true);
+const currentId = ref<number>();
+const formRef = ref();
+const typeNameOptions = ref<Array<{ label: string; value: string }>>([]);
 
-const getTitle = computed(() =>
-  data.value?.create
-    ? $t('ui.modal.create', { moduleName: t('pages.task.moduleName') })
-    : $t('ui.modal.update', { moduleName: t('pages.task.moduleName') }),
+// 表单数据
+const formData = reactive({
+  type: "PERIODIC",
+  typeName: "",
+  taskPayload: "",
+  cronSpec: "",
+  taskOptions: {
+    maxRetry: 3,
+    timeout: undefined as number | undefined,
+    deadline: undefined as Date | undefined,
+    processIn: undefined as Date | undefined,
+    processAt: undefined as Date | undefined,
+  },
+  enable: true,
+  remark: "",
+});
+
+// 表单验证规则
+const formRules = {
+  type: [{ required: true, message: $t("common.validation.selectRequired"), trigger: "change" }],
+  typeName: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  enable: [{ required: true, message: $t("common.validation.selectRequired"), trigger: "change" }],
+};
+
+// 标题
+const title = computed(() =>
+  isCreate.value ? $t("pages.task.button.create") : $t("pages.task.button.update")
 );
-// const isCreate = computed(() => data.value?.create);
 
-const [BaseForm, baseFormApi] = useVbenForm({
-  showDefaultActions: false,
-  // 所有表单项共用，可单独在表单内覆盖
-  commonConfig: {
-    // 所有表单项
-    componentProps: {
-      class: 'w-full',
-    },
-  },
-  schema: [
-    {
-      component: 'Select',
-      fieldName: 'type',
-      label: t('pages.task.type'),
-      defaultValue: 'PERIODIC',
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        options: taskTypeList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
-      },
-      rules: 'selectRequired',
-    },
-
-    {
-      component: 'ApiSelect',
-      fieldName: 'typeName',
-      label: t('pages.task.typeName'),
-      rules: 'required',
-      componentProps: {
-        allowClear: true,
-        showSearch: true,
-        placeholder: $t('ui.placeholder.select'),
-        api: async () => {
-          const result = await taskStore.listTaskTypeName();
-          return result.typeNames;
-        },
-        afterFetch: (data: { name: string; path: string }[]) => {
-          return data.map((item: any) => ({
-            label: item,
-            value: item,
-          }));
-        },
-      },
-    },
-
-    {
-      component: 'Textarea',
-      fieldName: 'taskPayload',
-      label: t('pages.task.taskPayload'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-
-    {
-      component: 'Input',
-      fieldName: 'cronSpec',
-      label: t('pages.task.cronSpec'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-      dependencies: {
-        show: (values) => {
-          return ['PERIODIC'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-    },
-
-    {
-      component: 'InputNumber',
-      fieldName: 'taskOptions.maxRetry',
-      label: t('pages.task.taskOptionsMaxRetry'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-        defaultValue: 3,
-      },
-    },
-
-    {
-      component: 'InputNumber',
-      fieldName: 'taskOptions.timeout',
-      label: t('pages.task.taskOptionsTimeout'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-      dependencies: {
-        show: (values) => {
-          return ['DELAY', 'WAIT_RESULT'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-    },
-
-    {
-      component: 'DatePicker',
-      fieldName: 'taskOptions.deadline',
-      label: t('pages.task.taskOptionsDeadline'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-        showTime: true,
-      },
-      dependencies: {
-        show: (values) => {
-          return ['DELAY'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-    },
-
-    {
-      component: 'DatePicker',
-      fieldName: 'taskOptions.processIn',
-      label: t('pages.task.taskOptionsProcessIn'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-        showTime: true,
-      },
-      dependencies: {
-        show: (values) => {
-          return ['DELAY'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-    },
-
-    {
-      component: 'DatePicker',
-      fieldName: 'taskOptions.processAt',
-      label: t('pages.task.taskOptionsProcessAt'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-        showTime: true,
-      },
-      dependencies: {
-        show: (values) => {
-          return ['DELAY'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-    },
-
-    {
-      component: 'RadioGroup',
-      fieldName: 'enable',
-      defaultValue: true,
-      label: t('pages.task.enable'),
-      rules: 'selectRequired',
-      componentProps: {
-        optionType: 'button',
-        buttonStyle: 'solid',
-        class: 'flex flex-wrap', // 如果选项过多，可以添加class来自动折叠
-        options: enableBoolList,
-      },
-    },
-
-    {
-      component: 'Textarea',
-      fieldName: 'remark',
-      label: $t('ui.table.remark'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-  ],
-});
-
-const [Drawer, drawerApi] = useVbenDrawer({
-  onCancel() {
-    drawerApi.close();
-  },
-
-  async onConfirm() {
-    console.log('onConfirm');
-
-    // 校验输入的数据
-    const validate = await baseFormApi.validate();
-    if (!validate.valid) {
-      return;
-    }
-
-    setLoading(true);
-
-    // 获取表单数据
-    const values = await baseFormApi.getValues();
-
-    console.log(getTitle.value, values);
-
-    try {
-      await (data.value?.create
-        ? taskStore.createTask(values)
-        : taskStore.updateTask(data.value.row.id, values));
-
-      notification.success({
-        message: data.value?.create
-          ? $t('ui.notification.create_success')
-          : $t('ui.notification.update_success'),
-      });
-    } catch {
-      notification.error({
-        message: data.value?.create
-          ? $t('ui.notification.create_failed')
-          : $t('ui.notification.update_failed'),
-      });
-    } finally {
-      // 关闭窗口
-      drawerApi.close();
-      setLoading(false);
-    }
-  },
-
-  onOpenChange(isOpen: boolean) {
-    if (isOpen) {
-      // 获取传入的数据
-      data.value = drawerApi.getData<Record<string, any>>();
-
-      // 为表单赋值
-      baseFormApi.setValues(data.value?.row);
-
-      setLoading(false);
-
-      console.log('onOpenChange', data.value, data.value?.create);
-    }
-  },
-});
-
-function setLoading(loading: boolean) {
-  drawerApi.setState({ confirmLoading: loading });
+// 加载任务类型名称选项
+async function loadTypeNameOptions() {
+  try {
+    const result = await taskStore.listTaskTypeName();
+    typeNameOptions.value = result.typeNames.map((item: any) => ({
+      label: item,
+      value: item,
+    }));
+  } catch (error) {
+    console.error("加载任务类型名称失败", error);
+  }
 }
+
+// 打开抽屉
+async function open(row?: any) {
+  visible.value = true;
+
+  // 加载任务类型名称选项
+  await loadTypeNameOptions();
+
+  if (row) {
+    // 编辑模式
+    isCreate.value = false;
+    currentId.value = row.id;
+    Object.assign(formData, row);
+    // 处理 taskOptions 字段
+    if (row.taskOptions) {
+      Object.assign(formData.taskOptions, row.taskOptions);
+    }
+  } else {
+    // 创建模式
+    isCreate.value = true;
+    currentId.value = undefined;
+    resetForm();
+  }
+}
+
+// 关闭抽屉
+function handleClose() {
+  visible.value = false;
+  resetForm();
+}
+
+// 重置表单
+function resetForm() {
+  formData.type = "PERIODIC";
+  formData.typeName = "";
+  formData.taskPayload = "";
+  formData.cronSpec = "";
+  formData.taskOptions = {
+    maxRetry: 3,
+    timeout: undefined,
+    deadline: undefined,
+    processIn: undefined,
+    processAt: undefined,
+  };
+  formData.enable = true;
+  formData.remark = "";
+
+  formRef.value?.clearValidate();
+}
+
+// 提交表单
+async function handleSubmit() {
+  if (!formRef.value) return;
+
+  try {
+    await formRef.value.validate();
+    submitLoading.value = true;
+
+    const values = { ...formData };
+
+    if (isCreate.value) {
+      await taskStore.createTask(values);
+      ElMessage.success($t("common.notification.createSuccess"));
+    } else {
+      await taskStore.updateTask(currentId.value!, values);
+      ElMessage.success($t("common.notification.updateSuccess"));
+    }
+
+    emit("success");
+    handleClose();
+  } catch (error) {
+    if (error !== false) {
+      // 不是验证错误
+      ElMessage.error(
+        isCreate.value
+          ? $t("common.notification.createFailed")
+          : $t("common.notification.updateFailed")
+      );
+    }
+  } finally {
+    submitLoading.value = false;
+  }
+}
+
+// 暴露方法给父组件
+defineExpose({
+  open,
+});
 </script>
 
-<template>
-  <Drawer :title="getTitle">
-    <BaseForm />
-  </Drawer>
-</template>
+<style lang="scss" scoped>
+.drawer-form {
+  padding-right: 10px;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+</style>

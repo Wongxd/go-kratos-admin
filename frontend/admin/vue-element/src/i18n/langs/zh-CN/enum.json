@@ -98,5 +98,95 @@
       "TIME": "时间",
       "DEVICE": "设备"
     }
+  },
+  "menu": {
+    "type": {
+      "CATALOG": "目录",
+      "MENU": "菜单",
+      "BUTTON": "按钮",
+      "EMBEDDED": "内嵌",
+      "LINK": "链接"
+    }
+  },
+  "task": {
+    "type": {
+      "Periodic": "周期性任务",
+      "Delay": "延迟任务",
+      "WaitResult": "等待结果任务"
+    }
+  },
+  "loginAuditLog": {
+    "status": {
+      "SUCCESS": "成功",
+      "FAILED": "失败",
+      "PARTIAL": "部分成功"
+    },
+    "actionType": {
+      "LOGIN": "登录",
+      "LOGOUT": "登出",
+      "SESSION_EXPIRED": "会话过期",
+      "KICKED_OUT": "被踢出",
+      "PASSWORD_RESET": "密码重置"
+    },
+    "riskLevel": {
+      "LOW": "低风险",
+      "MEDIUM": "中风险",
+      "HIGH": "高风险"
+    }
+  },
+  "operationAuditLog": {
+    "action": {
+      "CREATE": "创建",
+      "UPDATE": "更新",
+      "DELETE": "删除",
+      "READ": "读取",
+      "ASSIGN": "分配",
+      "UNASSIGN": "取消分配",
+      "EXPORT": "导出",
+      "IMPORT": "导入",
+      "OTHER": "其他"
+    }
+  },
+  "permissionAuditLog": {
+    "action": {
+      "GRANT": "授予",
+      "REVOKE": "撤销",
+      "UPDATE": "更新",
+      "RESET": "重置",
+      "CREATE": "创建",
+      "DELETE": "删除",
+      "ASSIGN": "分配",
+      "UNASSIGN": "取消分配",
+      "BULK_GRANT": "批量授予",
+      "BULK_REVOKE": "批量撤销",
+      "EXPIRE": "过期",
+      "RESUME": "恢复",
+      "ROLLBACK": "回滚",
+      "OTHER": "其他"
+    }
+  },
+  "internalMessage": {
+    "status": {
+      "DRAFT": "草稿",
+      "PUBLISHED": "已发布",
+      "SCHEDULED": "计划发送",
+      "REVOKED": "已撤回",
+      "ARCHIVED": "已归档",
+      "DELETED": "已删除"
+    },
+    "type": {
+      "NOTIFICATION": "通知",
+      "PRIVATE": "私信",
+      "GROUP": "群聊"
+    }
+  },
+  "internalMessageRecipient": {
+    "status": {
+      "SENT": "已发送",
+      "RECEIVED": "已接收",
+      "READ": "已读",
+      "REVOKED": "已撤回",
+      "DELETED": "已删除"
+    }
   }
 }

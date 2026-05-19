@@ -1,163 +1,174 @@
+<template>
+  <ElDrawer
+    v-model="visible"
+    :title="title"
+    size="600px"
+    append-to-body
+    destroy-on-close
+    @close="handleClose"
+  >
+    <ElForm ref="formRef" :model="formData" :rules="formRules" label-width="120px">
+      <ElFormItem :label="$t('pages.internal_message_category.name')" prop="name">
+        <ElInput v-model="formData.name" :placeholder="$t('common.placeholder.input')" clearable />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.internal_message_category.code')" prop="code">
+        <ElInput v-model="formData.code" :placeholder="$t('common.placeholder.input')" clearable />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('common.table.sortOrder')" prop="sortOrder">
+        <ElInputNumber
+          v-model="formData.sortOrder"
+          :min="1"
+          :max="9999"
+          controls-position="right"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('common.table.status')" prop="isEnabled">
+        <ElRadioGroup v-model="formData.isEnabled">
+          <ElRadio :value="true">{{ $t("common.switch.active") }}</ElRadio>
+          <ElRadio :value="false">{{ $t("common.switch.inactive") }}</ElRadio>
+        </ElRadioGroup>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('common.table.remark')" prop="remark">
+        <ElInput
+          v-model="formData.remark"
+          type="textarea"
+          :placeholder="$t('common.placeholder.input')"
+          :rows="4"
+        />
+      </ElFormItem>
+    </ElForm>
+
+    <template #footer>
+      <div class="drawer-footer">
+        <ElButton @click="handleClose">{{ $t("common.button.cancel") }}</ElButton>
+        <ElButton type="primary" :loading="loading" @click="handleSubmit">
+          {{ $t("common.button.confirm") }}
+        </ElButton>
+      </div>
+    </template>
+  </ElDrawer>
+</template>
+
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { ref, reactive, computed } from "vue";
 
-import { useVbenDrawer } from '@vben/common-ui';
-import { $t } from '@vben/locales';
+import { useInternalMessageCategoryStore } from "@/stores";
+import { $t } from "@/i18n";
 
-import { notification } from 'ant-design-vue';
-
-import { useVbenForm } from '@/adapter/form';
-import { enableBoolList, useInternalMessageCategoryStore } from '@/stores';
+const emit = defineEmits(["success"]);
 
 const internalMessageCategoryStore = useInternalMessageCategoryStore();
 
-const data = ref();
+const visible = ref(false);
+const loading = ref(false);
+const formRef = ref<FormInstance>();
+const isCreate = ref(true);
+const currentId = ref<number | undefined>();
 
-const getTitle = computed(() =>
-  data.value?.create
-    ? $t('ui.modal.create', {
-        moduleName: t('pages.internalMessageCategory.moduleName'),
-      })
-    : $t('ui.modal.update', {
-        moduleName: t('pages.internalMessageCategory.moduleName'),
-      }),
-);
-// const isCreate = computed(() => data.value?.create);
+// 表单数据
+const formData = reactive({
+  name: "",
+  code: "",
+  sortOrder: 1,
+  isEnabled: true,
+  remark: "",
+});
 
-const [BaseForm, baseFormApi] = useVbenForm({
-  showDefaultActions: false,
-  // 所有表单项共用，可单独在表单内覆盖
-  commonConfig: {
-    // 所有表单项
-    componentProps: {
-      class: 'w-full',
-    },
-  },
-  schema: [
-    {
-      component: 'Input',
-      fieldName: 'name',
-      label: t('pages.internalMessageCategory.name'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-      rules: 'required',
-    },
-    {
-      component: 'Input',
-      fieldName: 'code',
-      label: t('pages.internalMessageCategory.code'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-      rules: 'required',
-    },
-    {
-      component: 'InputNumber',
-      fieldName: 'sortOrder',
-      defaultValue: 1,
-      label: $t('ui.table.sortOrder'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-    {
-      component: 'RadioGroup',
-      fieldName: 'isEnabled',
-      label: $t('ui.table.status'),
-      defaultValue: true,
-      rules: 'selectRequired',
-      componentProps: {
-        optionType: 'button',
-        buttonStyle: 'solid',
-        class: 'flex flex-wrap', // 如果选项过多，可以添加class来自动折叠
-        options: enableBoolList,
-      },
-    },
-    {
-      component: 'Textarea',
-      fieldName: 'remark',
-      label: $t('ui.table.remark'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
+// 表单验证规则
+const formRules: FormRules = {
+  name: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  code: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  isEnabled: [
+    { required: true, message: $t("common.validation.selectRequired"), trigger: "change" },
   ],
-});
+};
 
-const [Drawer, drawerApi] = useVbenDrawer({
-  onCancel() {
-    drawerApi.close();
-  },
+// 标题
+const title = computed(() =>
+  isCreate.value
+    ? $t("common.modal.create", { moduleName: $t("pages.internal_message_category.moduleName") })
+    : $t("common.modal.update", { moduleName: $t("pages.internal_message_category.moduleName") })
+);
 
-  async onConfirm() {
-    console.log('onConfirm');
-
-    // 校验输入的数据
-    const validate = await baseFormApi.validate();
-    if (!validate.valid) {
-      return;
-    }
-
-    setLoading(true);
-
-    // 获取表单数据
-    const values = await baseFormApi.getValues();
-
-    console.log(getTitle.value, values);
-
-    try {
-      await (data.value?.create
-        ? internalMessageCategoryStore.createInternalMessageCategory(values)
-        : internalMessageCategoryStore.updateInternalMessageCategory(
-            data.value.row.id,
-            values,
-          ));
-
-      notification.success({
-        message: data.value?.create
-          ? $t('ui.notification.create_success')
-          : $t('ui.notification.update_success'),
-      });
-    } catch {
-      notification.error({
-        message: data.value?.create
-          ? $t('ui.notification.create_failed')
-          : $t('ui.notification.update_failed'),
-      });
-    } finally {
-      // 关闭窗口
-      drawerApi.close();
-      setLoading(false);
-    }
-  },
-
-  onOpenChange(isOpen: boolean) {
-    if (isOpen) {
-      // 获取传入的数据
-      data.value = drawerApi.getData<Record<string, any>>();
-
-      // 为表单赋值
-      baseFormApi.setValues(data.value?.row);
-
-      setLoading(false);
-
-      console.log('onOpenChange', data.value, data.value?.create);
-    }
-  },
-});
-
-function setLoading(loading: boolean) {
-  drawerApi.setState({ confirmLoading: loading });
+// 重置表单
+function resetForm() {
+  formData.name = "";
+  formData.code = "";
+  formData.sortOrder = 1;
+  formData.isEnabled = true;
+  formData.remark = "";
+  formRef.value?.clearValidate();
 }
+
+// 打开抽屉
+function open(row?: any) {
+  visible.value = true;
+
+  if (row) {
+    isCreate.value = false;
+    currentId.value = row.id;
+    Object.assign(formData, row);
+  } else {
+    isCreate.value = true;
+    currentId.value = undefined;
+    resetForm();
+  }
+}
+
+// 关闭抽屉
+function handleClose() {
+  visible.value = false;
+  resetForm();
+}
+
+// 提交表单
+async function handleSubmit() {
+  if (!formRef.value) return;
+
+  try {
+    await formRef.value.validate();
+    loading.value = true;
+
+    if (isCreate.value) {
+      await internalMessageCategoryStore.createInternalMessageCategory(formData);
+      ElMessage.success($t("common.notification.createSuccess"));
+    } else {
+      await internalMessageCategoryStore.updateInternalMessageCategory(currentId.value!, formData);
+      ElMessage.success($t("common.notification.updateSuccess"));
+    }
+
+    emit("success");
+    handleClose();
+  } catch (error) {
+    if (error !== false) {
+      // 非表单验证错误
+      ElMessage.error(
+        isCreate.value
+          ? $t("common.notification.createFailed")
+          : $t("common.notification.updateFailed")
+      );
+    }
+  } finally {
+    loading.value = false;
+  }
+}
+
+// 暴露方法
+defineExpose({
+  open,
+});
 </script>
 
-<template>
-  <Drawer :title="getTitle">
-    <BaseForm />
-  </Drawer>
-</template>
+<style lang="scss" scoped>
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+</style>

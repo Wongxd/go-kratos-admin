@@ -1,0 +1,18 @@
+{
+  "moduleName": "内部消息",
+  "title": "标题",
+  "status": "状态",
+  "type": "类型",
+  "categoryId": "分类",
+  "categoryName": "分类名称",
+  "content": "内容",
+  "senderName": "发送人",
+  "createdAt": "创建时间",
+  "button": {
+    "create": "新建消息"
+  },
+  "drawer": {
+    "create": "新建消息",
+    "update": "编辑消息"
+  }
+}

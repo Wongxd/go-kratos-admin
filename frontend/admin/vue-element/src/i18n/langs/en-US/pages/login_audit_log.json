@@ -1,0 +1,11 @@
+{
+  "moduleName": "Login Audit Log",
+  "username": "Username",
+  "ipAddress": "IP Address",
+  "actionType": "Action Type",
+  "riskLevel": "Risk Level",
+  "status": "Status",
+  "createdAt": "Created At",
+  "platform": "Platform Info",
+  "geoLocation": "Geo Location"
+}

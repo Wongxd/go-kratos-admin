@@ -1,13 +1,46 @@
+<template>
+  <div class="app-container h-full flex flex-1 flex-col">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :search-config="searchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    />
+
+    <!-- 列表 -->
+    <PageContent ref="contentRef" :content-config="contentConfig">
+      <!-- 是否成功 -->
+      <template #success="{ row }">
+        <ElTag size="small" effect="dark" round :color="successToColor(row.success)">
+          {{ successToNameWithStatusCode(row.success, row.statusCode) }}
+        </ElTag>
+      </template>
+
+      <!-- 操作类型 -->
+      <template #action="{ row }">
+        <ElTag size="small" effect="dark" round :color="operationAuditLogActionToColor(row.action)">
+          {{ operationAuditLogActionToName(row.action) }}
+        </ElTag>
+      </template>
+
+      <!-- 地理位置 -->
+      <template #geoLocation="{ row }">
+        {{ row.geoLocation?.province }} {{ row.geoLocation?.city }}
+      </template>
+    </PageContent>
+  </div>
+</template>
+
 <script lang="ts" setup>
-import type { VxeGridProps } from '@/adapter/vxe-table';
+import { ElTag } from "element-plus";
+import dayjs from "dayjs";
 
-import { Page, type VbenFormProps } from '@vben/common-ui';
+import PageContent from "@/components/CURD/PageContent.vue";
+import PageSearch from "@/components/CURD/PageSearch.vue";
+import usePage from "@/components/CURD/usePage";
+import type { ISearchConfig, IContentConfig } from "@/components/CURD/types";
 
-import dayjs from 'dayjs';
-
-import { useVbenVxeGrid } from '@/adapter/vxe-table';
-import { type auditservicev1_ApiAuditLog as ApiAuditLog } from '@/api/generated/admin/service/v1';
-import { $t } from '@/locales';
 import {
   operationAuditLogActionList,
   operationAuditLogActionToColor,
@@ -16,110 +49,108 @@ import {
   successToColor,
   successToNameWithStatusCode,
   useOperationAuditLogStore,
-} from '@/stores';
+} from "@/stores";
+import { $t } from "@/i18n";
 
 const operationAuditLogStore = useOperationAuditLogStore();
 
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  // 控制表单是否显示折叠按钮
-  showCollapseButton: false,
-  // 按下回车时是否提交表单
-  submitOnEnter: true,
-  schema: [
+// 使用 CURD hook
+const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
+
+// 搜索配置
+const searchConfig: ISearchConfig = {
+  grid: true, // 启用 Grid 布局
+  formItems: [
     {
-      component: 'Input',
-      fieldName: 'username',
-      label: t('pages.operationAuditLog.username'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("pages.operation_audit_log.username"),
+      prop: "username",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Input',
-      fieldName: 'resourceType',
-      label: t('pages.operationAuditLog.resourceType'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("pages.operation_audit_log.resourceType"),
+      prop: "resourceType",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Select',
-      fieldName: 'action',
-      label: t('pages.operationAuditLog.action'),
-      componentProps: {
-        options: operationAuditLogActionList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("pages.operation_audit_log.action"),
+      prop: "action",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
+      },
+      options: operationAuditLogActionList.value,
+    },
+    {
+      type: "input",
+      label: $t("pages.operation_audit_log.ipAddress"),
+      prop: "ipAddress",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Input',
-      fieldName: 'ipAddress',
-      label: t('pages.operationAuditLog.ipAddress'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "select",
+      label: $t("pages.operation_audit_log.success"),
+      prop: "success",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
       },
+      options: successStatusList.value,
     },
     {
-      component: 'Select',
-      fieldName: 'success',
-      label: t('pages.operationAuditLog.success'),
-      componentProps: {
-        options: successStatusList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
-      },
-    },
-    {
-      component: 'RangePicker',
-      fieldName: 'createdAt',
-      label: t('pages.operationAuditLog.createdAt'),
-      componentProps: {
-        showTime: true,
-        allowClear: true,
-        presets: [
+      type: "date-picker",
+      label: $t("pages.operation_audit_log.createdAt"),
+      prop: "createdAt",
+      attrs: {
+        type: "datetimerange",
+        startPlaceholder: $t("common.placeholder.date"),
+        endPlaceholder: $t("common.placeholder.date"),
+        clearable: true,
+        shortcuts: [
           {
-            label: $t('ui.dateRange.today'),
-            value: [dayjs().startOf('day'), dayjs().endOf('day')],
+            text: $t("common.dateRange.today"),
+            value: () => [dayjs().startOf("day").toDate(), dayjs().endOf("day").toDate()],
           },
           {
-            label: $t('ui.dateRange.yesterday'),
-            value: [
-              dayjs().subtract(1, 'day').startOf('day'),
-              dayjs().subtract(1, 'day').endOf('day'),
+            text: $t("common.dateRange.yesterday"),
+            value: () => [
+              dayjs().subtract(1, "day").startOf("day").toDate(),
+              dayjs().subtract(1, "day").endOf("day").toDate(),
             ],
           },
           {
-            label: $t('ui.dateRange.thisWeek'),
-            value: [dayjs().startOf('week'), dayjs().endOf('week')],
+            text: $t("common.dateRange.thisWeek"),
+            value: () => [dayjs().startOf("week").toDate(), dayjs().endOf("week").toDate()],
           },
           {
-            label: $t('ui.dateRange.lastWeek'),
-            value: [
-              dayjs().subtract(1, 'week').startOf('week'),
-              dayjs().subtract(1, 'week').endOf('week'),
+            text: $t("common.dateRange.lastWeek"),
+            value: () => [
+              dayjs().subtract(1, "week").startOf("week").toDate(),
+              dayjs().subtract(1, "week").endOf("week").toDate(),
             ],
           },
           {
-            label: $t('ui.dateRange.thisMonth'),
-            value: [dayjs().startOf('month'), dayjs().endOf('month')],
+            text: $t("common.dateRange.thisMonth"),
+            value: () => [dayjs().startOf("month").toDate(), dayjs().endOf("month").toDate()],
           },
           {
-            label: $t('ui.dateRange.lastMonth'),
-            value: [
-              dayjs().subtract(1, 'month').startOf('month'),
-              dayjs().subtract(1, 'month').endOf('month'),
+            text: $t("common.dateRange.lastMonth"),
+            value: () => [
+              dayjs().subtract(1, "month").startOf("month").toDate(),
+              dayjs().subtract(1, "month").endOf("month").toDate(),
             ],
           },
         ],
@@ -128,121 +159,87 @@ const formOptions: VbenFormProps = {
   ],
 };
 
-const gridOptions: VxeGridProps<ApiAuditLog> = {
-  toolbarConfig: {
-    custom: true,
-    export: true,
-    // import: true,
-    refresh: true,
-    zoom: true,
+// 表格配置
+const contentConfig: IContentConfig = {
+  permPrefix: "sys:operation_audit_log", // 操作审计日志权限前缀
+  toolbarRight: [], // 无自定义按钮
+  defaultToolbar: ["refresh", "exports", "filter"], // 右侧默认工具栏
+  table: {
+    border: true,
+    stripe: false,
   },
-  height: 'auto',
-  exportConfig: {},
-  pagerConfig: {},
-  rowConfig: {
-    isHover: true,
-  },
-  stripe: true,
+  indexAction: async (query: any) => {
+    const { page, pageSize, createdAt, ...queryParams } = query;
 
-  proxyConfig: {
-    ajax: {
-      query: async ({ page }, formValues) => {
-        console.log('query:', formValues);
+    let startTime: string | undefined;
+    let endTime: string | undefined;
+    if (createdAt && Array.isArray(createdAt) && createdAt.length === 2) {
+      startTime = dayjs(createdAt[0]).format("YYYY-MM-DD HH:mm:ss");
+      endTime = dayjs(createdAt[1]).format("YYYY-MM-DD HH:mm:ss");
+    }
 
-        let startTime: any;
-        let endTime: any;
-        if (
-          formValues.createdAt !== undefined &&
-          formValues.createdAt.length === 2
-        ) {
-          startTime = dayjs(formValues.createdAt[0]).format(
-            'YYYY-MM-DD HH:mm:ss',
-          );
-          endTime = dayjs(formValues.createdAt[1]).format(
-            'YYYY-MM-DD HH:mm:ss',
-          );
-          console.log(startTime, endTime);
-        }
-
-        return await operationAuditLogStore.listOperationAuditLog(
-          {
-            page: page.currentPage,
-            pageSize: page.pageSize,
-          },
-          {
-            username: formValues.username,
-            resourceType: formValues.resourceType,
-            action: formValues.action,
-            ipAddress: formValues.ipAddress,
-            success: formValues.success,
-            created_at__gte: startTime,
-            created_at__lte: endTime,
-          },
-          null,
-          ['-created_at'],
-        );
+    const result = await operationAuditLogStore.listOperationAuditLog(
+      {
+        page: page || 1,
+        pageSize: pageSize || 10,
       },
-    },
+      {
+        username: queryParams.username,
+        resourceType: queryParams.resourceType,
+        action: queryParams.action,
+        ipAddress: queryParams.ipAddress,
+        success: queryParams.success,
+        created_at__gte: startTime,
+        created_at__lte: endTime,
+      },
+      null,
+      ["-created_at"] // 按创建时间倒序排序
+    );
+    return {
+      items: result.items || [],
+      total: result.total || 0,
+    };
   },
-
   columns: [
     {
-      title: t('pages.operationAuditLog.createdAt'),
-      field: 'createdAt',
-      formatter: 'formatDateTime',
-      width: 140,
+      prop: "createdAt",
+      label: $t("pages.operation_audit_log.createdAt"),
+      minWidth: 160,
+      template: "date",
+      dateFormat: "YYYY-MM-DD HH:mm:ss",
     },
     {
-      title: t('pages.operationAuditLog.success'),
-      field: 'success',
-      slots: { default: 'success' },
-      width: 80,
+      prop: "success",
+      label: $t("pages.operation_audit_log.success"),
+      width: 120,
+      slotName: "success",
     },
     {
-      title: t('pages.operationAuditLog.action'),
-      field: 'action',
-      slots: { default: 'action' },
-      width: 80,
+      prop: "action",
+      label: $t("pages.operation_audit_log.action"),
+      width: 120,
+      slotName: "action",
     },
-    { title: t('pages.operationAuditLog.resourceType'), field: 'resourceType' },
-    { title: t('pages.operationAuditLog.resourceId'), field: 'resourceId' },
+    { prop: "resourceType", label: $t("pages.operation_audit_log.resourceType"), minWidth: 150 },
+    { prop: "resourceId", label: $t("pages.operation_audit_log.resourceId"), minWidth: 150 },
+    { prop: "requestId", label: $t("pages.operation_audit_log.requestId"), minWidth: 180 },
+    { prop: "username", label: $t("pages.operation_audit_log.username"), minWidth: 120 },
     {
-      title: t('pages.operationAuditLog.requestId'),
-      field: 'requestId',
+      prop: "geoLocation",
+      label: $t("pages.operation_audit_log.geoLocation"),
+      minWidth: 150,
+      slotName: "geoLocation",
     },
-    { title: t('pages.operationAuditLog.username'), field: 'username' },
-    {
-      title: t('pages.operationAuditLog.geoLocation'),
-      field: 'geoLocation',
-      slots: { default: 'geoLocation' },
-    },
-    {
-      title: t('pages.operationAuditLog.ipAddress'),
-      field: 'ipAddress',
-      width: 140,
-    },
+    { prop: "ipAddress", label: $t("pages.operation_audit_log.ipAddress"), width: 140 },
   ],
 };
-
-const [Grid] = useVbenVxeGrid({ gridOptions, formOptions });
 </script>
 
-<template>
-  <Page auto-content-height>
-    <Grid :table-title="$t('menu.log.operationAuditLog')">
-      <template #success="{ row }">
-        <a-tag :color="successToColor(row.success)">
-          {{ successToNameWithStatusCode(row.success, row.statusCode) }}
-        </a-tag>
-      </template>
-      <template #geoLocation="{ row }">
-        {{ row.geoLocation.province }} {{ row.geoLocation.city }}
-      </template>
-      <template #action="{ row }">
-        <a-tag :color="operationAuditLogActionToColor(row.action)">
-          {{ operationAuditLogActionToName(row.action) }}
-        </a-tag>
-      </template>
-    </Grid>
-  </Page>
-</template>
+<style lang="scss" scoped>
+.app-container {
+  padding: 20px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+</style>

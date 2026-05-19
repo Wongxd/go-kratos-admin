@@ -1,16 +1,195 @@
+<template>
+  <ElDrawer
+    v-model="visible"
+    :title="title"
+    size="800px"
+    :close-on-click-modal="false"
+    :append-to-body="true"
+    :destroy-on-close="true"
+    @close="handleClose"
+  >
+    <ElForm
+      ref="formRef"
+      :model="formData"
+      :rules="formRules"
+      label-width="120px"
+      class="drawer-form"
+    >
+      <!-- 基本信息 -->
+      <ElDivider content-position="left">{{ $t("common.section.basic") }}</ElDivider>
+
+      <ElFormItem :label="$t('pages.menu.type')" prop="type">
+        <ElRadioGroup v-model="formData.type">
+          <ElRadioButton v-for="item in menuTypeList" :key="item.value" :value="item.value">
+            {{ item.label }}
+          </ElRadioButton>
+        </ElRadioGroup>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.menu.title')" prop="meta.title">
+        <ElInput
+          v-model="formData.meta.title"
+          :placeholder="$t('common.placeholder.input')"
+          clearable
+        >
+          <template #append v-if="titleSuffix">
+            {{ titleSuffix }}
+          </template>
+        </ElInput>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.menu.parentId')" prop="parentId">
+        <ElTreeSelect
+          v-model="formData.parentId"
+          :data="menuTreeData"
+          :props="{ label: 'meta.title', value: 'id', children: 'children' }"
+          :placeholder="$t('common.placeholder.select')"
+          filterable
+          clearable
+          check-strictly
+          default-expand-all
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.menu.order')" prop="meta.order">
+        <ElInputNumber
+          v-model="formData.meta.order"
+          :min="0"
+          :placeholder="$t('common.placeholder.input')"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem v-if="!isButton(formData.type)" :label="$t('pages.menu.icon')" prop="meta.icon">
+        <IconSelect v-model="formData.meta.icon" prefix="lucide" />
+      </ElFormItem>
+
+      <ElFormItem v-if="!isButton(formData.type)" :label="$t('pages.menu.path')" prop="path">
+        <ElInput v-model="formData.path" :placeholder="$t('common.placeholder.input')" clearable />
+      </ElFormItem>
+
+      <ElFormItem v-if="isMenu(formData.type)" :label="$t('pages.menu.component')" prop="component">
+        <ElInput
+          v-model="formData.component"
+          :placeholder="$t('common.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="!isCatalog(formData.type)"
+        :label="$t('pages.menu.authority')"
+        prop="meta.authority"
+      >
+        <ElSelect
+          v-model="formData.meta.authority"
+          :placeholder="$t('common.placeholder.input')"
+          multiple
+          filterable
+          allow-create
+          default-first-option
+          style="width: 100%"
+        >
+          <ElOption
+            v-for="auth in formData.meta.authority"
+            :key="auth"
+            :label="auth"
+            :value="auth"
+          />
+        </ElSelect>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('common.table.status')" prop="status">
+        <ElRadioGroup v-model="formData.status">
+          <ElRadioButton v-for="item in statusList" :key="item.value" :value="item.value">
+            {{ item.label }}
+          </ElRadioButton>
+        </ElRadioGroup>
+      </ElFormItem>
+
+      <!-- 高级设置 -->
+      <ElDivider v-if="!['BUTTON', 'LINK'].includes(formData.type)" content-position="left">
+        {{ $t("pages.menu.advancedSettings") }}
+      </ElDivider>
+
+      <ElFormItem
+        v-if="isMenu(formData.type)"
+        :label="$t('pages.menu.keepAlive')"
+        prop="meta.keepAlive"
+      >
+        <ElCheckbox v-model="formData.meta.keepAlive">
+          {{ $t("pages.menu.keepAlive") }}
+        </ElCheckbox>
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="['EMBEDDED', 'MENU'].includes(formData.type)"
+        :label="$t('pages.menu.affixTab')"
+        prop="meta.affixTab"
+      >
+        <ElCheckbox v-model="formData.meta.affixTab">
+          {{ $t("pages.menu.affixTab") }}
+        </ElCheckbox>
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="!['BUTTON'].includes(formData.type)"
+        :label="$t('pages.menu.hideInMenu')"
+        prop="meta.hideInMenu"
+      >
+        <ElCheckbox v-model="formData.meta.hideInMenu">
+          {{ $t("pages.menu.hideInMenu") }}
+        </ElCheckbox>
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="['CATALOG', 'MENU'].includes(formData.type)"
+        :label="$t('pages.menu.hideChildrenInMenu')"
+        prop="meta.hideChildrenInMenu"
+      >
+        <ElCheckbox v-model="formData.meta.hideChildrenInMenu">
+          {{ $t("pages.menu.hideChildrenInMenu") }}
+        </ElCheckbox>
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="!['BUTTON', 'LINK'].includes(formData.type)"
+        :label="$t('pages.menu.hideInBreadcrumb')"
+        prop="meta.hideInBreadcrumb"
+      >
+        <ElCheckbox v-model="formData.meta.hideInBreadcrumb">
+          {{ $t("pages.menu.hideInBreadcrumb") }}
+        </ElCheckbox>
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="!['BUTTON', 'LINK'].includes(formData.type)"
+        :label="$t('pages.menu.hideInTab')"
+        prop="meta.hideInTab"
+      >
+        <ElCheckbox v-model="formData.meta.hideInTab">
+          {{ $t("pages.menu.hideInTab") }}
+        </ElCheckbox>
+      </ElFormItem>
+    </ElForm>
+
+    <template #footer>
+      <div class="drawer-footer">
+        <ElButton @click="handleClose">{{ $t("common.button.cancel") }}</ElButton>
+        <ElButton type="primary" :loading="submitLoading" @click="handleSubmit">
+          {{ $t("common.button.confirm") }}
+        </ElButton>
+      </div>
+    </template>
+  </ElDrawer>
+</template>
+
 <script lang="ts" setup>
-import type { ChangeEvent } from 'ant-design-vue/es/_util/EventInterface';
+import { computed, reactive, ref, watch } from "vue";
+import { ElMessage } from "element-plus";
 
-import { computed, reactive, ref } from 'vue';
-
-import { useVbenDrawer } from '@vben/common-ui';
-import { $t, $te } from '@vben/locales';
-
-import lucide from '@iconify/json/json/lucide.json';
-import { addCollection } from '@iconify/vue';
-import { notification } from 'ant-design-vue';
-
-import { useVbenForm } from '@/adapter/form';
+import IconSelect from "@/components/IconSelect/index.vue";
 import {
   buildMenuTree,
   isButton,
@@ -19,349 +198,185 @@ import {
   menuTypeList,
   statusList,
   useMenuStore,
-} from '@/stores';
+} from "@/stores";
+import { $t, $te } from "@/i18n";
+
+const emit = defineEmits<{
+  success: [];
+}>();
 
 const menuStore = useMenuStore();
 
-addCollection(lucide);
+const visible = ref(false);
+const submitLoading = ref(false);
+const isCreate = ref(true);
+const currentId = ref<number>();
+const formRef = ref();
+const menuTreeData = ref<any[]>([]);
+const titleSuffix = ref("");
 
-const data = ref();
+// 表单数据
+const formData = reactive({
+  type: "MENU",
+  parentId: 0,
+  path: "",
+  component: "BasicLayout",
+  meta: {
+    title: "",
+    icon: "",
+    order: 1,
+    authority: [] as string[],
+    keepAlive: false,
+    affixTab: false,
+    hideInMenu: false,
+    hideChildrenInMenu: false,
+    hideInBreadcrumb: false,
+    hideInTab: false,
+  },
+  status: "ON",
+});
 
-const titleSuffix = reactive({ title: '' });
+// 表单验证规则
+const formRules = {
+  "meta.title": [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  path: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  component: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  status: [{ required: true, message: $t("common.validation.selectRequired"), trigger: "change" }],
+};
 
-const getTitle = computed(() =>
-  data.value?.create
-    ? $t('ui.modal.create', { moduleName: t('pages.menu.moduleName') })
-    : $t('ui.modal.update', { moduleName: t('pages.menu.moduleName') }),
+// 标题
+const title = computed(() =>
+  isCreate.value ? $t("pages.menu.button.create") : $t("pages.menu.button.update")
 );
 
-// const isCreate = computed(() => data.value?.create);
-
-const [BaseForm, baseFormApi] = useVbenForm({
-  showDefaultActions: false,
-  // 所有表单项共用，可单独在表单内覆盖
-  commonConfig: {
-    formItemClass: 'col-span-2 md:col-span-1',
-  },
-  wrapperClass: 'grid-cols-2 gap-x-4',
-
-  schema: [
-    {
-      component: 'RadioGroup',
-      fieldName: 'type',
-      label: t('pages.menu.type'),
-      defaultValue: 'MENU',
-      formItemClass: 'col-span-2 md:col-span-2',
-      componentProps: {
-        optionType: 'button',
-        buttonStyle: 'solid',
-        options: menuTypeList,
-      },
-    },
-
-    {
-      component: 'Input',
-      fieldName: 'meta.title',
-      label: t('pages.menu.title'),
-      rules: 'required',
-      componentProps() {
-        // 不需要处理多语言时就无需这么做
-        return {
-          placeholder: $t('ui.placeholder.input'),
-          allowClear: true,
-          addonAfter: titleSuffix.title,
-          onChange({ target: { value } }: ChangeEvent) {
-            titleSuffix.title = value && $te(value) ? $t(value) : '';
-          },
-        };
-      },
-    },
-    {
-      component: 'ApiTreeSelect',
-      fieldName: 'parentId',
-      label: t('pages.menu.parentId'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        class: 'w-full',
-        showSearch: true,
-        treeDefaultExpandAll: true,
-        numberToString: true,
-        allowClear: true,
-        childrenField: 'children',
-        labelField: 'meta.title',
-        valueField: 'id',
-        treeNodeFilterProp: 'label',
-        api: async () => {
-          const fieldValue = baseFormApi.form.values;
-          const result = await menuStore.listMenu(undefined, {
-            parentId: fieldValue.parentId,
-            status: 'ON',
-          });
-          return result.items;
-        },
-
-        afterFetch: (data: any) => {
-          return buildMenuTree(data);
-        },
-      },
-    },
-    {
-      component: 'InputNumber',
-      fieldName: 'meta.order',
-      label: t('pages.menu.order'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-    {
-      component: 'IconPicker',
-      fieldName: 'meta.icon',
-      label: t('pages.menu.icon'),
-      componentProps: {
-        prefix: 'lucide',
-      },
-      dependencies: {
-        show: (values) => !isButton(values.type),
-        triggerFields: ['type'],
-      },
-    },
-    {
-      component: 'Input',
-      fieldName: 'path',
-      label: t('pages.menu.path'),
-      rules: 'required',
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-      dependencies: {
-        show: (values) => !isButton(values.type),
-        triggerFields: ['type'],
-      },
-    },
-    {
-      component: 'Input',
-      fieldName: 'component',
-      label: t('pages.menu.component'),
-      defaultValue: 'BasicLayout',
-      rules: 'required',
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-      dependencies: {
-        show: (values) => isMenu(values.type),
-        triggerFields: ['type'],
-      },
-    },
-    {
-      component: 'Select',
-      fieldName: 'meta.authority',
-      label: t('pages.menu.authority'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-        mode: 'tags',
-        tokenSeparators: [','],
-        class: 'w-full',
-      },
-      dependencies: {
-        show: (values) => !isCatalog(values.type),
-        triggerFields: ['type'],
-      },
-    },
-    {
-      component: 'RadioGroup',
-      fieldName: 'status',
-      defaultValue: 'ON',
-      label: $t('ui.table.status'),
-      rules: 'selectRequired',
-      componentProps: {
-        optionType: 'button',
-        buttonStyle: 'solid',
-        class: 'flex flex-wrap', // 如果选项过多，可以添加class来自动折叠
-        options: statusList,
-      },
-    },
-    {
-      component: 'Divider',
-      dependencies: {
-        show: (values) => {
-          return !['BUTTON', 'LINK'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-      fieldName: 'divider1',
-      formItemClass: 'col-span-2 md:col-span-2 pb-0',
-      hideLabel: true,
-      renderComponentContent() {
-        return {
-          default: () => t('pages.menu.advancedSettings'),
-        };
-      },
-    },
-
-    {
-      component: 'Checkbox',
-      fieldName: 'meta.keepAlive',
-      dependencies: {
-        show: (values) => {
-          return ['MENU'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-      renderComponentContent() {
-        return {
-          default: () => t('pages.menu.keepAlive'),
-        };
-      },
-    },
-    {
-      component: 'Checkbox',
-      fieldName: 'meta.affixTab',
-      dependencies: {
-        show: (values) => {
-          return ['EMBEDDED', 'MENU'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-      renderComponentContent() {
-        return {
-          default: () => t('pages.menu.affixTab'),
-        };
-      },
-    },
-    {
-      component: 'Checkbox',
-      fieldName: 'meta.hideInMenu',
-      dependencies: {
-        show: (values) => {
-          return !['BUTTON'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-      renderComponentContent() {
-        return {
-          default: () => t('pages.menu.hideInMenu'),
-        };
-      },
-    },
-    {
-      component: 'Checkbox',
-      fieldName: 'meta.hideChildrenInMenu',
-      dependencies: {
-        show: (values) => {
-          return ['CATALOG', 'MENU'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-      renderComponentContent() {
-        return {
-          default: () => t('pages.menu.hideChildrenInMenu'),
-        };
-      },
-    },
-    {
-      component: 'Checkbox',
-      fieldName: 'meta.hideInBreadcrumb',
-      dependencies: {
-        show: (values) => {
-          return !['BUTTON', 'LINK'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-      renderComponentContent() {
-        return {
-          default: () => t('pages.menu.hideInBreadcrumb'),
-        };
-      },
-    },
-    {
-      component: 'Checkbox',
-      fieldName: 'meta.hideInTab',
-      dependencies: {
-        show: (values) => {
-          return !['BUTTON', 'LINK'].includes(values.type);
-        },
-        triggerFields: ['type'],
-      },
-      renderComponentContent() {
-        return {
-          default: () => t('pages.menu.hideInTab'),
-        };
-      },
-    },
-  ],
-});
-
-const [Drawer, drawerApi] = useVbenDrawer({
-  onCancel() {
-    drawerApi.close();
-  },
-
-  async onConfirm() {
-    console.log('onConfirm');
-
-    // 校验输入的数据
-    const validate = await baseFormApi.validate();
-    if (!validate.valid) {
-      return;
+// 监听标题变化，显示多语言翻译
+watch(
+  () => formData.meta.title,
+  (newVal) => {
+    if (newVal && $te(newVal)) {
+      titleSuffix.value = $t(newVal);
+    } else {
+      titleSuffix.value = "";
     }
+  }
+);
 
-    setLoading(true);
+// 打开抽屉
+async function open(row?: any) {
+  visible.value = true;
 
-    // 获取表单数据
-    const values = await baseFormApi.getValues();
+  // 加载菜单树数据
+  await loadMenuTree();
 
-    console.log(getTitle.value, values);
-
-    try {
-      await (data.value?.create
-        ? menuStore.createMenu(values)
-        : menuStore.updateMenu(data.value.row.id, values));
-
-      notification.success({
-        message: data.value?.create
-          ? $t('ui.notification.create_success')
-          : $t('ui.notification.update_success'),
-      });
-    } catch {
-      notification.error({
-        message: data.value?.create
-          ? $t('ui.notification.create_failed')
-          : $t('ui.notification.update_failed'),
-      });
-    } finally {
-      drawerApi.close();
-      setLoading(false);
+  if (row) {
+    // 编辑模式
+    isCreate.value = false;
+    currentId.value = row.id;
+    Object.assign(formData, row);
+    // 处理 meta 字段
+    if (row.meta) {
+      Object.assign(formData.meta, row.meta);
     }
-  },
-
-  onOpenChange(isOpen) {
-    if (isOpen) {
-      // 获取传入的数据
-      data.value = drawerApi.getData<Record<string, any>>();
-
-      titleSuffix.title = data.value?.row?.meta?.title
-        ? $t(data.value?.row?.meta?.title)
-        : '';
-
-      // 为表单赋值
-      baseFormApi.setValues(data.value?.row);
-
-      setLoading(false);
+    // 初始化 titleSuffix
+    if (row.meta?.title && $te(row.meta.title)) {
+      titleSuffix.value = $t(row.meta.title);
     }
-  },
-});
-
-function setLoading(loading: boolean) {
-  drawerApi.setState({ loading });
+  } else {
+    // 创建模式
+    isCreate.value = true;
+    currentId.value = undefined;
+    resetForm();
+  }
 }
+
+// 关闭抽屉
+function handleClose() {
+  visible.value = false;
+  resetForm();
+}
+
+// 重置表单
+function resetForm() {
+  formData.type = "MENU";
+  formData.parentId = 0;
+  formData.path = "";
+  formData.component = "BasicLayout";
+  formData.meta = {
+    title: "",
+    icon: "",
+    order: 1,
+    authority: [],
+    keepAlive: false,
+    affixTab: false,
+    hideInMenu: false,
+    hideChildrenInMenu: false,
+    hideInBreadcrumb: false,
+    hideInTab: false,
+  };
+  formData.status = "ON";
+  titleSuffix.value = "";
+
+  formRef.value?.clearValidate();
+}
+
+// 加载菜单树
+async function loadMenuTree() {
+  try {
+    const result = await menuStore.listMenu(undefined, { status: "ON" });
+    menuTreeData.value = buildMenuTree(result.items || []);
+  } catch (error) {
+    console.error("加载菜单树失败", error);
+  }
+}
+
+// 提交表单
+async function handleSubmit() {
+  if (!formRef.value) return;
+
+  try {
+    await formRef.value.validate();
+    submitLoading.value = true;
+
+    const values = { ...formData };
+
+    if (isCreate.value) {
+      await menuStore.createMenu(values);
+      ElMessage.success($t("common.notification.createSuccess"));
+    } else {
+      await menuStore.updateMenu(currentId.value!, values);
+      ElMessage.success($t("common.notification.updateSuccess"));
+    }
+
+    emit("success");
+    handleClose();
+  } catch (error) {
+    if (error !== false) {
+      // 不是验证错误
+      ElMessage.error(
+        isCreate.value
+          ? $t("common.notification.createFailed")
+          : $t("common.notification.updateFailed")
+      );
+    }
+  } finally {
+    submitLoading.value = false;
+  }
+}
+
+// 暴露方法给父组件
+defineExpose({
+  open,
+});
 </script>
 
-<template>
-  <Drawer :title="getTitle" class="w-full max-w-[800px]">
-    <BaseForm class="mx-4" />
-  </Drawer>
-</template>
+<style lang="scss" scoped>
+.drawer-form {
+  padding-right: 10px;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+</style>

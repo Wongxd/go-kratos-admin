@@ -1,247 +1,26 @@
-<script lang="ts" setup>
-import type { VxeGridProps } from '@/adapter/vxe-table';
-
-import { h } from 'vue';
-
-import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import { IconifyIcon, LucideFilePenLine, LucideTrash2 } from '@vben/icons';
-
-import { Icon } from '@iconify/vue';
-import { notification } from 'ant-design-vue';
-
-import { useVbenVxeGrid } from '@/adapter/vxe-table';
-import { type resourceservicev1_Menu as Menu } from '@/api/generated/admin/service/v1';
-import { $t } from '@/locales';
-import {
-  menuTypeToColor,
-  menuTypeToName,
-  statusList,
-  statusToColor,
-  statusToName,
-  useMenuStore,
-} from '@/stores';
-import { getRandomColor } from '@/utils/color';
-
-import MenuDrawer from './menu-drawer.vue';
-
-const menuStore = useMenuStore();
-
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  // 控制表单是否显示折叠按钮
-  showCollapseButton: false,
-  // 按下回车时是否提交表单
-  submitOnEnter: true,
-  schema: [
-    {
-      component: 'Input',
-      fieldName: 'name',
-      label: t('pages.menu.name'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-    {
-      component: 'Select',
-      fieldName: 'status',
-      label: $t('ui.table.status'),
-      componentProps: {
-        options: statusList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
-      },
-    },
-  ],
-};
-
-const gridOptions: VxeGridProps<Menu> = {
-  toolbarConfig: {
-    custom: true,
-    export: true,
-    // import: true,
-    refresh: true,
-    zoom: true,
-  },
-  exportConfig: {},
-  pagerConfig: {
-    enabled: false,
-  },
-  rowConfig: {
-    isHover: true,
-  },
-
-  stripe: true,
-  height: 'auto',
-
-  treeConfig: {
-    parentField: 'parentId',
-    rowField: 'id',
-    transform: true,
-  },
-
-  proxyConfig: {
-    ajax: {
-      query: async ({ page }, formValues) => {
-        console.log('query:', formValues);
-
-        return await menuStore.listMenu(
-          {
-            page: page.currentPage,
-            pageSize: page.pageSize,
-          },
-          {
-            'meta.title': formValues.name,
-            status: formValues.status,
-          },
-          null,
-          ['id'],
-        );
-      },
-    },
-  },
-
-  columns: [
-    {
-      title: t('pages.menu.name'),
-      field: 'meta.title',
-      slots: { default: 'title' },
-      width: 180,
-      fixed: 'left',
-      align: 'left',
-      treeNode: true,
-    },
-    {
-      title: t('pages.menu.type'),
-      field: 'type',
-      slots: { default: 'type' },
-      width: 95,
-    },
-    {
-      title: t('pages.menu.authority'),
-      field: 'meta.authority',
-      align: 'left',
-      slots: { default: 'authority' },
-    },
-    { title: t('pages.menu.path'), field: 'path', align: 'left' },
-    { title: t('pages.menu.component'), field: 'component', align: 'left' },
-    {
-      title: $t('ui.table.status'),
-      field: 'status',
-      slots: { default: 'status' },
-      width: 95,
-    },
-    { title: $t('ui.table.sortOrder'), field: 'meta.order', width: 70 },
-    {
-      title: $t('ui.table.action'),
-      field: 'action',
-      fixed: 'right',
-      slots: { default: 'action' },
-      width: 90,
-    },
-  ],
-};
-
-const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
-
-const [Drawer, drawerApi] = useVbenDrawer({
-  // 连接抽离的组件
-  connectedComponent: MenuDrawer,
-
-  onOpenChange(isOpen: boolean) {
-    if (!isOpen) {
-      // 关闭时，重载表格数据
-      gridApi.reload();
-    }
-  },
-});
-
-function openDrawer(create: boolean, row?: any) {
-  drawerApi.setData({
-    create,
-    row,
-  });
-  drawerApi.open();
-}
-
-/* 创建 */
-function handleCreate() {
-  console.log('创建');
-
-  openDrawer(true);
-}
-
-/* 编辑 */
-function handleEdit(row: any) {
-  console.log('编辑', row);
-  openDrawer(false, row);
-}
-
-/* 删除 */
-async function handleDelete(row: any) {
-  console.log('删除', row);
-
-  try {
-    await menuStore.deleteMenu(row.id);
-
-    notification.success({
-      message: $t('ui.notification.delete_success'),
-    });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.delete_failed'),
-    });
-  }
-}
-
-const expandAll = () => {
-  gridApi.grid?.setAllTreeExpand(true);
-};
-
-const collapseAll = () => {
-  gridApi.grid?.setAllTreeExpand(false);
-};
-
-function normalizeAuthority(authority: unknown): string[] {
-  if (Array.isArray(authority)) return authority;
-  if (typeof authority === 'string') {
-    return authority
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-  }
-  return [];
-}
-</script>
-
 <template>
-  <Page auto-content-height>
-    <Grid :table-title="$t('menu.system.menu')">
-      <template #toolbar-tools>
-        <a-button class="mr-2" type="primary" @click="handleCreate">
-          {{ t('pages.menu.button.create') }}
-        </a-button>
-        <a-button class="mr-2" @click="expandAll">
-          {{ $t('ui.tree.expand_all') }}
-        </a-button>
-        <a-button class="mr-2" @click="collapseAll">
-          {{ $t('ui.tree.collapse_all') }}
-        </a-button>
-      </template>
+  <div class="app-container h-full flex flex-1 flex-col">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :search-config="searchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    />
+
+    <!-- 列表 -->
+    <PageContent
+      ref="contentRef"
+      :content-config="contentConfig"
+      @add-click="handleAddClick"
+      @operate-click="handleOperateClick"
+      @toolbar-click="handleToolbarClick"
+    >
+      <!-- 标题 -->
       <template #title="{ row }">
         <div class="flex w-full items-center gap-1">
           <div class="size-5 flex-shrink-0">
-            <IconifyIcon
-              v-if="row.type === 'button'"
-              icon="carbon:security"
-              class="size-full"
-            />
+            <IconifyIcon v-if="row.type === 'BUTTON'" icon="carbon:security" class="size-full" />
             <IconifyIcon
               v-else-if="row.meta?.icon"
               :icon="row.meta?.icon || 'carbon:circle-dash'"
@@ -249,28 +28,26 @@ function normalizeAuthority(authority: unknown): string[] {
             />
           </div>
           <span class="flex-auto">{{ $t(row.meta?.title) }}</span>
-          <div class="items-center justify-end"></div>
         </div>
       </template>
-      <template #icon="{ row }">
-        <Icon
-          v-if="row.meta.icon !== undefined"
-          :icon="row.meta.icon"
-          class="mr-1 size-4 flex-shrink-0"
-        />
-      </template>
-      <template #status="{ row }">
-        <a-tag :color="statusToColor(row.status)">
-          {{ statusToName(row.status) }}
-        </a-tag>
-      </template>
+
+      <!-- 类型 -->
       <template #type="{ row }">
-        <a-tag :color="menuTypeToColor(row.type)">
+        <ElTag size="small" effect="dark" round :color="menuTypeToColor(row.type)">
           {{ menuTypeToName(row.type) }}
-        </a-tag>
+        </ElTag>
       </template>
+
+      <!-- 状态 -->
+      <template #status="{ row }">
+        <ElTag size="small" effect="dark" round :color="statusToColor(row.status)">
+          {{ statusToName(row.status) }}
+        </ElTag>
+      </template>
+
+      <!-- 权限标识 -->
       <template #authority="{ row }">
-        <a-tag
+        <ElTag
           v-for="auth in normalizeAuthority(row.meta?.authority)"
           :key="auth"
           class="mb-1 mr-1"
@@ -281,28 +58,249 @@ function normalizeAuthority(authority: unknown): string[] {
           }"
         >
           {{ auth }}
-        </a-tag>
+        </ElTag>
       </template>
-      <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: t('pages.menu.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
-      </template>
-    </Grid>
-    <Drawer />
-  </Page>
+    </PageContent>
+
+    <!-- 新增/编辑抽屉 -->
+    <MenuDrawer ref="drawerRef" @success="handleSuccess" />
+  </div>
 </template>
+
+<script lang="ts" setup>
+import { ElMessage, ElMessageBox, ElTag } from "element-plus";
+import { Icon as IconifyIcon } from "@iconify/vue";
+
+import PageContent from "@/components/CURD/PageContent.vue";
+import PageSearch from "@/components/CURD/PageSearch.vue";
+import usePage from "@/components/CURD/usePage";
+import type { IOperateData, ISearchConfig, IContentConfig } from "@/components/CURD/types";
+import MenuDrawer from "./menu-drawer.vue";
+
+import {
+  buildMenuTree,
+  menuTypeToColor,
+  menuTypeToName,
+  statusList,
+  statusToColor,
+  statusToName,
+  useMenuStore,
+} from "@/stores";
+import { getRandomColor } from "@/utils/color";
+import { $t } from "@/i18n";
+
+const menuStore = useMenuStore();
+
+// 使用 CURD hook
+const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
+
+// 抽屉引用
+const drawerRef = ref();
+
+// 搜索配置
+const searchConfig: ISearchConfig = {
+  grid: true, // 启用 Grid 布局
+  formItems: [
+    {
+      type: "input",
+      label: $t("pages.menu.name"),
+      prop: "name",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
+      },
+    },
+    {
+      type: "select",
+      label: $t("common.table.status"),
+      prop: "status",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
+      },
+      options: statusList.value,
+    },
+  ],
+};
+
+// 表格配置
+const contentConfig: IContentConfig = {
+  permPrefix: "sys:menu", // 菜单管理权限前缀
+  toolbarRight: ["add"], // 右侧自定义按钮（在defaultToolbar左侧）
+  defaultToolbar: ["refresh", "filter"], // 右侧默认工具栏
+  table: {
+    border: true,
+    stripe: false,
+    treeConfig: {
+      parentField: "parentId",
+      rowField: "id",
+      transform: true,
+    },
+  },
+  pagination: false, // 禁用分页（树形表格不需要分页）
+  indexAction: async (query: any) => {
+    const { page, pageSize, ...queryParams } = query;
+    const result = await menuStore.listMenu(
+      {
+        page: page || 1,
+        pageSize: pageSize || 10,
+      },
+      {
+        "meta.title": queryParams.name,
+        status: queryParams.status,
+      },
+      null,
+      ["id"] // 按 id 排序
+    );
+    // 转换数据格式为树形结构
+    return {
+      items: buildMenuTree(result.items || []),
+      total: result.total || 0,
+    };
+  },
+  columns: [
+    {
+      type: "index",
+      label: $t("common.table.seq"),
+      width: 60,
+    },
+    {
+      prop: "meta.title",
+      label: $t("pages.menu.name"),
+      minWidth: 180,
+      fixed: "left",
+      treeNode: true,
+      slotName: "title",
+    },
+    {
+      prop: "type",
+      label: $t("pages.menu.type"),
+      width: 95,
+      slotName: "type",
+    },
+    {
+      prop: "meta.authority",
+      label: $t("pages.menu.authority"),
+      minWidth: 150,
+      slotName: "authority",
+    },
+    { prop: "path", label: $t("pages.menu.path"), minWidth: 150 },
+    { prop: "component", label: $t("pages.menu.component"), minWidth: 150 },
+    {
+      prop: "status",
+      label: $t("common.table.status"),
+      width: 95,
+      slotName: "status",
+    },
+    { prop: "meta.order", label: $t("common.table.sortOrder"), width: 70 },
+    {
+      prop: "action",
+      label: $t("common.table.action"),
+      fixed: "right",
+      width: 150,
+      template: "tool",
+      action: [
+        {
+          name: "edit",
+          text: $t("common.button.edit"),
+        },
+        {
+          name: "delete",
+          text: $t("common.button.delete"),
+          attrs: {
+            type: "danger",
+          },
+        },
+      ],
+    },
+  ],
+};
+
+// 处理操作点击
+const handleOperateClick = (data: IOperateData) => {
+  const { name, row } = data;
+
+  if (name === "edit") {
+    // 编辑
+    drawerRef.value?.open(row);
+  } else if (name === "delete") {
+    // 删除
+    ElMessageBox.confirm(
+      $t("common.confirm.do_you_want_delete", { moduleName: $t("pages.menu.moduleName") }),
+      $t("common.title.confirm"),
+      {
+        confirmButtonText: $t("common.button.confirm"),
+        cancelButtonText: $t("common.button.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await menuStore.deleteMenu(row.id);
+        ElMessage.success($t("common.notification.delete_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("common.notification.delete_failed"));
+      }
+    });
+  }
+};
+
+// 处理新增点击
+const handleAddClick = () => {
+  drawerRef.value?.open();
+};
+
+// 处理成功回调
+const handleSuccess = () => {
+  contentRef.value?.fetchPageData({}, true);
+};
+
+// 处理工具栏点击
+const handleToolbarClick = (name: string) => {
+  console.log("Toolbar clicked:", name);
+};
+
+// 展开所有节点
+const expandAll = () => {
+  const tableRef = contentRef.value?.getTableRef();
+  if (tableRef) {
+    tableRef.setAllTreeExpand(true);
+  }
+};
+
+// 折叠所有节点
+const collapseAll = () => {
+  const tableRef = contentRef.value?.getTableRef();
+  if (tableRef) {
+    tableRef.clearTreeExpand();
+  }
+};
+
+// 规范化权限标识
+function normalizeAuthority(authority: unknown): string[] {
+  if (Array.isArray(authority)) return authority;
+  if (typeof authority === "string") {
+    return authority
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+// 暴露方法给父组件（用于工具栏按钮）
+defineExpose({
+  expandAll,
+  collapseAll,
+});
+</script>
+
+<style lang="scss" scoped>
+.app-container {
+  padding: 20px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+</style>

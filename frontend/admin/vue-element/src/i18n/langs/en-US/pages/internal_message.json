@@ -1,0 +1,18 @@
+{
+  "moduleName": "Internal Message",
+  "title": "Title",
+  "status": "Status",
+  "type": "Type",
+  "categoryId": "Category",
+  "categoryName": "Category Name",
+  "content": "Content",
+  "senderName": "Sender",
+  "createdAt": "Created At",
+  "button": {
+    "create": "New Message"
+  },
+  "drawer": {
+    "create": "New Message",
+    "update": "Edit Message"
+  }
+}

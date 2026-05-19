@@ -1,0 +1,12 @@
+{
+  "moduleName": "API Audit Log",
+  "username": "Username",
+  "path": "Request Path",
+  "httpMethod": "HTTP Method",
+  "ipAddress": "IP Address",
+  "success": "Success",
+  "createdAt": "Created At",
+  "latencyMs": "Latency (ms)",
+  "platform": "Platform Info",
+  "geoLocation": "Geo Location"
+}

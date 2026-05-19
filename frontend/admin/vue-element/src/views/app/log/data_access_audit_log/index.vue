@@ -1,13 +1,51 @@
+<template>
+  <div class="app-container h-full flex flex-1 flex-col">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :search-config="searchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    />
+
+    <!-- 列表 -->
+    <PageContent ref="contentRef" :content-config="contentConfig">
+      <!-- 是否成功 -->
+      <template #success="{ row }">
+        <ElTag size="small" effect="dark" round :color="successToColor(row.success)">
+          {{ successToNameWithStatusCode(row.success, row.statusCode) }}
+        </ElTag>
+      </template>
+
+      <!-- 访问类型 -->
+      <template #accessType="{ row }">
+        <ElTag
+          size="small"
+          effect="dark"
+          round
+          :color="dataAccessAuditLogAccessTypeToColor(row.accessType)"
+        >
+          {{ dataAccessAuditLogAccessTypeToName(row.accessType) }}
+        </ElTag>
+      </template>
+
+      <!-- 地理位置 -->
+      <template #geoLocation="{ row }">
+        {{ row.geoLocation?.province }} {{ row.geoLocation?.city }}
+      </template>
+    </PageContent>
+  </div>
+</template>
+
 <script lang="ts" setup>
-import type { VxeGridProps } from '@/adapter/vxe-table';
+import { ElTag } from "element-plus";
+import dayjs from "dayjs";
 
-import { Page, type VbenFormProps } from '@vben/common-ui';
+import PageContent from "@/components/CURD/PageContent.vue";
+import PageSearch from "@/components/CURD/PageSearch.vue";
+import usePage from "@/components/CURD/usePage";
+import type { ISearchConfig, IContentConfig } from "@/components/CURD/types";
 
-import dayjs from 'dayjs';
-
-import { useVbenVxeGrid } from '@/adapter/vxe-table';
-import { type auditservicev1_ApiAuditLog as ApiAuditLog } from '@/api/generated/admin/service/v1';
-import { $t } from '@/locales';
 import {
   dataAccessAuditLogAccessTypeList,
   dataAccessAuditLogAccessTypeToColor,
@@ -16,110 +54,108 @@ import {
   successToColor,
   successToNameWithStatusCode,
   useDataAccessAuditLogStore,
-} from '@/stores';
+} from "@/stores";
+import { $t } from "@/i18n";
 
 const dataAccessAuditLogStore = useDataAccessAuditLogStore();
 
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  // 控制表单是否显示折叠按钮
-  showCollapseButton: false,
-  // 按下回车时是否提交表单
-  submitOnEnter: true,
-  schema: [
+// 使用 CURD hook
+const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
+
+// 搜索配置
+const searchConfig: ISearchConfig = {
+  grid: true, // 启用 Grid 布局
+  formItems: [
     {
-      component: 'Input',
-      fieldName: 'username',
-      label: t('pages.dataAccessAuditLog.username'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("pages.data_access_audit_log.username"),
+      prop: "username",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Input',
-      fieldName: 'tableName',
-      label: t('pages.dataAccessAuditLog.tableName'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("pages.data_access_audit_log.tableName"),
+      prop: "tableName",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Select',
-      fieldName: 'accessType',
-      label: t('pages.dataAccessAuditLog.accessType'),
-      componentProps: {
-        options: dataAccessAuditLogAccessTypeList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("pages.data_access_audit_log.accessType"),
+      prop: "accessType",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
+      },
+      options: dataAccessAuditLogAccessTypeList.value,
+    },
+    {
+      type: "input",
+      label: $t("pages.data_access_audit_log.ipAddress"),
+      prop: "ipAddress",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Input',
-      fieldName: 'ipAddress',
-      label: t('pages.dataAccessAuditLog.ipAddress'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "select",
+      label: $t("pages.data_access_audit_log.success"),
+      prop: "success",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
       },
+      options: successStatusList.value,
     },
     {
-      component: 'Select',
-      fieldName: 'success',
-      label: t('pages.dataAccessAuditLog.success'),
-      componentProps: {
-        options: successStatusList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
-      },
-    },
-    {
-      component: 'RangePicker',
-      fieldName: 'createdAt',
-      label: t('pages.dataAccessAuditLog.createdAt'),
-      componentProps: {
-        showTime: true,
-        allowClear: true,
-        presets: [
+      type: "date-picker",
+      label: $t("pages.data_access_audit_log.createdAt"),
+      prop: "createdAt",
+      attrs: {
+        type: "datetimerange",
+        startPlaceholder: $t("common.placeholder.date"),
+        endPlaceholder: $t("common.placeholder.date"),
+        clearable: true,
+        shortcuts: [
           {
-            label: $t('ui.dateRange.today'),
-            value: [dayjs().startOf('day'), dayjs().endOf('day')],
+            text: $t("common.dateRange.today"),
+            value: () => [dayjs().startOf("day").toDate(), dayjs().endOf("day").toDate()],
           },
           {
-            label: $t('ui.dateRange.yesterday'),
-            value: [
-              dayjs().subtract(1, 'day').startOf('day'),
-              dayjs().subtract(1, 'day').endOf('day'),
+            text: $t("common.dateRange.yesterday"),
+            value: () => [
+              dayjs().subtract(1, "day").startOf("day").toDate(),
+              dayjs().subtract(1, "day").endOf("day").toDate(),
             ],
           },
           {
-            label: $t('ui.dateRange.thisWeek'),
-            value: [dayjs().startOf('week'), dayjs().endOf('week')],
+            text: $t("common.dateRange.thisWeek"),
+            value: () => [dayjs().startOf("week").toDate(), dayjs().endOf("week").toDate()],
           },
           {
-            label: $t('ui.dateRange.lastWeek'),
-            value: [
-              dayjs().subtract(1, 'week').startOf('week'),
-              dayjs().subtract(1, 'week').endOf('week'),
+            text: $t("common.dateRange.lastWeek"),
+            value: () => [
+              dayjs().subtract(1, "week").startOf("week").toDate(),
+              dayjs().subtract(1, "week").endOf("week").toDate(),
             ],
           },
           {
-            label: $t('ui.dateRange.thisMonth'),
-            value: [dayjs().startOf('month'), dayjs().endOf('month')],
+            text: $t("common.dateRange.thisMonth"),
+            value: () => [dayjs().startOf("month").toDate(), dayjs().endOf("month").toDate()],
           },
           {
-            label: $t('ui.dateRange.lastMonth'),
-            value: [
-              dayjs().subtract(1, 'month').startOf('month'),
-              dayjs().subtract(1, 'month').endOf('month'),
+            text: $t("common.dateRange.lastMonth"),
+            value: () => [
+              dayjs().subtract(1, "month").startOf("month").toDate(),
+              dayjs().subtract(1, "month").endOf("month").toDate(),
             ],
           },
         ],
@@ -128,121 +164,87 @@ const formOptions: VbenFormProps = {
   ],
 };
 
-const gridOptions: VxeGridProps<ApiAuditLog> = {
-  toolbarConfig: {
-    custom: true,
-    export: true,
-    // import: true,
-    refresh: true,
-    zoom: true,
+// 表格配置
+const contentConfig: IContentConfig = {
+  permPrefix: "sys:data_access_audit_log", // 数据访问审计日志权限前缀
+  toolbarRight: [], // 无自定义按钮
+  defaultToolbar: ["refresh", "exports", "filter"], // 右侧默认工具栏
+  table: {
+    border: true,
+    stripe: false,
   },
-  height: 'auto',
-  exportConfig: {},
-  pagerConfig: {},
-  rowConfig: {
-    isHover: true,
-  },
-  stripe: true,
+  indexAction: async (query: any) => {
+    const { page, pageSize, createdAt, ...queryParams } = query;
 
-  proxyConfig: {
-    ajax: {
-      query: async ({ page }, formValues) => {
-        console.log('query:', formValues);
+    let startTime: string | undefined;
+    let endTime: string | undefined;
+    if (createdAt && Array.isArray(createdAt) && createdAt.length === 2) {
+      startTime = dayjs(createdAt[0]).format("YYYY-MM-DD HH:mm:ss");
+      endTime = dayjs(createdAt[1]).format("YYYY-MM-DD HH:mm:ss");
+    }
 
-        let startTime: any;
-        let endTime: any;
-        if (
-          formValues.createdAt !== undefined &&
-          formValues.createdAt.length === 2
-        ) {
-          startTime = dayjs(formValues.createdAt[0]).format(
-            'YYYY-MM-DD HH:mm:ss',
-          );
-          endTime = dayjs(formValues.createdAt[1]).format(
-            'YYYY-MM-DD HH:mm:ss',
-          );
-          console.log(startTime, endTime);
-        }
-
-        return await dataAccessAuditLogStore.listDataAccessAuditLog(
-          {
-            page: page.currentPage,
-            pageSize: page.pageSize,
-          },
-          {
-            username: formValues.username,
-            accessType: formValues.accessType,
-            tableName: formValues.tableName,
-            ipAddress: formValues.ipAddress,
-            success: formValues.success,
-            created_at__gte: startTime,
-            created_at__lte: endTime,
-          },
-          null,
-          ['-created_at'],
-        );
+    const result = await dataAccessAuditLogStore.listDataAccessAuditLog(
+      {
+        page: page || 1,
+        pageSize: pageSize || 10,
       },
-    },
+      {
+        username: queryParams.username,
+        accessType: queryParams.accessType,
+        tableName: queryParams.tableName,
+        ipAddress: queryParams.ipAddress,
+        success: queryParams.success,
+        created_at__gte: startTime,
+        created_at__lte: endTime,
+      },
+      null,
+      ["-created_at"] // 按创建时间倒序排序
+    );
+    return {
+      items: result.items || [],
+      total: result.total || 0,
+    };
   },
-
   columns: [
     {
-      title: t('pages.dataAccessAuditLog.createdAt'),
-      field: 'createdAt',
-      formatter: 'formatDateTime',
+      prop: "createdAt",
+      label: $t("pages.data_access_audit_log.createdAt"),
+      minWidth: 160,
+      template: "date",
+      dateFormat: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
+      prop: "success",
+      label: $t("pages.data_access_audit_log.success"),
+      width: 120,
+      slotName: "success",
+    },
+    {
+      prop: "accessType",
+      label: $t("pages.data_access_audit_log.accessType"),
       width: 140,
+      slotName: "accessType",
     },
+    { prop: "tableName", label: $t("pages.data_access_audit_log.tableName"), minWidth: 150 },
+    { prop: "dataCategory", label: $t("pages.data_access_audit_log.dataCategory"), minWidth: 150 },
+    { prop: "latencyMs", label: $t("pages.data_access_audit_log.latencyMs"), width: 120 },
+    { prop: "username", label: $t("pages.data_access_audit_log.username"), minWidth: 120 },
     {
-      title: t('pages.dataAccessAuditLog.success'),
-      field: 'success',
-      slots: { default: 'success' },
-      width: 80,
+      prop: "geoLocation",
+      label: $t("pages.data_access_audit_log.geoLocation"),
+      minWidth: 150,
+      slotName: "geoLocation",
     },
-    {
-      title: t('pages.dataAccessAuditLog.accessType'),
-      field: 'accessType',
-      slots: { default: 'accessType' },
-      width: 80,
-    },
-    { title: t('pages.dataAccessAuditLog.tableName'), field: 'tableName' },
-    {
-      title: t('pages.dataAccessAuditLog.dataCategory'),
-      field: 'dataCategory',
-    },
-    { title: t('pages.dataAccessAuditLog.latencyMs'), field: 'latencyMs' },
-    { title: t('pages.dataAccessAuditLog.username'), field: 'username' },
-    {
-      title: t('pages.dataAccessAuditLog.geoLocation'),
-      field: 'geoLocation',
-      slots: { default: 'geoLocation' },
-    },
-    {
-      title: t('pages.dataAccessAuditLog.ipAddress'),
-      field: 'ipAddress',
-      width: 140,
-    },
+    { prop: "ipAddress", label: $t("pages.data_access_audit_log.ipAddress"), width: 140 },
   ],
 };
-
-const [Grid] = useVbenVxeGrid({ gridOptions, formOptions });
 </script>
 
-<template>
-  <Page auto-content-height>
-    <Grid :table-title="$t('menu.log.dataAccessAuditLog')">
-      <template #success="{ row }">
-        <a-tag :color="successToColor(row.success)">
-          {{ successToNameWithStatusCode(row.success, row.statusCode) }}
-        </a-tag>
-      </template>
-      <template #geoLocation="{ row }">
-        {{ row.geoLocation.province }} {{ row.geoLocation.city }}
-      </template>
-      <template #accessType="{ row }">
-        <a-tag :color="dataAccessAuditLogAccessTypeToColor(row.accessType)">
-          {{ dataAccessAuditLogAccessTypeToName(row.accessType) }}
-        </a-tag>
-      </template>
-    </Grid>
-  </Page>
-</template>
+<style lang="scss" scoped>
+.app-container {
+  padding: 20px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+</style>

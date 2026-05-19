@@ -1,73 +1,91 @@
+<template>
+  <div class="app-container h-full flex flex-1 flex-col">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :search-config="searchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    />
+
+    <!-- 列表 -->
+    <PageContent
+      ref="contentRef"
+      :content-config="contentConfig"
+      @add-click="handleAddClick"
+      @operate-click="handleOperateClick"
+      @toolbar-click="handleToolbarClick"
+    >
+      <!-- 是否启用 -->
+      <template #enable="{ row }">
+        <ElSwitch
+          v-model="row.enable"
+          :loading="row.pending"
+          :active-text="$t('common.switch.active')"
+          :inactive-text="$t('common.switch.inactive')"
+          @change="(value: boolean) => handleEnableChanged(row, value)"
+        />
+      </template>
+
+      <!-- 任务类型 -->
+      <template #type="{ row }">
+        <ElTag size="small" effect="dark" round :color="taskTypeToColor(row.type)">
+          {{ taskTypeToName(row.type) }}
+        </ElTag>
+      </template>
+    </PageContent>
+
+    <!-- 新增/编辑抽屉 -->
+    <TaskDrawer ref="drawerRef" @success="handleSuccess" />
+  </div>
+</template>
+
 <script lang="ts" setup>
-import type { VxeGridProps } from '@/adapter/vxe-table';
+import { ElMessage, ElMessageBox, ElSwitch, ElTag } from "element-plus";
 
-import { h } from 'vue';
+import PageContent from "@/components/CURD/PageContent.vue";
+import PageSearch from "@/components/CURD/PageSearch.vue";
+import usePage from "@/components/CURD/usePage";
+import type { IOperateData, ISearchConfig, IContentConfig } from "@/components/CURD/types";
+import TaskDrawer from "./task-drawer.vue";
 
-import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import {
-  LucideCirclePlay,
-  LucideCircleStop,
-  LucideFilePenLine,
-  LucideRotateCcw,
-  LucideTrash2,
-} from '@vben/icons';
-
-import { notification } from 'ant-design-vue';
-
-import { useVbenVxeGrid } from '@/adapter/vxe-table';
-import {
-  type taskservicev1_ControlTaskRequest_ControlType as ControlTaskRequest_ControlType,
-  type taskservicev1_Task as Task,
-} from '@/api/generated/admin/service/v1';
-import { $t } from '@/locales';
-import {
-  enableList,
-  taskTypeList,
-  taskTypeToColor,
-  taskTypeToName,
-  useTaskStore,
-} from '@/stores';
-
-import TaskDrawer from './task-drawer.vue';
+import { enableList, taskTypeList, taskTypeToColor, taskTypeToName, useTaskStore } from "@/stores";
+import { $t } from "@/i18n";
 
 const taskStore = useTaskStore();
 
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  // 控制表单是否显示折叠按钮
-  showCollapseButton: false,
-  // 按下回车时是否提交表单
-  submitOnEnter: true,
-  schema: [
-    {
-      component: 'Select',
-      fieldName: 'type',
-      label: t('pages.task.type'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        options: taskTypeList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
-      },
-    },
+// 使用 CURD hook
+const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
 
+// 抽屉引用
+const drawerRef = ref();
+
+// 搜索配置
+const searchConfig: ISearchConfig = {
+  grid: true, // 启用 Grid 布局
+  formItems: [
     {
-      component: 'ApiSelect',
-      fieldName: 'typeName',
-      label: t('pages.task.typeName'),
-      componentProps: {
-        allowClear: true,
-        showSearch: true,
-        placeholder: $t('ui.placeholder.select'),
+      type: "select",
+      label: $t("pages.task.type"),
+      prop: "type",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
+      },
+      options: taskTypeList.value,
+    },
+    {
+      type: "api-select",
+      label: $t("pages.task.typeName"),
+      prop: "typeName",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
         api: async () => {
           const result = await taskStore.listTaskTypeName();
-          return result.typeNames;
-        },
-        afterFetch: (data: { name: string; path: string }[]) => {
-          return data.map((item: any) => ({
+          return result.typeNames.map((item: any) => ({
             label: item,
             value: item,
           }));
@@ -75,413 +93,320 @@ const formOptions: VbenFormProps = {
       },
     },
     {
-      component: 'Select',
-      fieldName: 'enable',
-      label: $t('ui.table.status'),
-      componentProps: {
-        options: enableList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("common.table.status"),
+      prop: "enable",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
       },
+      options: enableList.value,
     },
   ],
 };
 
-const gridOptions: VxeGridProps<Task> = {
-  toolbarConfig: {
-    custom: true,
-    export: true,
-    // import: true,
-    refresh: true,
-    zoom: true,
-  },
-  height: 'auto',
-  exportConfig: {},
-  pagerConfig: {
-    enabled: false,
-  },
-  rowConfig: {
-    isHover: true,
-  },
-
-  proxyConfig: {
-    ajax: {
-      query: async ({ page }, formValues) => {
-        console.log('query:', formValues);
-
-        return await taskStore.listTask(
-          {
-            page: page.currentPage,
-            pageSize: page.pageSize,
-          },
-          formValues,
-        );
+// 表格配置
+const contentConfig: IContentConfig = {
+  permPrefix: "sys:task", // 任务管理权限前缀
+  toolbarRight: [
+    {
+      name: "startAll",
+      text: $t("pages.task.button.startAll"),
+      attrs: {
+        type: "success",
       },
     },
+    {
+      name: "stopAll",
+      text: $t("pages.task.button.stopAll"),
+      attrs: {
+        type: "danger",
+      },
+    },
+    {
+      name: "restartAll",
+      text: $t("pages.task.button.restartAll"),
+      attrs: {
+        type: "primary",
+      },
+    },
+    "add",
+  ],
+  defaultToolbar: ["refresh", "exports", "filter"],
+  table: {
+    border: true,
+    stripe: false,
   },
-
+  pagination: false, // 禁用分页（原 Vben 页面 pagerConfig.enabled = false）
+  indexAction: async (query: any) => {
+    const { page, pageSize, ...queryParams } = query;
+    const result = await taskStore.listTask(
+      {
+        page: page || 1,
+        pageSize: pageSize || 10,
+      },
+      queryParams
+    );
+    return {
+      items: result.items || [],
+      total: result.total || 0,
+    };
+  },
   columns: [
-    { title: $t('ui.table.seq'), type: 'seq', width: 50 },
-    { title: t('pages.task.type'), field: 'type', slots: { default: 'type' } },
-    { title: t('pages.task.typeName'), field: 'typeName' },
-    { title: t('pages.task.taskPayload'), field: 'taskPayload' },
-    { title: t('pages.task.cronSpec'), field: 'cronSpec' },
+    { type: "index", label: $t("common.table.seq"), width: 60 },
     {
-      title: t('pages.task.enable'),
-      field: 'enable',
-      slots: { default: 'enable' },
-      width: 95,
+      prop: "type",
+      label: $t("pages.task.type"),
+      width: 120,
+      slotName: "type",
+    },
+    { prop: "typeName", label: $t("pages.task.typeName"), minWidth: 150 },
+    { prop: "taskPayload", label: $t("pages.task.taskPayload"), minWidth: 150 },
+    { prop: "cronSpec", label: $t("pages.task.cronSpec"), minWidth: 150 },
+    {
+      prop: "enable",
+      label: $t("pages.task.enable"),
+      width: 100,
+      slotName: "enable",
     },
     {
-      title: $t('ui.table.createdAt'),
-      field: 'createdAt',
-      formatter: 'formatDateTime',
-      width: 140,
+      prop: "createdAt",
+      label: $t("common.table.createdAt"),
+      minWidth: 160,
+      template: "date",
+      dateFormat: "YYYY-MM-DD HH:mm:ss",
     },
-    { title: $t('ui.table.remark'), field: 'remark' },
+    { prop: "remark", label: $t("common.table.remark"), minWidth: 150 },
     {
-      title: $t('ui.table.action'),
-      field: 'action',
-      fixed: 'right',
-      slots: { default: 'action' },
-      width: 190,
+      prop: "action",
+      label: $t("common.table.action"),
+      fixed: "right",
+      width: 240,
+      template: "tool",
+      action: [
+        {
+          name: "edit",
+          text: $t("common.button.edit"),
+        },
+        {
+          name: "start",
+          text: $t("pages.task.text.do_you_want_start_task", {
+            moduleName: $t("pages.task.moduleName"),
+          }),
+          attrs: {
+            type: "success",
+          },
+        },
+        {
+          name: "stop",
+          text: $t("pages.task.text.do_you_want_stop_task", {
+            moduleName: $t("pages.task.moduleName"),
+          }),
+          attrs: {
+            type: "danger",
+          },
+        },
+        {
+          name: "restart",
+          text: $t("pages.task.text.do_you_want_restart_task", {
+            moduleName: $t("pages.task.moduleName"),
+          }),
+          attrs: {
+            type: "primary",
+          },
+        },
+        {
+          name: "delete",
+          text: $t("common.button.delete"),
+          attrs: {
+            type: "danger",
+          },
+        },
+      ],
     },
   ],
 };
 
-const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
+// 处理操作点击
+const handleOperateClick = (data: IOperateData) => {
+  const { name, row } = data;
 
-const [Drawer, drawerApi] = useVbenDrawer({
-  // 连接抽离的组件
-  connectedComponent: TaskDrawer,
-
-  onOpenChange(isOpen: boolean) {
-    if (!isOpen) {
-      // 关闭时，重载表格数据
-      gridApi.reload();
-    }
-  },
-});
-
-/* 打开模态窗口 */
-function openModal(create: boolean, row?: any) {
-  drawerApi.setData({
-    create,
-    row,
-  });
-
-  drawerApi.open();
-}
-
-/* 创建 */
-function handleCreate() {
-  console.log('创建');
-
-  openModal(true);
-}
-
-async function handleRestartAllTask() {
-  console.log('重启所有任务');
-
-  try {
-    await taskStore.restartAllTask();
-
-    notification.success({
-      message: $t('ui.notification.operation_success'),
+  if (name === "edit") {
+    // 编辑
+    drawerRef.value?.open(row);
+  } else if (name === "start") {
+    // 启动任务
+    ElMessageBox.confirm(
+      $t("pages.task.text.do_you_want_start_task", { moduleName: $t("pages.task.moduleName") }),
+      $t("common.title.confirm"),
+      {
+        confirmButtonText: $t("common.button.confirm"),
+        cancelButtonText: $t("common.button.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await taskStore.controlTask(row.typeName, "Start");
+        ElMessage.success($t("common.notification.operation_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("common.notification.operation_failed"));
+      }
     });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.operation_failed'),
+  } else if (name === "stop") {
+    // 停止任务
+    ElMessageBox.confirm(
+      $t("pages.task.text.do_you_want_stop_task", { moduleName: $t("pages.task.moduleName") }),
+      $t("common.title.confirm"),
+      {
+        confirmButtonText: $t("common.button.confirm"),
+        cancelButtonText: $t("common.button.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await taskStore.controlTask(row.typeName, "Stop");
+        ElMessage.success($t("common.notification.operation_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("common.notification.operation_failed"));
+      }
     });
-  }
-}
-
-async function handleStartAllTask() {
-  console.log('启动所有任务');
-
-  try {
-    await taskStore.startAllTask();
-
-    notification.success({
-      message: $t('ui.notification.operation_success'),
+  } else if (name === "restart") {
+    // 重启任务
+    ElMessageBox.confirm(
+      $t("pages.task.text.do_you_want_restart_task", { moduleName: $t("pages.task.moduleName") }),
+      $t("common.title.confirm"),
+      {
+        confirmButtonText: $t("common.button.confirm"),
+        cancelButtonText: $t("common.button.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await taskStore.controlTask(row.typeName, "Restart");
+        ElMessage.success($t("common.notification.operation_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("common.notification.operation_failed"));
+      }
     });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.operation_failed'),
-    });
-  }
-}
-
-async function handleStopAllTask() {
-  console.log('停止所有任务');
-
-  try {
-    await taskStore.stopAllTask();
-
-    notification.success({
-      message: $t('ui.notification.operation_success'),
-    });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.operation_failed'),
-    });
-  }
-}
-
-/**
- * 控制任务
- * @param typeName 任务类型名称
- * @param controlType 控制类型
- */
-async function controlTask(
-  typeName: string,
-  controlType: ControlTaskRequest_ControlType,
-) {
-  try {
-    await taskStore.controlTask(typeName, controlType);
-
-    notification.success({
-      message: $t('ui.notification.operation_success'),
-    });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.operation_failed'),
+  } else if (name === "delete") {
+    // 删除
+    ElMessageBox.confirm(
+      $t("common.confirm.do_you_want_delete", { moduleName: $t("pages.task.moduleName") }),
+      $t("common.title.confirm"),
+      {
+        confirmButtonText: $t("common.button.confirm"),
+        cancelButtonText: $t("common.button.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await taskStore.deleteTask(row.id);
+        ElMessage.success($t("common.notification.delete_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("common.notification.delete_failed"));
+      }
     });
   }
-}
+};
 
-async function handleStartTask(row: any) {
-  await controlTask(row.typeName, 'Start');
-}
+// 处理新增点击
+const handleAddClick = () => {
+  drawerRef.value?.open();
+};
 
-async function handleStopTask(row: any) {
-  await controlTask(row.typeName, 'Stop');
-}
+// 处理成功回调
+const handleSuccess = () => {
+  contentRef.value?.fetchPageData({}, true);
+};
 
-async function handleRestartTask(row: any) {
-  await controlTask(row.typeName, 'Restart');
-}
-
-/* 编辑 */
-function handleEdit(row: any) {
-  console.log('编辑', row);
-  openModal(false, row);
-}
-
-/* 删除 */
-async function handleDelete(row: any) {
-  console.log('删除', row);
-
-  try {
-    await taskStore.deleteTask(row.id);
-
-    notification.success({
-      message: $t('ui.notification.delete_success'),
+// 处理工具栏点击
+const handleToolbarClick = async (name: string) => {
+  if (name === "startAll") {
+    ElMessageBox.confirm(
+      $t("pages.task.text.do_you_want_start_all_task", { moduleName: $t("pages.task.moduleName") }),
+      $t("common.title.confirm"),
+      {
+        confirmButtonText: $t("common.button.confirm"),
+        cancelButtonText: $t("common.button.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await taskStore.startAllTask();
+        ElMessage.success($t("common.notification.operation_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("common.notification.operation_failed"));
+      }
     });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.delete_failed'),
+  } else if (name === "stopAll") {
+    ElMessageBox.confirm(
+      $t("pages.task.text.do_you_want_stop_all_task", { moduleName: $t("pages.task.moduleName") }),
+      $t("common.title.confirm"),
+      {
+        confirmButtonText: $t("common.button.confirm"),
+        cancelButtonText: $t("common.button.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await taskStore.stopAllTask();
+        ElMessage.success($t("common.notification.operation_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("common.notification.operation_failed"));
+      }
+    });
+  } else if (name === "restartAll") {
+    ElMessageBox.confirm(
+      $t("pages.task.text.do_you_want_restart_all_task", {
+        moduleName: $t("pages.task.moduleName"),
+      }),
+      $t("common.title.confirm"),
+      {
+        confirmButtonText: $t("common.button.confirm"),
+        cancelButtonText: $t("common.button.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await taskStore.restartAllTask();
+        ElMessage.success($t("common.notification.operation_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("common.notification.operation_failed"));
+      }
     });
   }
-}
+};
 
-/* 修改状态 */
+// 修改状态
 async function handleEnableChanged(row: any, checked: boolean) {
-  console.log('handleStatusChanged', row.enable, checked);
-
   row.pending = true;
   row.enable = checked;
 
   try {
     await taskStore.updateTask(row.id, { enable: row.enable });
-
-    await controlTask(row.typeName, row.enable ? 'Start' : 'Stop');
-
-    notification.success({
-      message: $t('ui.notification.update_status_success'),
-    });
+    await taskStore.controlTask(row.typeName, row.enable ? "Start" : "Stop");
+    ElMessage.success($t("common.notification.update_status_success"));
   } catch {
-    notification.error({
-      message: $t('ui.notification.update_status_failed'),
-    });
+    ElMessage.error($t("common.notification.update_status_failed"));
   } finally {
     row.pending = false;
   }
 }
 </script>
 
-<template>
-  <Page auto-content-height>
-    <Grid :table-title="$t('menu.system.task')">
-      <template #toolbar-tools>
-        <a-button class="mr-2" type="primary" @click="handleCreate">
-          {{ t('pages.task.button.create') }}
-        </a-button>
-
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            t('pages.task.text.do_you_want_start_all_task', {
-              moduleName: t('pages.task.moduleName'),
-            })
-          "
-          @confirm="handleStartAllTask()"
-        >
-          <a-button class="btn-start-all mr-2" type="primary">
-            {{ t('pages.task.button.startAll') }}
-          </a-button>
-        </a-popconfirm>
-
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            t('pages.task.text.do_you_want_stop_all_task', {
-              moduleName: t('pages.task.moduleName'),
-            })
-          "
-          @confirm="handleStopAllTask()"
-        >
-          <a-button danger class="mr-2" type="primary">
-            {{ t('pages.task.button.stopAll') }}
-          </a-button>
-        </a-popconfirm>
-
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            t('pages.task.text.do_you_want_restart_all_task', {
-              moduleName: t('pages.task.moduleName'),
-            })
-          "
-          @confirm="handleRestartAllTask()"
-        >
-          <a-button class="mr-2" type="primary">
-            {{ t('pages.task.button.restartAll') }}
-          </a-button>
-        </a-popconfirm>
-      </template>
-
-      <template #enable="{ row }">
-        <a-switch
-          :checked="row.enable === true"
-          :loading="row.pending"
-          :checked-children="$t('ui.switch.active')"
-          :un-checked-children="$t('ui.switch.inactive')"
-          @change="
-            (checked: any) => handleEnableChanged(row, checked as boolean)
-          "
-        />
-      </template>
-      <template #type="{ row }">
-        <a-tag :color="taskTypeToColor(row.type)">
-          {{ taskTypeToName(row.type) }}
-        </a-tag>
-      </template>
-      <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            t('pages.task.text.do_you_want_start_task', {
-              moduleName: t('pages.task.moduleName'),
-            })
-          "
-          @confirm="handleStartTask(row)"
-        >
-          <a-button
-            type="link"
-            class="green-link-btn"
-            :icon="h(LucideCirclePlay)"
-          />
-        </a-popconfirm>
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            t('pages.task.text.do_you_want_stop_task', {
-              moduleName: t('pages.task.moduleName'),
-            })
-          "
-          @confirm="handleStopTask(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideCircleStop)" />
-        </a-popconfirm>
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            t('pages.task.text.do_you_want_restart_task', {
-              moduleName: t('pages.task.moduleName'),
-            })
-          "
-          @confirm="handleRestartTask(row)"
-        >
-          <a-button type="link" :icon="h(LucideRotateCcw)" />
-        </a-popconfirm>
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: t('pages.task.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
-      </template>
-    </Grid>
-    <Drawer />
-  </Page>
-</template>
-
-<style scoped>
-.btn-start-all {
-  background-color: #52c41a !important;
-  border-color: #52c41a !important;
-  color: #fff !important;
-}
-
-.btn-start-all:hover,
-.btn-start-all:focus {
-  background-color: #4cae4c !important;
-  border-color: #4cae4c !important;
-}
-
-.btn-start-all[disabled] {
-  background-color: #c2e7b0 !important;
-  border-color: #c2e7b0 !important;
-  color: #86b379 !important;
-  cursor: not-allowed !important;
-}
-
-:deep(.green-link-btn) {
-  color: #52c41a !important;
-}
-
-:deep(.green-link-btn:hover) {
-  color: #4cae4c !important;
+<style lang="scss" scoped>
+.app-container {
+  padding: 20px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
 }
 </style>

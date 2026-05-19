@@ -1,0 +1,11 @@
+{
+  "moduleName": "Permission Audit Log",
+  "targetType": "Target Type",
+  "operatorName": "Operator",
+  "action": "Action Type",
+  "ipAddress": "IP Address",
+  "createdAt": "Created At",
+  "targetName": "Target Name",
+  "reason": "Reason",
+  "geoLocation": "Geo Location"
+}

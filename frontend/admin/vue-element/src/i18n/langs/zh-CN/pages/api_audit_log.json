@@ -1,0 +1,12 @@
+{
+  "moduleName": "API审计日志",
+  "username": "用户名",
+  "path": "请求路径",
+  "httpMethod": "HTTP方法",
+  "ipAddress": "IP地址",
+  "success": "是否成功",
+  "createdAt": "创建时间",
+  "latencyMs": "响应时间(ms)",
+  "platform": "平台信息",
+  "geoLocation": "地理位置"
+}

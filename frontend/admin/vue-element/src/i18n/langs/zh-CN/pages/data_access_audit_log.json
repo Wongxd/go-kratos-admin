@@ -1,0 +1,12 @@
+{
+  "moduleName": "数据访问审计日志",
+  "username": "用户名",
+  "tableName": "表名",
+  "accessType": "访问类型",
+  "ipAddress": "IP地址",
+  "success": "是否成功",
+  "createdAt": "创建时间",
+  "dataCategory": "数据分类",
+  "latencyMs": "响应时间(ms)",
+  "geoLocation": "地理位置"
+}
