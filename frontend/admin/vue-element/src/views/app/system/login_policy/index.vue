@@ -1,16 +1,49 @@
+<template>
+  <div class="app-container h-full flex flex-1 flex-col">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :search-config="searchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    />
+
+    <!-- 列表 -->
+    <PageContent
+      ref="contentRef"
+      :content-config="contentConfig"
+      @add-click="handleAddClick"
+      @operate-click="handleOperateClick"
+    >
+      <!-- 策略类型 -->
+      <template #type="{ row }">
+        <ElTag size="small" effect="dark" round :color="loginPolicyTypeToColor(row.type)">
+          {{ loginPolicyTypeToName(row.type) }}
+        </ElTag>
+      </template>
+
+      <!-- 策略方法 -->
+      <template #method="{ row }">
+        <ElTag size="small" effect="dark" round :color="loginPolicyMethodToColor(row.method)">
+          {{ loginPolicyMethodToName(row.method) }}
+        </ElTag>
+      </template>
+    </PageContent>
+
+    <!-- 新增/编辑抽屉 -->
+    <LoginPolicyDrawer ref="drawerRef" @success="handleSuccess" />
+  </div>
+</template>
+
 <script lang="ts" setup>
-import type { VxeGridProps } from '@/adapter/vxe-table';
+import { ElMessage, ElMessageBox, ElTag } from "element-plus";
 
-import { h } from 'vue';
+import PageContent from "@/components/CURD/PageContent.vue";
+import PageSearch from "@/components/CURD/PageSearch.vue";
+import usePage from "@/components/CURD/usePage";
+import type { IOperateData, ISearchConfig, IContentConfig } from "@/components/CURD/types";
+import LoginPolicyDrawer from "./login-policy-drawer.vue";
 
-import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
-
-import { notification } from 'ant-design-vue';
-
-import { useVbenVxeGrid } from '@/adapter/vxe-table';
-import { type authenticationservicev1_LoginPolicy as LoginPolicy } from '@/api/generated/admin/service/v1';
-import { $t } from '@/locales';
 import {
   loginPolicyMethodList,
   loginPolicyMethodToColor,
@@ -19,206 +52,162 @@ import {
   loginPolicyTypeToColor,
   loginPolicyTypeToName,
   useLoginPolicyStore,
-} from '@/stores';
-
-import LoginPolicyDrawer from './login-policy-drawer.vue';
+} from "@/stores";
+import { $t } from "@/i18n";
 
 const loginPolicyStore = useLoginPolicyStore();
 
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  // 控制表单是否显示折叠按钮
-  showCollapseButton: false,
-  // 按下回车时是否提交表单
-  submitOnEnter: true,
-  schema: [
+// 使用 CURD hook
+const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
+
+// 抽屉引用
+const drawerRef = ref();
+
+// 搜索配置
+const searchConfig: ISearchConfig = {
+  grid: true, // 启用 Grid 布局
+  formItems: [
     {
-      component: 'Select',
-      fieldName: 'type',
-      label: t('pages.loginPolicy.type'),
-      componentProps: {
-        options: loginPolicyTypeList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("pages.login_policy.type"),
+      prop: "type",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
       },
+      options: loginPolicyTypeList.value,
     },
     {
-      component: 'Select',
-      fieldName: 'method',
-      label: t('pages.loginPolicy.method'),
-      componentProps: {
-        options: loginPolicyMethodList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("pages.login_policy.method"),
+      prop: "method",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
+        filterable: true,
       },
+      options: loginPolicyMethodList.value,
     },
   ],
 };
 
-const gridOptions: VxeGridProps<LoginPolicy> = {
-  toolbarConfig: {
-    custom: true,
-    export: true,
-    // import: true,
-    refresh: true,
-    zoom: true,
+// 表格配置
+const contentConfig: IContentConfig = {
+  permPrefix: "sys:login_policy", // 登录策略管理权限前缀
+  toolbarRight: ["add"], // 右侧自定义按钮（在defaultToolbar左侧）
+  defaultToolbar: ["refresh", "exports", "filter"], // 右侧默认工具栏
+  table: {
+    border: true,
+    stripe: false,
   },
-  height: 'auto',
-  exportConfig: {},
-  pagerConfig: {},
-  rowConfig: {
-    isHover: true,
-  },
-  stripe: true,
-
-  proxyConfig: {
-    ajax: {
-      query: async ({ page }, formValues) => {
-        // console.log('query:', filters, form, formValues);
-
-        return await loginPolicyStore.listLoginPolicy(
-          {
-            page: page.currentPage,
-            pageSize: page.pageSize,
-          },
-          formValues,
-        );
+  indexAction: async (query: any) => {
+    const { page, pageSize, ...queryParams } = query;
+    const result = await loginPolicyStore.listLoginPolicy(
+      {
+        page: page || 1,
+        pageSize: pageSize || 10,
       },
-    },
+      queryParams
+    );
+    // 转换数据格式
+    return {
+      items: result.items || [],
+      total: result.total || 0,
+    };
   },
-
   columns: [
-    { title: $t('ui.table.seq'), type: 'seq', width: 50 },
-    { title: t('pages.loginPolicy.targetId'), field: 'targetId' },
+    { type: "index", label: $t("common.table.seq"), width: 60 },
+    { prop: "targetId", label: $t("pages.login_policy.targetId"), minWidth: 120 },
     {
-      title: t('pages.loginPolicy.type'),
-      field: 'type',
-      slots: { default: 'type' },
+      prop: "type",
+      label: $t("pages.login_policy.type"),
+      width: 100,
+      slotName: "type",
     },
     {
-      title: t('pages.loginPolicy.method'),
-      field: 'method',
-      slots: { default: 'method' },
+      prop: "method",
+      label: $t("pages.login_policy.method"),
+      width: 100,
+      slotName: "method",
     },
-    { title: t('pages.loginPolicy.value'), field: 'value' },
-    { title: t('pages.loginPolicy.reason'), field: 'reason' },
+    { prop: "value", label: $t("pages.login_policy.value"), minWidth: 150 },
+    { prop: "reason", label: $t("pages.login_policy.reason"), minWidth: 150 },
     {
-      title: $t('ui.table.createdAt'),
-      field: 'createdAt',
-      formatter: 'formatDateTime',
-      width: 140,
+      prop: "createdAt",
+      label: $t("common.table.createdAt"),
+      minWidth: 160,
+      template: "date",
+      dateFormat: "YYYY-MM-DD HH:mm:ss",
     },
     {
-      title: $t('ui.table.action'),
-      field: 'action',
-      fixed: 'right',
-      slots: { default: 'action' },
-      width: 90,
+      prop: "action",
+      label: $t("common.table.action"),
+      fixed: "right",
+      width: 150,
+      template: "tool",
+      action: [
+        {
+          name: "edit",
+          text: $t("common.button.edit"),
+        },
+        {
+          name: "delete",
+          text: $t("common.button.delete"),
+          attrs: {
+            type: "danger",
+          },
+        },
+      ],
     },
   ],
 };
 
-const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
+// 处理操作点击
+const handleOperateClick = (data: IOperateData) => {
+  const { name, row } = data;
 
-const [Drawer, drawerApi] = useVbenDrawer({
-  // 连接抽离的组件
-  connectedComponent: LoginPolicyDrawer,
-
-  onOpenChange(isOpen: boolean) {
-    if (!isOpen) {
-      // 关闭时，重载表格数据
-      gridApi.reload();
-    }
-  },
-});
-
-/* 打开模态窗口 */
-function openDrawer(create: boolean, row?: any) {
-  drawerApi.setData({
-    create,
-    row,
-  });
-
-  drawerApi.open();
-}
-
-/* 创建 */
-function handleCreate() {
-  console.log('创建');
-  openDrawer(true);
-}
-
-/* 编辑 */
-function handleEdit(row: any) {
-  console.log('编辑', row);
-  openDrawer(false, row);
-}
-
-/* 删除 */
-async function handleDelete(row: any) {
-  console.log('删除', row);
-
-  try {
-    await loginPolicyStore.deleteLoginPolicy(row.id);
-
-    notification.success({
-      message: $t('ui.notification.delete_success'),
-    });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.delete_failed'),
+  if (name === "edit") {
+    // 编辑
+    drawerRef.value?.open(row);
+  } else if (name === "delete") {
+    // 删除
+    ElMessageBox.confirm(
+      $t("common.confirm.do_you_want_delete", { moduleName: $t("pages.login_policy.moduleName") }),
+      $t("common.title.confirm"),
+      {
+        confirmButtonText: $t("common.button.confirm"),
+        cancelButtonText: $t("common.button.cancel"),
+        type: "warning",
+      }
+    ).then(async () => {
+      try {
+        await loginPolicyStore.deleteLoginPolicy(row.id);
+        ElMessage.success($t("common.notification.delete_success"));
+        contentRef.value?.fetchPageData({}, true);
+      } catch {
+        ElMessage.error($t("common.notification.delete_failed"));
+      }
     });
   }
-}
+};
+
+// 处理新增点击
+const handleAddClick = () => {
+  drawerRef.value?.open();
+};
+
+// 处理成功回调
+const handleSuccess = () => {
+  contentRef.value?.fetchPageData({}, true);
+};
 </script>
 
-<template>
-  <Page auto-content-height>
-    <Grid :table-title="$t('menu.system.loginPolicy')">
-      <template #toolbar-tools>
-        <a-button type="primary" class="mr-2" @click="handleCreate">
-          {{ t('pages.loginPolicy.button.create') }}
-        </a-button>
-      </template>
-      <template #type="{ row }">
-        <a-tag :color="loginPolicyTypeToColor(row.type)">
-          {{ loginPolicyTypeToName(row.type) }}
-        </a-tag>
-      </template>
-      <template #method="{ row }">
-        <a-tag :color="loginPolicyMethodToColor(row.method)">
-          {{ loginPolicyMethodToName(row.method) }}
-        </a-tag>
-      </template>
-      <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: t('pages.loginPolicy.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
-      </template>
-    </Grid>
-    <Drawer />
-  </Page>
-</template>
+<style lang="scss" scoped>
+.app-container {
+  padding: 20px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+</style>

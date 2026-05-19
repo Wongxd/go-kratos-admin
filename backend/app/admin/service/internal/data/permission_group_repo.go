@@ -107,40 +107,21 @@ func (r *PermissionGroupRepo) List(ctx context.Context, req *paginationV1.Paging
 		return nil, permissionV1.ErrorInternalServerError("query permission group list failed")
 	}
 
+	// 转换所有实体为 DTO
 	dtos := make([]*permissionV1.PermissionGroup, 0, len(entities))
+	for _, entity := range entities {
+		dto := r.mapper.ToDTO(entity)
+		dtos = append(dtos, dto)
+	}
+
+	// 构建树形结构
 	if treeTravel {
-		// 构建映射表，用于快速查找
-		dtoMap := make(map[uint32]*permissionV1.PermissionGroup)
-
-		// 第一次遍历：转换所有实体并建立映射
-		for _, entity := range entities {
-			dto := r.mapper.ToDTO(entity)
-			if dto.Id != nil {
-				dtoMap[*dto.Id] = dto
-			}
-		}
-
-		// 第二次遍历：构建树结构
-		for _, dto := range dtoMap {
-			if dto.ParentId == nil || *dto.ParentId == 0 {
-				// 根节点
-				dtos = append(dtos, dto)
-			} else {
-				// 子节点：查找父节点并添加
-				if parent, ok := dtoMap[*dto.ParentId]; ok {
-					if parent.Children == nil {
-						parent.Children = make([]*permissionV1.PermissionGroup, 0)
-					}
-					parent.Children = append(parent.Children, dto)
-				}
-				// 如果找不到父节点，则该节点被跳过（孤儿节点）
-			}
-		}
-	} else {
-		for _, entity := range entities {
-			dto := r.mapper.ToDTO(entity)
-			dtos = append(dtos, dto)
-		}
+		dtos = BuildTree(
+			dtos,
+			func(node *permissionV1.PermissionGroup) *uint32 { return node.Id },
+			func(node *permissionV1.PermissionGroup) *uint32 { return node.ParentId },
+			func(node *permissionV1.PermissionGroup) *[]*permissionV1.PermissionGroup { return &node.Children },
+		)
 	}
 
 	count, err := r.Count(ctx, whereSelectors)

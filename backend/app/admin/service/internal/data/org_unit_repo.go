@@ -134,34 +134,20 @@ func (r *OrgUnitRepo) List(ctx context.Context, req *paginationV1.PagingRequest)
 		return sortI < sortJ
 	})
 
-	// 构建映射表，用于快速查找
-	dtoMap := make(map[uint32]*identityV1.OrgUnit)
-	dtos := make([]*identityV1.OrgUnit, 0)
-
-	// 第一次遍历：转换所有实体并建立映射
+	// 转换所有实体为 DTO
+	dtos := make([]*identityV1.OrgUnit, 0, len(entities))
 	for _, entity := range entities {
 		dto := r.mapper.ToDTO(entity)
-		if dto.Id != nil {
-			dtoMap[*dto.Id] = dto
-		}
+		dtos = append(dtos, dto)
 	}
 
-	// 第二次遍历：构建树结构
-	for _, dto := range dtoMap {
-		if dto.ParentId == nil || *dto.ParentId == 0 {
-			// 根节点
-			dtos = append(dtos, dto)
-		} else {
-			// 子节点：查找父节点并添加
-			if parent, ok := dtoMap[*dto.ParentId]; ok {
-				if parent.Children == nil {
-					parent.Children = make([]*identityV1.OrgUnit, 0)
-				}
-				parent.Children = append(parent.Children, dto)
-			}
-			// 如果找不到父节点，则该节点被跳过（孤儿节点）
-		}
-	}
+	// 构建树形结构
+	dtos = BuildTree(
+		dtos,
+		func(node *identityV1.OrgUnit) *uint32 { return node.Id },
+		func(node *identityV1.OrgUnit) *uint32 { return node.ParentId },
+		func(node *identityV1.OrgUnit) *[]*identityV1.OrgUnit { return &node.Children },
+	)
 
 	count, err := r.count(ctx, whereSelectors)
 	if err != nil {
@@ -432,4 +418,65 @@ func (r *OrgUnitRepo) setTreePath(ctx context.Context, tx *ent.Tx, entity *ent.O
 		Exec(ctx)
 
 	return err
+}
+
+// BuildTree 构建树形结构的泛型方法
+// T: 节点类型，必须包含 Id、ParentId 和 Children 字段
+// getId: 获取节点ID的函数
+// getParentId: 获取父节点ID的函数
+// getChildren: 获取子节点切片的指针的函数
+// nodes: 扁平的节点列表
+// 返回：根节点列表（包含完整的子树）
+// 时间复杂度：O(n)，空间复杂度：O(n)
+//
+// 使用示例：
+//
+//	dtos = BuildTree(
+//	    dtos,
+//	    func(node *OrgUnit) *uint32 { return node.Id },
+//	    func(node *OrgUnit) *uint32 { return node.ParentId },
+//	    func(node *OrgUnit) *[]*OrgUnit { return &node.Children },
+//	)
+func BuildTree[T any](
+	nodes []*T,
+	getId func(node *T) *uint32,
+	getParentId func(node *T) *uint32,
+	getChildren func(node *T) *[]*T,
+) []*T {
+	if len(nodes) == 0 {
+		return []*T{}
+	}
+
+	// 构建映射表，用于快速查找
+	nodeMap := make(map[uint32]*T)
+	rootNodes := make([]*T, 0)
+
+	// 第一次遍历：建立 ID -> Node 的映射
+	for _, node := range nodes {
+		if id := getId(node); id != nil {
+			nodeMap[*id] = node
+		}
+	}
+
+	// 第二次遍历：构建树结构
+	for _, node := range nodeMap {
+		parentId := getParentId(node)
+		if parentId == nil || *parentId == 0 {
+			// 根节点
+			rootNodes = append(rootNodes, node)
+		} else {
+			// 子节点：查找父节点并添加
+			if parent, ok := nodeMap[*parentId]; ok {
+				children := getChildren(parent)
+				if *children == nil {
+					// 初始化子节点切片
+					*children = make([]*T, 0)
+				}
+				*children = append(*children, node)
+			}
+			// 如果找不到父节点，则该节点被跳过（孤儿节点）
+		}
+	}
+
+	return rootNodes
 }

@@ -1,163 +1,200 @@
+<template>
+  <ElDrawer
+    v-model="visible"
+    :title="title"
+    size="600px"
+    :close-on-click-modal="false"
+    :append-to-body="true"
+    :destroy-on-close="true"
+    @close="handleClose"
+  >
+    <ElForm
+      ref="formRef"
+      :model="formData"
+      :rules="formRules"
+      label-width="120px"
+      class="drawer-form"
+    >
+      <!-- 基本信息 -->
+      <ElDivider content-position="left">{{ $t("common.section.basic") }}</ElDivider>
+
+      <ElFormItem :label="$t('pages.language.languageName')" prop="languageName">
+        <ElInput
+          v-model="formData.languageName"
+          :placeholder="$t('common.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.language.languageCode')" prop="languageCode">
+        <ElInput
+          v-model="formData.languageCode"
+          :placeholder="$t('common.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.language.nativeName')" prop="nativeName">
+        <ElInput
+          v-model="formData.nativeName"
+          :placeholder="$t('common.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('common.table.sortOrder')" prop="sortOrder">
+        <ElInputNumber
+          v-model="formData.sortOrder"
+          :min="1"
+          :placeholder="$t('common.placeholder.input')"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.language.isEnabled')" prop="isEnabled">
+        <ElSwitch v-model="formData.isEnabled" />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.language.isDefault')" prop="isDefault">
+        <ElSwitch v-model="formData.isDefault" />
+      </ElFormItem>
+    </ElForm>
+
+    <template #footer>
+      <div class="drawer-footer">
+        <ElButton @click="handleClose">{{ $t("common.button.cancel") }}</ElButton>
+        <ElButton type="primary" :loading="submitLoading" @click="handleSubmit">
+          {{ $t("common.button.confirm") }}
+        </ElButton>
+      </div>
+    </template>
+  </ElDrawer>
+</template>
+
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, reactive, ref } from "vue";
+import { ElMessage } from "element-plus";
 
-import { useVbenDrawer } from "@vben/common-ui";
-import { $t } from "@vben/locales";
-
-import { notification } from "ant-design-vue";
-
-import { useVbenForm } from "@/adapter/form";
 import { useLanguageDataStore } from "@/stores";
+import { $t } from "@/i18n";
+
+const emit = defineEmits<{
+  success: [];
+}>();
 
 const languageStore = useLanguageDataStore();
 
-const data = ref();
+const visible = ref(false);
+const submitLoading = ref(false);
+const isCreate = ref(true);
+const currentId = ref<number>();
+const formRef = ref();
 
-const getTitle = computed(() =>
-  data.value?.create ? t("pages.language.button.create") : t("pages.language.button.update")
+// 表单数据
+const formData = reactive({
+  languageName: "",
+  languageCode: "",
+  nativeName: "",
+  sortOrder: 1,
+  isEnabled: true,
+  isDefault: false,
+});
+
+// 表单验证规则
+const formRules = {
+  languageName: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  languageCode: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  nativeName: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+};
+
+// 标题
+const title = computed(() =>
+  isCreate.value ? $t("pages.language.button.create") : $t("pages.language.button.update")
 );
-// const isCreate = computed(() => data.value?.create);
 
-const [BaseForm, baseFormApi] = useVbenForm({
-  showDefaultActions: false,
-  // 所有表单项共用，可单独在表单内覆盖
-  commonConfig: {
-    // 所有表单项
-    componentProps: {
-      class: "w-full",
-    },
-  },
-  schema: [
-    {
-      component: "Input",
-      fieldName: "languageName",
-      label: t("pages.language.languageName"),
-      rules: "required",
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-    },
-    {
-      component: "Input",
-      fieldName: "languageCode",
-      label: t("pages.language.languageCode"),
-      rules: "required",
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-    },
-    {
-      component: "Input",
-      fieldName: "nativeName",
-      label: t("pages.language.nativeName"),
-      rules: "required",
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-    },
-    {
-      component: "InputNumber",
-      fieldName: "sortOrder",
-      defaultValue: 1,
-      label: $t("ui.table.sortOrder"),
-      componentProps: {
-        placeholder: $t("ui.placeholder.input"),
-        allowClear: true,
-      },
-    },
-    {
-      component: "Switch",
-      fieldName: "isEnabled",
-      defaultValue: true,
-      label: t("pages.language.isEnabled"),
-      componentProps: {
-        class: "w-auto",
-      },
-    },
-    {
-      component: "Switch",
-      fieldName: "isDefault",
-      defaultValue: false,
-      label: t("pages.language.isDefault"),
-      componentProps: {
-        class: "w-auto",
-      },
-    },
-  ],
-});
+// 打开抽屉
+function open(row?: any) {
+  visible.value = true;
 
-const [Drawer, drawerApi] = useVbenDrawer({
-  onCancel() {
-    drawerApi.close();
-  },
-
-  async onConfirm() {
-    console.log("onConfirm");
-
-    // 校验输入的数据
-    const validate = await baseFormApi.validate();
-    if (!validate.valid) {
-      return;
-    }
-
-    // 加载条设置为加载状态
-    setLoading(true);
-
-    // 获取表单数据
-    const values = await baseFormApi.getValues();
-
-    console.log(getTitle.value, Object.keys(values));
-
-    try {
-      await (data.value?.create
-        ? languageStore.createLanguage(values)
-        : languageStore.updateLanguage(data.value.row.id, values));
-
-      notification.success({
-        message: data.value?.create
-          ? $t("ui.notification.create_success")
-          : $t("ui.notification.update_success"),
-      });
-    } catch {
-      notification.error({
-        message: data.value?.create
-          ? $t("ui.notification.create_failed")
-          : $t("ui.notification.update_failed"),
-      });
-    } finally {
-      // 关闭窗口
-      drawerApi.close();
-      setLoading(false);
-    }
-  },
-
-  onOpenChange(isOpen: boolean) {
-    if (isOpen) {
-      // 获取传入的数据
-      data.value = drawerApi.getData<Record<string, any>>();
-
-      // 为表单赋值
-      if (data.value.row !== undefined) {
-        baseFormApi.setValues(data.value?.row);
-      }
-
-      setLoading(false);
-
-      console.log("onOpenChange", data.value, data.value?.create);
-    }
-  },
-});
-
-function setLoading(loading: boolean) {
-  drawerApi.setState({ confirmLoading: loading });
+  if (row) {
+    // 编辑模式
+    isCreate.value = false;
+    currentId.value = row.id;
+    Object.assign(formData, row);
+  } else {
+    // 创建模式
+    isCreate.value = true;
+    currentId.value = undefined;
+    resetForm();
+  }
 }
+
+// 关闭抽屉
+function handleClose() {
+  visible.value = false;
+  resetForm();
+}
+
+// 重置表单
+function resetForm() {
+  formData.languageName = "";
+  formData.languageCode = "";
+  formData.nativeName = "";
+  formData.sortOrder = 1;
+  formData.isEnabled = true;
+  formData.isDefault = false;
+
+  formRef.value?.clearValidate();
+}
+
+// 提交表单
+async function handleSubmit() {
+  if (!formRef.value) return;
+
+  try {
+    await formRef.value.validate();
+    submitLoading.value = true;
+
+    const values = { ...formData };
+
+    if (isCreate.value) {
+      await languageStore.createLanguage(values);
+      ElMessage.success($t("common.notification.createSuccess"));
+    } else {
+      await languageStore.updateLanguage(currentId.value!, values);
+      ElMessage.success($t("common.notification.updateSuccess"));
+    }
+
+    emit("success");
+    handleClose();
+  } catch (error) {
+    if (error !== false) {
+      // 不是验证错误
+      ElMessage.error(
+        isCreate.value
+          ? $t("common.notification.createFailed")
+          : $t("common.notification.updateFailed")
+      );
+    }
+  } finally {
+    submitLoading.value = false;
+  }
+}
+
+// 暴露方法给父组件
+defineExpose({
+  open,
+});
 </script>
 
-<template>
-  <Drawer :title="getTitle">
-    <BaseForm />
-  </Drawer>
-</template>
+<style lang="scss" scoped>
+.drawer-form {
+  padding-right: 10px;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+</style>

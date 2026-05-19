@@ -85,5 +85,18 @@
       "CONTRACT": "Contract Worker",
       "OTHER": "Other"
     }
+  },
+  "loginPolicy": {
+    "type": {
+      "BLACKLIST": "Blacklist",
+      "WHITELIST": "Whitelist"
+    },
+    "method": {
+      "IP": "IP Address",
+      "MAC": "MAC Address",
+      "REGION": "Region",
+      "TIME": "Time",
+      "DEVICE": "Device"
+    }
   }
 }

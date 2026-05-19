@@ -85,5 +85,18 @@
       "CONTRACT": "合同工",
       "OTHER": "其他"
     }
+  },
+  "loginPolicy": {
+    "type": {
+      "BLACKLIST": "黑名单",
+      "WHITELIST": "白名单"
+    },
+    "method": {
+      "IP": "IP地址",
+      "MAC": "MAC地址",
+      "REGION": "地区",
+      "TIME": "时间",
+      "DEVICE": "设备"
+    }
   }
 }

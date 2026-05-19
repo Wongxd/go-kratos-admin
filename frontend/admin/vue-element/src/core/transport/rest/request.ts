@@ -1,3 +1,5 @@
+import { ElMessage } from "element-plus";
+
 import { useAuthStore, useAccessStore } from "@/stores";
 import { preferences } from "@/core/preferences";
 
@@ -7,7 +9,7 @@ import {
   errorMessageResponseInterceptor,
 } from "./preset-interceptors";
 import { RequestClient } from "./request-client";
-import { ElMessage } from "element-plus";
+import { defaultIdGenerator } from "./utils";
 
 function createRequestClient(baseURL: string) {
   const client = new RequestClient({
@@ -50,6 +52,12 @@ function createRequestClient(baseURL: string) {
           : (accessStore.accessToken ?? null);
       config.headers.Authorization = formatToken(accessToken);
       config.headers["Accept-Language"] = preferences.app.locale;
+
+      const requestId = config.headers["X-Request-ID"] || defaultIdGenerator();
+      (config as any)._requestId = requestId;
+
+      config.headers["X-Request-ID"] = requestId;
+      config.headers["X-Requested-With"] = "XMLHttpRequest";
       return config;
     },
   });

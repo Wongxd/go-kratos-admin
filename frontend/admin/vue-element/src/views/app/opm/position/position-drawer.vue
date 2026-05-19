@@ -53,7 +53,7 @@
           default-expand-all
           filterable
           clearable
-          :props="{ label: 'name', value: 'id', children: 'children' }"
+          :props="{ label: 'name', value: 'id', children: 'children' } as any"
           :placeholder="$t('common.placeholder.select')"
           style="width: 100%"
         />
