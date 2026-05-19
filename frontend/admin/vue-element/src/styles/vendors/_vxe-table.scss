@@ -164,12 +164,12 @@ html.dark {
   --vxe-ui-table-border-color: var(--dark-border, #23272F) !important;
   --vxe-table-header-background-color: var(--dark-header, #14171C) !important;
   --vxe-table-body-background-color: var(--dark-bg-table, #14171C) !important;
-  --vxe-table-row-hover-background-color: var(--dark-bg-hover, #1E2229) !important;
-  --vxe-table-row-current-background-color: var(--dark-bg-hover, #1E2229) !important;
-  --vxe-table-row-hover-current-background-color: var(--dark-bg-hover, #1E2229) !important;
+  --vxe-table-row-hover-background-color: var(--dark-bg-hover, #1A1E26) !important;
+  --vxe-table-row-current-background-color: var(--dark-bg-hover, #1A1E26) !important;
+  --vxe-table-row-hover-current-background-color: var(--dark-bg-hover, #1A1E26) !important;
   --vxe-table-header-font-color: var(--dark-text-primary, #E5EAF3) !important;
   --vxe-table-body-font-color: var(--dark-text-data, #C9CDD4) !important;
-  --vxe-table-checkbox-range-background-color: var(--dark-bg-hover, #1E2229) !important;
+  --vxe-table-checkbox-range-background-color: var(--dark-bg-hover, #1A1E26) !important;
 
   // 强制覆盖 vxe-table 的所有边框
   .vxe-table--basic,
@@ -234,7 +234,7 @@ html.dark {
       // hover 态
       &:hover,
       &.row--hover {
-        background-color: var(--dark-bg-hover, #1E2229) !important;
+        background-color: var(--dark-bg-hover, #1A1E26) !important;
 
         > td {
           background-color: transparent !important;
@@ -244,7 +244,7 @@ html.dark {
 
       // 选中行
       &.row--current {
-        background-color: var(--dark-bg-hover, #1E2229) !important;
+        background-color: var(--dark-bg-hover, #1A1E26) !important;
         outline: 1px solid var(--dark-primary, #409EFF) !important;
 
         > td {
@@ -255,7 +255,7 @@ html.dark {
 
       // hover + 选中
       &.row--hover.row--current {
-        background-color: var(--dark-bg-hover, #1E2229) !important;
+        background-color: var(--dark-bg-hover, #1A1E26) !important;
       }
     }
   }
