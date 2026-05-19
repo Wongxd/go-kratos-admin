@@ -76,20 +76,12 @@ const searchConfig: ISearchConfig = {
       options: taskTypeList.value,
     },
     {
-      type: "api-select",
+      type: "input",
       label: $t("pages.task.typeName"),
       prop: "typeName",
       attrs: {
-        placeholder: $t("common.placeholder.select"),
+        placeholder: $t("common.placeholder.input"),
         clearable: true,
-        filterable: true,
-        api: async () => {
-          const result = await taskStore.listTaskTypeName();
-          return result.typeNames.map((item: any) => ({
-            label: item,
-            value: item,
-          }));
-        },
       },
     },
     {
