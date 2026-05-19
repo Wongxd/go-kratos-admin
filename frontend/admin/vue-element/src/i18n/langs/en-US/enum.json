@@ -61,5 +61,19 @@
       "APPROVED": "Approved",
       "REJECTED": "Rejected"
     }
+  },
+  "orgUnit": {
+    "type": {
+      "COMPANY": "Group",
+      "DIVISION": "Division",
+      "DEPARTMENT": "Department",
+      "TEAM": "Team",
+      "PROJECT": "Project Team",
+      "COMMITTEE": "Committee",
+      "REGION": "Regional Center",
+      "SUBSIDIARY": "Subsidiary",
+      "BRANCH": "Branch",
+      "OTHER": "Other"
+    }
   }
 }

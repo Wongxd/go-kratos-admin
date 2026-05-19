@@ -1,258 +1,237 @@
+<template>
+  <div class="app-container h-full flex flex-1 flex-col">
+    <!-- 搜索 -->
+    <PageSearch
+      ref="searchRef"
+      :search-config="searchConfig"
+      @query-click="handleQueryClick"
+      @reset-click="handleResetClick"
+    />
+
+    <!-- 列表 -->
+    <PageContent
+      ref="contentRef"
+      :content-config="contentConfig"
+      @add-click="handleAddClick"
+      @operate-click="handleOperateClick"
+      @toolbar-click="handleToolbarClick"
+    >
+      <!-- 类型 -->
+      <template #type="{ row }">
+        <ElTag size="small" effect="dark" round :color="orgUnitTypeToColor(row.type)">
+          {{ orgUnitTypeToName(row.type) }}
+        </ElTag>
+      </template>
+
+      <!-- 状态 -->
+      <template #status="{ row }">
+        <ElTag size="small" effect="dark" round :color="orgUnitStatusToColor(row.status)">
+          {{ orgUnitStatusToName(row.status) }}
+        </ElTag>
+      </template>
+    </PageContent>
+
+    <!-- 新增/编辑抽屉 -->
+    <OrgDrawer ref="drawerRef" @success="handleSuccess" />
+  </div>
+</template>
+
 <script lang="ts" setup>
-import type { VxeGridProps } from '@/adapter/vxe-table';
+import { ElTag, ElMessage, ElMessageBox } from "element-plus";
 
-import { h } from 'vue';
+import PageContent from "@/components/CURD/PageContent.vue";
+import PageSearch from "@/components/CURD/PageSearch.vue";
+import usePage from "@/components/CURD/usePage";
+import type { IOperateData, ISearchConfig, IContentConfig } from "@/components/CURD/types";
+import OrgDrawer from "./org-drawer.vue";
 
-import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
-import { LucideFilePenLine, LucideTrash2 } from '@vben/icons';
-
-import { notification } from 'ant-design-vue';
-
-import { useVbenVxeGrid } from '@/adapter/vxe-table';
-import { type identityservicev1_OrgUnit as OrgUnit } from '@/api/generated/admin/service/v1';
-import { $t } from '@/locales';
 import {
   orgUnitStatusToColor,
   orgUnitStatusToName,
   orgUnitTypeListForQuery,
   orgUnitTypeToColor,
   orgUnitTypeToName,
-  statusList,
   useOrgUnitStore,
-} from '@/stores';
-
-import OrgDrawer from './org-drawer.vue';
+} from "@/stores";
+import { $t } from "@/i18n";
 
 const orgUnitStore = useOrgUnitStore();
 
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  // 控制表单是否显示折叠按钮
-  showCollapseButton: false,
-  // 按下回车时是否提交表单
-  submitOnEnter: true,
-  schema: [
+// 使用 CURD hook
+const { searchRef, contentRef, handleQueryClick, handleResetClick } = usePage();
+
+// 抽屉引用
+const drawerRef = ref();
+
+// 搜索配置
+const searchConfig: ISearchConfig = {
+  grid: true, // 启用 Grid 布局
+  formItems: [
     {
-      component: 'Input',
-      fieldName: 'name',
-      label: t('pages.orgUnit.name'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
+      type: "input",
+      label: $t("pages.org-unit.name"),
+      prop: "name",
+      attrs: {
+        placeholder: $t("common.placeholder.input"),
+        clearable: true,
       },
     },
     {
-      component: 'Select',
-      fieldName: 'status',
-      label: $t('ui.table.status'),
-      componentProps: {
-        options: statusList,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("common.table.status"),
+      prop: "status",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
       },
+      options: [
+        { value: "ON", label: $t("enum.status.ON") },
+        { value: "OFF", label: $t("enum.status.OFF") },
+      ],
     },
     {
-      component: 'Select',
-      fieldName: 'type',
-      label: t('pages.orgUnit.type'),
-      componentProps: {
-        options: orgUnitTypeListForQuery,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
+      type: "select",
+      label: $t("pages.org-unit.type"),
+      prop: "type",
+      attrs: {
+        placeholder: $t("common.placeholder.select"),
+        clearable: true,
       },
+      options: orgUnitTypeListForQuery.value,
     },
   ],
 };
 
-const gridOptions: VxeGridProps<OrgUnit> = {
-  toolbarConfig: {
-    custom: true,
-    export: true,
-    // import: true,
-    refresh: true,
-    zoom: true,
-  },
-  height: 'auto',
-  exportConfig: {},
-  pagerConfig: {
-    enabled: false,
-  },
-  rowConfig: {
-    isHover: true,
-  },
-
-  treeConfig: {
-    childrenField: 'children',
-    rowField: 'id',
-  },
-
-  proxyConfig: {
-    ajax: {
-      query: async ({ page }, formValues) => {
-        console.log('query:', formValues);
-
-        return await orgUnitStore.listOrgUnit(
-          {
-            page: page.currentPage,
-            pageSize: page.pageSize,
-          },
-          formValues,
-        );
-      },
+// 表格配置
+const contentConfig: IContentConfig = {
+  permPrefix: "sys:platform_admin", // 组织单位管理权限前缀
+  toolbarRight: ["add"], // 右侧自定义按钮（在defaultToolbar左侧）
+  defaultToolbar: ["refresh", "filter"], // 右侧默认工具栏
+  table: {
+    border: true,
+    stripe: false,
+    // 树形表格配置
+    treeConfig: {
+      // transform: true, // 自动转换树形数据（后端返回的是混合结构）
+      rowField: "id",
+      childrenField: "children",
     },
   },
-
+  indexAction: async (query: any) => {
+    const { page, pageSize, ...queryParams } = query;
+    const result = await orgUnitStore.listOrgUnit(
+      {
+        page: page || 1,
+        pageSize: pageSize || 100, // 树形表格通常不分页
+      },
+      queryParams
+    );
+    console.log("org unit data:", result);
+    // 转换数据格式：将 items 转换为 list
+    return {
+      items: result.items || [],
+      total: result.total || 0,
+    };
+  },
   columns: [
-    { title: t('pages.orgUnit.name'), field: 'name', treeNode: true },
-    { title: t('pages.orgUnit.code'), field: 'code' },
+    { type: "index", label: $t("common.table.seq"), width: 60 },
+    { prop: "name", label: $t("pages.org-unit.name"), minWidth: 150, treeNode: true },
+    { prop: "code", label: $t("pages.org-unit.code"), minWidth: 120 },
     {
-      title: t('pages.orgUnit.type'),
-      field: 'type',
-      slots: { default: 'orgUnitType' },
-      width: 95,
+      prop: "type",
+      label: $t("pages.org-unit.type"),
+      minWidth: 100,
+      slotName: "type",
     },
-    { title: t('pages.orgUnit.description'), field: 'description' },
-    { title: t('pages.orgUnit.leaderName'), field: 'leaderName' },
+    { prop: "leaderName", label: $t("pages.org-unit.leaderName"), minWidth: 100 },
     {
-      title: $t('ui.table.status'),
-      field: 'status',
-      slots: { default: 'status' },
-      width: 95,
+      prop: "status",
+      label: $t("common.table.status"),
+      minWidth: 100,
+      slotName: "status",
     },
-    { title: $t('ui.table.sortOrder'), field: 'sortOrder', width: 70 },
+    { prop: "sortOrder", label: $t("common.table.sortOrder"), width: 80 },
     {
-      title: $t('ui.table.createdAt'),
-      field: 'createdAt',
-      formatter: 'formatDateTime',
-      width: 140,
+      prop: "createdAt",
+      label: $t("common.table.createdAt"),
+      minWidth: 160,
+      template: "date",
+      dateFormat: "YYYY-MM-DD HH:mm:ss",
     },
-    { title: $t('ui.table.remark'), field: 'remark' },
+    { prop: "remark", label: $t("common.table.remark"), minWidth: 150 },
     {
-      title: $t('ui.table.action'),
-      field: 'action',
-      fixed: 'right',
-      slots: { default: 'action' },
-      width: 90,
+      prop: "action",
+      label: $t("common.table.action"),
+      fixed: "right",
+      width: 150,
+      template: "tool",
+      action: [
+        {
+          name: "edit",
+          text: $t("common.button.edit"),
+        },
+        {
+          name: "delete",
+          text: $t("common.button.delete"),
+          attrs: {
+            type: "danger",
+          },
+        },
+      ],
     },
   ],
 };
 
-const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
+// 新增按钮点击
+function handleAddClick() {
+  drawerRef.value?.open({ create: true });
+}
 
-const [Drawer, drawerApi] = useVbenDrawer({
-  // 连接抽离的组件
-  connectedComponent: OrgDrawer,
+// 操作按钮点击
+async function handleOperateClick(data: IOperateData) {
+  const { name, row } = data;
 
-  onOpenChange(isOpen: boolean) {
-    if (!isOpen) {
-      // 关闭时，重载表格数据
-      gridApi.reload();
+  if (name === "edit") {
+    drawerRef.value?.open({ create: false, row });
+  } else if (name === "delete") {
+    try {
+      await ElMessageBox.confirm(
+        $t("common.message.confirmDelete", { moduleName: $t("pages.org-unit.moduleName") }),
+        $t("common.title.warning"),
+        {
+          confirmButtonText: $t("common.button.confirm"),
+          cancelButtonText: $t("common.button.cancel"),
+          type: "warning",
+        }
+      );
+
+      await orgUnitStore.deleteOrgUnit(row.id);
+      ElMessage.success($t("common.notification.deleteSuccess"));
+      handleSuccess();
+    } catch (error) {
+      if (error !== "cancel") {
+        ElMessage.error($t("common.notification.deleteFailed"));
+      }
     }
-  },
-});
-
-/* 打开模态窗口 */
-function openDrawer(create: boolean, row?: any) {
-  drawerApi.setData({
-    create,
-    row,
-  });
-
-  drawerApi.open();
-}
-
-/* 创建 */
-function handleCreate() {
-  console.log('创建');
-
-  openDrawer(true);
-}
-
-/* 编辑 */
-function handleEdit(row: any) {
-  console.log('编辑', row);
-  openDrawer(false, row);
-}
-
-/* 删除 */
-async function handleDelete(row: any) {
-  console.log('删除', row);
-
-  try {
-    await orgUnitStore.deleteOrgUnit(row.id);
-
-    notification.success({
-      message: $t('ui.notification.delete_success'),
-    });
-
-    await gridApi.reload();
-  } catch {
-    notification.error({
-      message: $t('ui.notification.delete_failed'),
-    });
   }
 }
 
-const expandAll = () => {
-  gridApi.grid?.setAllTreeExpand(true);
-};
+// 工具栏按钮点击
+function handleToolbarClick(name: string) {
+  console.log("toolbar click:", name);
+}
 
-const collapseAll = () => {
-  gridApi.grid?.setAllTreeExpand(false);
-};
+// 成功回调
+function handleSuccess() {
+  contentRef.value?.fetchPageData();
+}
 </script>
 
-<template>
-  <Page auto-content-height>
-    <Grid :table-title="$t('menu.opm.orgUnit')">
-      <template #toolbar-tools>
-        <a-button class="mr-2" type="primary" @click="handleCreate">
-          {{ t('pages.orgUnit.button.create') }}
-        </a-button>
-        <a-button class="mr-2" @click="expandAll">
-          {{ $t('ui.tree.expand_all') }}
-        </a-button>
-        <a-button class="mr-2" @click="collapseAll">
-          {{ $t('ui.tree.collapse_all') }}
-        </a-button>
-      </template>
-      <template #status="{ row }">
-        <a-tag :color="orgUnitStatusToColor(row.status)">
-          {{ orgUnitStatusToName(row.status) }}
-        </a-tag>
-      </template>
-      <template #orgUnitType="{ row }">
-        <a-tag :color="orgUnitTypeToColor(row.type)">
-          {{ orgUnitTypeToName(row.type) }}
-        </a-tag>
-      </template>
-      <template #action="{ row }">
-        <a-button
-          type="link"
-          :icon="h(LucideFilePenLine)"
-          @click.stop="handleEdit(row)"
-        />
-        <a-popconfirm
-          :cancel-text="$t('ui.button.cancel')"
-          :ok-text="$t('ui.button.ok')"
-          :title="
-            $t('ui.text.do_you_want_delete', {
-              moduleName: t('pages.orgUnit.moduleName'),
-            })
-          "
-          @confirm="handleDelete(row)"
-        >
-          <a-button danger type="link" :icon="h(LucideTrash2)" />
-        </a-popconfirm>
-      </template>
-    </Grid>
-    <Drawer />
-  </Page>
-</template>
+<style lang="scss" scoped>
+.app-container {
+  padding: 20px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+</style>

@@ -61,5 +61,19 @@
       "APPROVED": "已批准",
       "REJECTED": "已拒绝"
     }
+  },
+  "orgUnit": {
+    "type": {
+      "COMPANY": "集团",
+      "DIVISION": "事业部",
+      "DEPARTMENT": "部门",
+      "TEAM": "团队",
+      "PROJECT": "项目组",
+      "COMMITTEE": "委员会",
+      "REGION": "区域中心",
+      "SUBSIDIARY": "子公司",
+      "BRANCH": "分公司",
+      "OTHER": "其他"
+    }
   }
 }

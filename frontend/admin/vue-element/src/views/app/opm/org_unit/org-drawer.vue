@@ -1,269 +1,338 @@
+<template>
+  <ElDrawer
+    v-model="visible"
+    :title="title"
+    size="600px"
+    :close-on-click-modal="false"
+    :append-to-body="true"
+    :destroy-on-close="true"
+    @close="handleClose"
+  >
+    <ElForm
+      ref="formRef"
+      :model="formData"
+      :rules="formRules"
+      label-width="120px"
+      class="drawer-form"
+    >
+      <!-- 基本信息 -->
+      <ElDivider content-position="left">{{ $t("common.section.basic") }}</ElDivider>
+
+      <ElFormItem :label="$t('pages.org-unit.name')" prop="name">
+        <ElInput v-model="formData.name" :placeholder="$t('common.placeholder.input')" clearable />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.org-unit.code')" prop="code">
+        <ElInput v-model="formData.code" :placeholder="$t('common.placeholder.input')" clearable />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.org-unit.parentId')" prop="parentId">
+        <ElTreeSelect
+          v-model="formData.parentId"
+          :data="orgUnitTreeData"
+          node-key="id"
+          check-strictly
+          :render-after-expand="false"
+          default-expand-all
+          filterable
+          clearable
+          :props="{ label: 'name', value: 'id', children: 'children' }"
+          :placeholder="$t('common.placeholder.select')"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.org-unit.leaderId')" prop="leaderId">
+        <ElSelect
+          v-model="formData.leaderId"
+          :placeholder="$t('common.placeholder.select')"
+          filterable
+          clearable
+          style="width: 100%"
+        >
+          <ElOption
+            v-for="user in userList"
+            :key="user.id"
+            :label="user.nickname"
+            :value="user.id"
+          />
+        </ElSelect>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('pages.org-unit.type')" prop="type">
+        <ElSelect
+          v-model="formData.type"
+          :placeholder="$t('common.placeholder.select')"
+          filterable
+          clearable
+          style="width: 100%"
+        >
+          <ElOption
+            v-for="item in orgUnitTypeList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </ElSelect>
+      </ElFormItem>
+
+      <ElFormItem :label="$t('common.table.sortOrder')" prop="sortOrder">
+        <ElInputNumber
+          v-model="formData.sortOrder"
+          :min="1"
+          :placeholder="$t('common.placeholder.input')"
+          style="width: 100%"
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('common.table.status')" prop="status">
+        <ElRadioGroup v-model="formData.status">
+          <ElRadioButton v-for="item in orgUnitStatusList" :key="item.value" :value="item.value">
+            {{ item.label }}
+          </ElRadioButton>
+        </ElRadioGroup>
+      </ElFormItem>
+
+      <!-- 法人实体信息 -->
+      <ElDivider content-position="left">{{ $t("pages.org-unit.legalEntity") }}</ElDivider>
+
+      <ElFormItem :label="$t('pages.org-unit.isLegalEntity')" prop="isLegalEntity">
+        <ElSwitch v-model="formData.isLegalEntity" />
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="formData.isLegalEntity"
+        :label="$t('pages.org-unit.registrationNumber')"
+        prop="registrationNumber"
+      >
+        <ElInput
+          v-model="formData.registrationNumber"
+          :placeholder="$t('common.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+
+      <ElFormItem v-if="formData.isLegalEntity" :label="$t('pages.org-unit.taxId')" prop="taxId">
+        <ElInput v-model="formData.taxId" :placeholder="$t('common.placeholder.input')" clearable />
+      </ElFormItem>
+
+      <ElFormItem
+        v-if="formData.isLegalEntity"
+        :label="$t('pages.org-unit.address')"
+        prop="address"
+      >
+        <ElInput
+          v-model="formData.address"
+          :placeholder="$t('common.placeholder.input')"
+          clearable
+        />
+      </ElFormItem>
+
+      <!-- 其他信息 -->
+      <ElDivider content-position="left">{{ $t("common.section.other") }}</ElDivider>
+
+      <ElFormItem :label="$t('pages.org-unit.description')" prop="description">
+        <ElInput
+          v-model="formData.description"
+          type="textarea"
+          :rows="3"
+          :placeholder="$t('common.placeholder.input')"
+        />
+      </ElFormItem>
+
+      <ElFormItem :label="$t('common.table.remark')" prop="remark">
+        <ElInput
+          v-model="formData.remark"
+          type="textarea"
+          :rows="3"
+          :placeholder="$t('common.placeholder.input')"
+        />
+      </ElFormItem>
+    </ElForm>
+
+    <template #footer>
+      <div class="drawer-footer">
+        <ElButton @click="handleClose">{{ $t("common.button.cancel") }}</ElButton>
+        <ElButton type="primary" :loading="submitLoading" @click="handleSubmit">
+          {{ $t("common.button.confirm") }}
+        </ElButton>
+      </div>
+    </template>
+  </ElDrawer>
+</template>
+
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from "vue";
+import { ElMessage } from "element-plus";
 
-import { useVbenDrawer } from '@vben/common-ui';
-import { $t } from '@vben/locales';
+import { useOrgUnitStore, useUserListStore, orgUnitTypeList, orgUnitStatusList } from "@/stores";
+import { $t } from "@/i18n";
 
-import { notification } from 'ant-design-vue';
-
-import { useVbenForm } from '@/adapter/form';
-import {
-  orgUnitStatusList,
-  orgUnitTypeList,
-  useOrgUnitStore,
-  useUserListStore,
-} from '@/stores';
+const emit = defineEmits<{
+  success: [];
+}>();
 
 const orgUnitStore = useOrgUnitStore();
 const userListStore = useUserListStore();
 
-const data = ref();
+const visible = ref(false);
+const submitLoading = ref(false);
+const isCreate = ref(true);
+const currentId = ref<number>();
+const formRef = ref();
 
-const getTitle = computed(() =>
-  data.value?.create
-    ? $t('ui.modal.create', { moduleName: t('pages.orgUnit.moduleName') })
-    : $t('ui.modal.update', { moduleName: t('pages.orgUnit.moduleName') }),
+// 表单数据
+const formData = reactive({
+  name: "",
+  code: "",
+  parentId: undefined as number | undefined,
+  leaderId: undefined as number | undefined,
+  type: "",
+  sortOrder: 1,
+  status: "ON",
+  isLegalEntity: false,
+  registrationNumber: "",
+  taxId: "",
+  address: "",
+  description: "",
+  remark: "",
+});
+
+// 表单验证规则
+const formRules = {
+  name: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  code: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  type: [{ required: true, message: $t("common.validation.selectRequired"), trigger: "change" }],
+  sortOrder: [{ required: true, message: $t("common.validation.required"), trigger: "blur" }],
+  status: [{ required: true, message: $t("common.validation.selectRequired"), trigger: "change" }],
+};
+
+// 标题
+const title = computed(() =>
+  isCreate.value
+    ? $t("common.modal.create", { moduleName: $t("pages.org-unit.moduleName") })
+    : $t("common.modal.update", { moduleName: $t("pages.org-unit.moduleName") })
 );
-// const isCreate = computed(() => data.value?.create);
 
-const [BaseForm, baseFormApi] = useVbenForm({
-  showDefaultActions: false,
-  // 所有表单项共用，可单独在表单内覆盖
-  commonConfig: {
-    // 所有表单项
-    componentProps: {
-      class: 'w-full',
-    },
-  },
-  schema: [
-    {
-      component: 'Input',
-      fieldName: 'name',
-      label: t('pages.orgUnit.name'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-      rules: 'required',
-    },
-    {
-      component: 'Input',
-      fieldName: 'code',
-      label: t('pages.orgUnit.code'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-      rules: 'required',
-    },
-    {
-      component: 'ApiTreeSelect',
-      fieldName: 'parentId',
-      label: t('pages.orgUnit.parentId'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        numberToString: true,
-        showSearch: true,
-        treeDefaultExpandAll: true,
-        allowClear: true,
-        childrenField: 'children',
-        labelField: 'name',
-        valueField: 'id',
-        treeNodeFilterProp: 'label',
-        api: async () => {
-          const result = await orgUnitStore.listOrgUnit(undefined, {
-            // parent_id: 0,
-            status: 'ON',
-          });
-          return result.items;
-        },
-      },
-    },
-    {
-      component: 'ApiSelect',
-      fieldName: 'leaderId',
-      label: t('pages.orgUnit.leaderId'),
-      componentProps: {
-        allowClear: true,
-        showSearch: true,
-        placeholder: $t('ui.placeholder.select'),
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        afterFetch: (data: { name: string; path: string }[]) => {
-          return data.map((item: any) => ({
-            label: item.nickname,
-            value: item.id,
-          }));
-        },
-        api: async () => {
-          const result = await userListStore.listUser(undefined, {
-            // parent_id: 0,
-          });
-          return result.items;
-        },
-      },
-    },
-    {
-      component: 'Select',
-      fieldName: 'type',
-      label: t('pages.orgUnit.type'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.select'),
-        options: orgUnitTypeList,
-        filterOption: (input: string, option: any) =>
-          option.label.toLowerCase().includes(input.toLowerCase()),
-        allowClear: true,
-        showSearch: true,
-      },
-      rules: 'selectRequired',
-    },
-    {
-      component: 'InputNumber',
-      fieldName: 'sortOrder',
-      defaultValue: 1,
-      label: $t('ui.table.sortOrder'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-      rules: 'required',
-    },
-    {
-      component: 'RadioGroup',
-      fieldName: 'status',
-      defaultValue: 'ON',
-      label: $t('ui.table.status'),
-      rules: 'selectRequired',
-      componentProps: {
-        optionType: 'button',
-        buttonStyle: 'solid',
-        class: 'flex flex-wrap', // 如果选项过多，可以添加class来自动折叠
-        options: orgUnitStatusList,
-      },
-    },
-    {
-      component: 'Switch',
-      fieldName: 'isLegalEntity',
-      defaultValue: false,
-      label: t('pages.orgUnit.isLegalEntity'),
-      componentProps: {
-        class: 'w-auto',
-      },
-    },
-    {
-      component: 'Input',
-      fieldName: 'registrationNumber',
-      label: t('pages.orgUnit.registrationNumber'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-    {
-      component: 'Input',
-      fieldName: 'taxId',
-      label: t('pages.orgUnit.taxId'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-    {
-      component: 'Input',
-      fieldName: 'address',
-      label: t('pages.orgUnit.address'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-    {
-      component: 'Textarea',
-      fieldName: 'description',
-      label: t('pages.orgUnit.description'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-    {
-      component: 'Textarea',
-      fieldName: 'remark',
-      label: $t('ui.table.remark'),
-      componentProps: {
-        placeholder: $t('ui.placeholder.input'),
-        allowClear: true,
-      },
-    },
-  ],
-});
+// 组织树数据
+const orgUnitTreeData = ref<any[]>([]);
 
-const [Drawer, drawerApi] = useVbenDrawer({
-  onCancel() {
-    drawerApi.close();
-  },
+// 用户列表
+const userList = ref<any[]>([]);
 
-  async onConfirm() {
-    console.log('onConfirm');
-
-    // 校验输入的数据
-    const validate = await baseFormApi.validate();
-    if (!validate.valid) {
-      return;
-    }
-
-    setLoading(true);
-
-    // 获取表单数据
-    const values = await baseFormApi.getValues();
-
-    console.log(getTitle.value, values);
-
-    try {
-      await (data.value?.create
-        ? orgUnitStore.createOrgUnit(values)
-        : orgUnitStore.updateOrgUnit(data.value.row.id, values));
-
-      notification.success({
-        message: data.value?.create
-          ? $t('ui.notification.create_success')
-          : $t('ui.notification.update_success'),
-      });
-    } catch {
-      notification.error({
-        message: data.value?.create
-          ? $t('ui.notification.create_failed')
-          : $t('ui.notification.update_failed'),
-      });
-    } finally {
-      // 关闭窗口
-      drawerApi.close();
-      setLoading(false);
-    }
-  },
-
-  onOpenChange(isOpen: boolean) {
-    if (isOpen) {
-      // 获取传入的数据
-      data.value = drawerApi.getData<Record<string, any>>();
-
-      // 为表单赋值
-      baseFormApi.setValues(data.value?.row);
-
-      setLoading(false);
-
-      console.log('onOpenChange', data.value, data.value?.create);
-    }
-  },
-});
-
-function setLoading(loading: boolean) {
-  drawerApi.setState({ confirmLoading: loading });
+// 加载组织树
+async function loadOrgUnitTree() {
+  try {
+    const result = await orgUnitStore.listOrgUnit(undefined, {
+      status: "ON",
+    });
+    orgUnitTreeData.value = result.items || [];
+  } catch (error) {
+    console.error("Failed to load org unit tree:", error);
+  }
 }
+
+// 加载用户列表
+async function loadUserList() {
+  try {
+    const result = await userListStore.listUser(undefined, {});
+    userList.value = result.items || [];
+  } catch (error) {
+    console.error("Failed to load user list:", error);
+  }
+}
+
+// 打开抽屉
+async function open(data?: { create: boolean; row?: any }) {
+  visible.value = true;
+  isCreate.value = data?.create ?? true;
+  currentId.value = data?.row?.id;
+
+  // 重置表单
+  resetForm();
+
+  // 加载数据
+  await Promise.all([loadOrgUnitTree(), loadUserList()]);
+
+  // 如果是编辑模式，填充数据
+  if (!isCreate.value && data?.row) {
+    Object.assign(formData, data.row);
+  }
+}
+
+// 关闭抽屉
+function handleClose() {
+  visible.value = false;
+  resetForm();
+}
+
+// 重置表单
+function resetForm() {
+  formData.name = "";
+  formData.code = "";
+  formData.parentId = undefined;
+  formData.leaderId = undefined;
+  formData.type = "";
+  formData.sortOrder = 1;
+  formData.status = "ON";
+  formData.isLegalEntity = false;
+  formData.registrationNumber = "";
+  formData.taxId = "";
+  formData.address = "";
+  formData.description = "";
+  formData.remark = "";
+
+  formRef.value?.clearValidate();
+}
+
+// 提交表单
+async function handleSubmit() {
+  if (!formRef.value) return;
+
+  try {
+    await formRef.value.validate();
+    submitLoading.value = true;
+
+    const values = { ...formData };
+
+    if (isCreate.value) {
+      await orgUnitStore.createOrgUnit(values);
+      ElMessage.success($t("common.notification.createSuccess"));
+    } else {
+      await orgUnitStore.updateOrgUnit(currentId.value!, values);
+      ElMessage.success($t("common.notification.updateSuccess"));
+    }
+
+    emit("success");
+    handleClose();
+  } catch (error) {
+    if (error !== false) {
+      // 不是验证错误
+      ElMessage.error(
+        isCreate.value
+          ? $t("common.notification.createFailed")
+          : $t("common.notification.updateFailed")
+      );
+    }
+  } finally {
+    submitLoading.value = false;
+  }
+}
+
+// 暴露方法给父组件
+defineExpose({
+  open,
+});
 </script>
 
-<template>
-  <Drawer :title="getTitle">
-    <BaseForm />
-  </Drawer>
-</template>
+<style lang="scss" scoped>
+.drawer-form {
+  padding-right: 10px;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+</style>

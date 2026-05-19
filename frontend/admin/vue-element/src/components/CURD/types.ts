@@ -2,6 +2,7 @@ import type { CSSProperties } from "vue";
 
 import type { DialogProps, DrawerProps, FormItemRule, PaginationProps } from "element-plus";
 import type { FormProps, TableProps, ColProps, ButtonProps, CardProps } from "element-plus";
+import type { VxeTablePropTypes } from "vxe-table";
 
 import type PageContent from "./PageContent.vue";
 import type PageModal from "./PageModal.vue";
@@ -63,7 +64,10 @@ export interface IContentConfig<TQuery = any, TItem = any> {
   // 权限前缀(如sys:user，用于组成权限标识)，不提供则不进行权限校验
   permPrefix?: string;
   // table组件属性
-  table?: Partial<Omit<TableProps<any>, "data">>;
+  table?: Partial<Omit<TableProps<any>, "data">> & {
+    // vxe-table 树形配置
+    treeConfig?: VxeTablePropTypes.TreeConfig;
+  };
   // 分页组件位置(默认：left)
   pagePosition?: "left" | "right";
   // pagination组件属性
@@ -120,6 +124,8 @@ export interface IContentConfig<TQuery = any, TItem = any> {
     reserveSelection?: boolean;
     // 列是否显示
     show?: boolean;
+    // 是否为树节点列（用于树形表格）
+    treeNode?: boolean;
     // 模板
     template?:
       | "image"

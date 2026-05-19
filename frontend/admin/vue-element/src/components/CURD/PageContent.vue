@@ -64,6 +64,7 @@
       :show-header="contentConfig.table?.showHeader"
       :row-config="{ keyField: pk, isHover: true, isCurrent: true }"
       :scroll-y="{ enabled: true }"
+      :tree-config="contentConfig.table?.treeConfig"
       :data="pageData"
       class="flex-1"
       style="overflow: hidden;"
@@ -87,6 +88,7 @@
           :header-align="col.headerAlign || 'center'"
           :sortable="col.sortable"
           :formatter="col.formatter"
+          :tree-node="col.treeNode"
         >
           <template #default="scope">
             <!-- 显示图片 -->

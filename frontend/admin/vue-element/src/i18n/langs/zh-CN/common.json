@@ -62,7 +62,8 @@
     "status": "状态",
     "createdAt": "创建时间",
     "remark": "备注",
-    "action": "操作"
+    "action": "操作",
+    "sortOrder": "排序"
   },
   "notification": {
     "delete_success": "删除成功",
@@ -70,10 +71,17 @@
     "update_success": "更新成功",
     "update_failed": "更新失败",
     "add_success": "新增成功",
-    "add_failed": "新增失败"
+    "add_failed": "新增失败",
+    "createSuccess": "创建成功",
+    "createFailed": "创建失败",
+    "deleteSuccess": "删除成功",
+    "deleteFailed": "删除失败",
+    "updateSuccess": "更新成功",
+    "updateFailed": "更新失败"
   },
   "title": {
-    "confirm": "确认"
+    "confirm": "确认",
+    "warning": "警告"
   },
   "modal": {
     "create": "创建{moduleName}",
@@ -81,6 +89,9 @@
   },
   "confirm": {
     "do_you_want_delete": "确定要删除该{moduleName}吗？"
+  },
+  "message": {
+    "confirmDelete": "确定要删除该{moduleName}吗？"
   },
   "navbar": {
     "profile": "个人中心",
@@ -103,5 +114,13 @@
     "total": "共 {total} 条记录",
     "perPage": "{count}条/页",
     "goToPage": "跳转到"
+  },
+  "section": {
+    "basic": "基本信息",
+    "other": "其他信息"
+  },
+  "validation": {
+    "required": "请输入",
+    "selectRequired": "请选择"
   }
 }

@@ -64,7 +64,8 @@
     "status": "Status",
     "createdAt": "Created At",
     "remark": "Remark",
-    "action": "Action"
+    "action": "Action",
+    "sortOrder": "Sort Order"
   },
   "notification": {
     "delete_success": "Delete successful",
@@ -72,10 +73,17 @@
     "update_success": "Update successful",
     "update_failed": "Update failed",
     "add_success": "Add successful",
-    "add_failed": "Add failed"
+    "add_failed": "Add failed",
+    "createSuccess": "Create successful",
+    "createFailed": "Create failed",
+    "deleteSuccess": "Delete successful",
+    "deleteFailed": "Delete failed",
+    "updateSuccess": "Update successful",
+    "updateFailed": "Update failed"
   },
   "title": {
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "warning": "Warning"
   },
   "modal": {
     "create": "Create {moduleName}",
@@ -83,6 +91,9 @@
   },
   "confirm": {
     "do_you_want_delete": "Are you sure you want to delete this {moduleName}?"
+  },
+  "message": {
+    "confirmDelete": "Are you sure you want to delete this {moduleName}?"
   },
   "navbar": {
     "profile": "Profile",
@@ -105,5 +116,13 @@
     "total": "{total} records",
     "perPage": "{count}/page",
     "goToPage": "Go to page"
+  },
+  "section": {
+    "basic": "Basic Information",
+    "other": "Other Information"
+  },
+  "validation": {
+    "required": "Please input",
+    "selectRequired": "Please select"
   }
 }
