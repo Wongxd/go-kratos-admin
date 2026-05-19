@@ -7,6 +7,7 @@
             v-show="isExpand ? true : index < showNumber"
             :label="item?.label"
             :prop="item.prop"
+            :class="{ 'form-item-stretch': searchConfig?.grid }"
           >
             <!-- Label -->
             <template #label>
@@ -49,11 +50,19 @@
           </el-form-item>
         </template>
 
-        <el-form-item :class="{ 'col-[auto/-1] justify-self-end': searchConfig?.grid === 'right' }">
+        <!-- 按钮区域：固定在右下角 -->
+        <el-form-item
+          :class="{
+            'button-group': searchConfig?.grid,
+            'col-[auto/-1] justify-self-end': searchConfig?.grid === 'right',
+          }"
+        >
           <el-button icon="search" type="primary" @click="handleQuery">
             {{ t("common.button.search") }}
           </el-button>
-          <el-button icon="refresh" @click="handleReset">{{ t("common.button.reset") }}</el-button>
+          <el-button icon="refresh" @click="handleReset">
+            {{ t("common.button.reset") }}
+          </el-button>
           <!-- 展开/收起 -->
           <template v-if="isExpandable && formItems.length > showNumber">
             <el-link class="ml-3" type="primary" underline="never" @click="isExpand = !isExpand">
@@ -171,8 +180,48 @@ defineExpose({
 :deep(.el-input-number .el-input__inner) {
   text-align: left;
 }
+
 .el-form-item {
   margin-right: 0;
   margin-bottom: 0;
+}
+
+// 全局样式：按钮固定在右下角，输入框拉伸
+:deep(.el-form) {
+  // Grid 布局模式
+  &.grid {
+    // 所有表单项（除了按钮组）
+    .el-form-item:not(.button-group) {
+      .el-form-item__content {
+        flex: 1 !important;
+        min-width: 0;
+        width: 100% !important;
+      }
+    }
+
+    // 按钮组固定在右下角
+    .button-group {
+      grid-column: -1 !important;
+      justify-self: end !important;
+      align-self: end !important;
+      margin-left: auto !important;
+
+      .el-form-item__content {
+        justify-content: flex-end !important;
+        gap: 8px;
+      }
+    }
+  }
+
+  // Flex 布局模式
+  &.flex {
+    .form-item-stretch {
+      .el-form-item__content {
+        flex: 1 !important;
+        min-width: 0;
+        width: 100% !important;
+      }
+    }
+  }
 }
 </style>

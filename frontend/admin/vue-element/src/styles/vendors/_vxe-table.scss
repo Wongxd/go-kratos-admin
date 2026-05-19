@@ -137,6 +137,24 @@
 }
 
 // ============================================
+// 去掉列分割线
+// ============================================
+
+.vxe-table {
+  // 去掉列之间的边框
+  .vxe-body--column,
+  .vxe-header--column,
+  .vxe-footer--column {
+    border-right: none !important;
+  }
+
+  // 保留表格整体边框
+  &.vxe-table--border-line {
+    border: 1px solid var(--el-border-color);
+  }
+}
+
+// ============================================
 // 暗色主题样式
 // ============================================
 
@@ -148,8 +166,10 @@ html.dark {
   --vxe-table-body-background-color: #1a1a1a !important;
   --vxe-table-row-hover-background-color: #2a2a2a !important;
   --vxe-table-row-current-background-color: #333333 !important;
+  --vxe-table-row-hover-current-background-color: #333333 !important;
   --vxe-table-header-font-color: #e0e0e0 !important;
   --vxe-table-body-font-color: #d0d0d0 !important;
+  --vxe-table-checkbox-range-background-color: #2a2a2a !important;
 
   // 强制覆盖 vxe-table 的所有边框
   .vxe-table--basic,
@@ -184,5 +204,34 @@ html.dark {
   .vxe-body--row.row--middle > td,
   .vxe-header--row.row--middle > th {
     border-color: #404040 !important;
+  }
+
+  // 强制覆盖行的背景色（最高优先级）
+  .vxe-table--body-wrapper {
+    .vxe-body--row {
+      background-color: #1a1a1a !important;
+      transition: background-color 0.2s ease !important;
+
+      &:hover,
+      &.row--hover {
+        background-color: #2a2a2a !important;
+
+        > td {
+          background-color: transparent !important;
+        }
+      }
+
+      &.row--current {
+        background-color: #333333 !important;
+
+        > td {
+          background-color: transparent !important;
+        }
+      }
+
+      &.row--hover.row--current {
+        background-color: #333333 !important;
+      }
+    }
   }
 }

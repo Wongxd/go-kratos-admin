@@ -1015,6 +1015,16 @@ defineExpose({ fetchPageData, exportPageData, getFilterParams, getSelectionData,
   .vxe-table--header-wrapper {
     background-color: var(--el-fill-color-light);
 
+    .vxe-header--column {
+      height: 45px !important;
+      line-height: 45px !important;
+
+      .vxe-cell {
+        height: 45px !important;
+        line-height: 45px !important;
+      }
+    }
+
     .vxe-cell {
       font-weight: 600;
       color: var(--el-text-color-primary);
@@ -1026,16 +1036,60 @@ defineExpose({ fetchPageData, exportPageData, getFilterParams, getSelectionData,
     background-color: var(--el-bg-color);
   }
 
+  // 去掉列之间的分割线
+  .vxe-body--column,
+  .vxe-header--column,
+  .vxe-footer--column {
+    border-right: none !important;
+  }
+
   // 表格行样式
   .vxe-body--row {
     background-color: var(--el-bg-color);
 
+    .vxe-body--column {
+      height: 40px !important;
+      line-height: 40px !important;
+
+      .vxe-cell {
+        height: 40px !important;
+        line-height: 40px !important;
+      }
+    }
+
     &.row--hover {
-      background-color: var(--el-fill-color-lighter);
+      background-color: var(--el-fill-color-light);
     }
 
     &.row--current {
       background-color: var(--el-fill-color);
+    }
+  }
+
+  // 暗黑模式下的悬停效果增强（最高优先级）
+  html.dark & .vxe-body--row {
+    background-color: #1a1a1a !important;
+    transition: background-color 0.2s ease !important;
+
+    &:hover,
+    &.row--hover {
+      background-color: #2a2a2a !important;
+
+      > td {
+        background-color: transparent !important;
+      }
+    }
+
+    &.row--current {
+      background-color: #333333 !important;
+
+      > td {
+        background-color: transparent !important;
+      }
+    }
+
+    &.row--hover.row--current {
+      background-color: #333333 !important;
     }
   }
 
