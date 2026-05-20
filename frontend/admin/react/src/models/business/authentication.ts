@@ -36,7 +36,7 @@ export default function AuthenticationModel() {
    * 加密密码
    */
   function encryptPassword(password: string): string {
-    const key = process.env.AES_KEY || '';
+    const key = REACT_AES_KEY || '';
     return encryptByAES(password, key);
   }
 
