@@ -2,7 +2,7 @@ import { defineMock } from "./base";
 
 export default defineMock([
   {
-    url: "auth/captcha",
+    url: "/captcha",
     method: ["GET"],
     body: {
       code: "00000",
@@ -16,7 +16,7 @@ export default defineMock([
   },
 
   {
-    url: "auth/login",
+    url: "/login",
     method: ["POST"],
     body: {
       code: "00000",
@@ -33,7 +33,7 @@ export default defineMock([
   },
 
   {
-    url: "auth/refresh-token",
+    url: "/refresh-token",
     method: ["POST"],
     body: {
       code: "00000",
@@ -50,7 +50,7 @@ export default defineMock([
   },
 
   {
-    url: "auth/logout",
+    url: "/logout",
     method: ["DELETE"],
     body: {
       code: "00000",
