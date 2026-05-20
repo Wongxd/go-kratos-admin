@@ -33,7 +33,10 @@ export const useAppUserStore = defineStore("app-user", () => {
     return tenantId.value !== null && tenantId.value !== undefined && tenantId.value > 0;
   }
 
-  function $reset() {}
+  function $reset() {
+    userInfo.value = null;
+    userRoles.value = [];
+  }
 
   return {
     $reset,

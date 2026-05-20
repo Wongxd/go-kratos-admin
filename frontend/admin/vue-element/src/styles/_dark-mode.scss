@@ -7,6 +7,8 @@
  * - 使用 CSS 变量实现，便于维护和调整
  */
 
+@use 'sass:color';
+
 html.dark {
   // ============================================
   // CSS 变量定义（暗色模式专用）
@@ -102,8 +104,8 @@ html.dark {
           border-color: var(--dark-primary) !important;
 
           &:hover {
-            background-color: lighten(#409EFF, 10%) !important;
-            border-color: lighten(#409EFF, 10%) !important;
+            background-color: color.adjust(#409EFF, $lightness: 10%) !important;
+            border-color: color.adjust(#409EFF, $lightness: 10%) !important;
           }
         }
 
@@ -126,7 +128,7 @@ html.dark {
         color: var(--dark-primary) !important;
 
         &:hover {
-          color: lighten(#409EFF, 10%) !important;
+          color: color.adjust(#409EFF, $lightness: 10%) !important;
         }
       }
     }
@@ -339,8 +341,8 @@ html.dark {
 
       // hover 态：亮度微增，强化主操作的交互感
       &:hover {
-        background-color: lighten(#409EFF, 10%) !important;
-        border-color: lighten(#409EFF, 10%) !important;
+        background-color: color.adjust(#409EFF, $lightness: 10%) !important;
+        border-color: color.adjust(#409EFF, $lightness: 10%) !important;
       }
     }
 
@@ -351,8 +353,8 @@ html.dark {
       color: #fff !important;
 
       &:hover {
-        background-color: lighten(#00B42A, 10%) !important;
-        border-color: lighten(#00B42A, 10%) !important;
+        background-color: color.adjust(#00B42A, $lightness: 10%) !important;
+        border-color: color.adjust(#00B42A, $lightness: 10%) !important;
       }
     }
 
@@ -363,8 +365,8 @@ html.dark {
       color: #fff !important;
 
       &:hover {
-        background-color: lighten(#F7BA1E, 10%) !important;
-        border-color: lighten(#F7BA1E, 10%) !important;
+        background-color: color.adjust(#F7BA1E, $lightness: 10%) !important;
+        border-color: color.adjust(#F7BA1E, $lightness: 10%) !important;
       }
     }
 
@@ -375,8 +377,8 @@ html.dark {
       color: #fff !important;
 
       &:hover {
-        background-color: lighten(#F53F3F, 10%) !important;
-        border-color: lighten(#F53F3F, 10%) !important;
+        background-color: color.adjust(#F53F3F, $lightness: 10%) !important;
+        border-color: color.adjust(#F53F3F, $lightness: 10%) !important;
       }
     }
   }
@@ -566,7 +568,7 @@ html.dark {
         color: var(--dark-error) !important;
 
         &:hover {
-          color: lighten(#F53F3F, 10%) !important;
+          color: color.adjust(#F53F3F, $lightness: 10%) !important;
         }
       }
     }

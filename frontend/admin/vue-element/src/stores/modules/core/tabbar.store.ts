@@ -1,4 +1,3 @@
-import type { TabDefinition } from "@/types";
 import type { Router, RouteRecordNormalized } from "vue-router";
 
 import { toRaw } from "vue";
@@ -39,6 +38,8 @@ interface TabbarState {
  */
 export const useTabbarStore = defineStore("core-tabbar", {
   actions: {
+    $reset() {},
+
     /**
      * Close tabs in bulk
      */

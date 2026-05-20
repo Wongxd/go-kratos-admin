@@ -34,7 +34,11 @@ export function resetAllStores() {
     return;
   }
   const allStores = (pinia as any)._s;
-  for (const [store] of allStores) {
-    store.$reset();
+  for (const [key, store] of allStores) {
+    if (typeof store.$reset === "function") {
+      store.$reset();
+    } else {
+      console.warn(`Store "${key}" does not have a $reset method`);
+    }
   }
 }

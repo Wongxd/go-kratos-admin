@@ -13,6 +13,8 @@ interface AppState {
 
 export const useLockStore = defineStore("core-lock", {
   actions: {
+    $reset() {},
+
     lockScreen(password: string) {
       this.isLockScreen = true;
       this.lockScreenPassword = password;
