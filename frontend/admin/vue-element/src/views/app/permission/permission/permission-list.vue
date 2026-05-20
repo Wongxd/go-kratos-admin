@@ -53,7 +53,7 @@ const drawerRef = ref();
 
 // 搜索配置
 const searchConfig: ISearchConfig = {
-  grid: true,
+  // grid: true,
   formItems: [
     {
       type: "input",

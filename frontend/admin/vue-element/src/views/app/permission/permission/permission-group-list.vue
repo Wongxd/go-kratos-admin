@@ -53,7 +53,8 @@ const drawerRef = ref();
 
 // 搜索配置
 const searchConfig: ISearchConfig = {
-  grid: true,
+  // 移除 grid: true，改用默认 Flex 布局实现基于容器宽度的自动换行
+  // Grid 布局依赖视口断点，在左侧窄面板中不会触发换行
   formItems: [
     {
       type: "input",
@@ -62,6 +63,7 @@ const searchConfig: ISearchConfig = {
       attrs: {
         placeholder: $t("common.placeholder.input"),
         clearable: true,
+        style: { minWidth: "200px" }, // 设置最小宽度，配合 Flex 换行
       },
     },
     {
@@ -71,6 +73,7 @@ const searchConfig: ISearchConfig = {
       attrs: {
         placeholder: $t("common.placeholder.input"),
         clearable: true,
+        style: { minWidth: "200px" }, // 设置最小宽度，配合 Flex 换行
       },
     },
     {
@@ -80,6 +83,7 @@ const searchConfig: ISearchConfig = {
       attrs: {
         placeholder: $t("common.placeholder.select"),
         clearable: true,
+        style: { minWidth: "200px" }, // 设置最小宽度，配合 Flex 换行
       },
       options: statusList.value,
     },
@@ -93,7 +97,7 @@ const contentConfig: IContentConfig = {
   defaultToolbar: ["refresh", "filter"],
   table: {
     border: true,
-    stripe: true,
+    stripe: false,
     height: "auto",
     treeConfig: {
       parentField: "parentId",

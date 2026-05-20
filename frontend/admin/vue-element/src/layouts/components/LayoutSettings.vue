@@ -12,7 +12,7 @@
 
         <div class="flex-center">
           <el-switch
-            v-model="isDark"
+            :model-value="isDark"
             active-icon="Moon"
             inactive-icon="Sunny"
             class="theme-switch"
