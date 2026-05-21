@@ -1,0 +1,27 @@
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+    readonly VITE_API_URL: string
+    readonly VITE_SSE_URL: string
+
+    readonly VITE_APP_TITLE: string
+    readonly VITE_APP_NAMESPACE: string
+    readonly VITE_APP_VERSION: string
+
+    readonly VITE_AES_KEY: string
+
+    readonly VITE_ENV: string
+
+    readonly VITE_MOCK: boolean
+    readonly VITE_ANALYZE: boolean
+}
+
+interface ImportMeta {
+    readonly env: ImportMetaEnv
+}
+
+// 兼容 process.env
+declare namespace NodeJS {
+    interface ProcessEnv extends ImportMetaEnv {
+    }
+}

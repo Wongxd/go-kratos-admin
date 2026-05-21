@@ -148,14 +148,33 @@ export function verifyHMAC(data: string, signature: string, secret: string): boo
     }
 }
 
-export default {
-    encryptByAES,
-    decryptByAES,
-    encryptByMD5,
-    encryptBySHA256,
-    encodeBase64,
-    decodeBase64,
-    generateSecretKey,
-    generateHMAC,
-    verifyHMAC,
-};
+/**
+ * 加密密码
+ * @param password 明文密码
+ */
+export function encryptPassword(password: string): string {
+    const key = import.meta.env.VITE_AES_KEY;
+    if (!key) {
+        throw new Error("VITE_AES_KEY is not set in environment");
+    }
+    return encryptData(password, key, key);
+}
+
+/**
+ * 加密数据
+ * @param data 待加密数据
+ * @param key 密钥
+ * @param iv 初始向量
+ */
+export function encryptData(data: string, key: string, iv: string): string {
+    const keyHex = CryptoJS.enc.Utf8.parse(key);
+    const ivHex = CryptoJS.enc.Utf8.parse(iv);
+    const encrypted = CryptoJS.AES.encrypt(data, keyHex, {
+        iv: ivHex,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+    });
+    return encrypted.toString();
+}
+
+

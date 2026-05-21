@@ -26,3 +26,8 @@ export const formatDateTime = (timestamp?: any) => {
         return '-';
     }
 };
+
+// 日期格式化
+export const DATE_FORMAT = 'YYYY-MM-DD';
+export const TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+export const TIME_PICKER_FORMAT = 'HH:mm:ss';

@@ -1,0 +1,19 @@
+{
+  "button": {
+    "back": "Back"
+  },
+  "refresh": "Refresh",
+  "fallback": {
+    "unauthorized": "Unauthorized",
+    "unauthorizedDesc": "You don't have permission to access this page. Please log in and try again.",
+    "forbidden": "Forbidden",
+    "forbiddenDesc": "You don't have permission to access this resource.",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDesc": "Sorry, the page you visited does not exist.",
+    "internalError": "Internal Server Error",
+    "internalErrorDesc": "An internal server error occurred. Please try again later.",
+    "comingSoon": "Coming Soon",
+    "offlineError": "Offline",
+    "offlineErrorDesc": "Network connection has been lost. Please check your network settings."
+  }
+}

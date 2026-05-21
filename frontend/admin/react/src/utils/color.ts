@@ -25,3 +25,14 @@ export const getCharColor = (char: string) => {
   const lightness = 45;
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
+
+// 辅助函数：将十六进制颜色转换为 RGB
+export function hexToRgb(hex: string): [number, number, number] {
+  const bigint = parseInt(hex.slice(1), 16);
+  return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+}
+
+// 辅助函数：将 RGB 转换为十六进制颜色
+export function rgbToHex(r: number, g: number, b: number): string {
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}

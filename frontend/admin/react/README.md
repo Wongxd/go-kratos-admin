@@ -1,51 +1,13 @@
-# Ant Design Pro
+# GoWind React Admin
 
-This project is initialized with [Ant Design Pro](https://pro.ant.design). Follow is the quick guide for how to use.
+## 技术栈
 
-## Environment Prepare
-
-Install `node_modules`:
-
-```bash
-pnpm install
-```
-
-## Provided Scripts
-
-Ant Design Pro provides some useful script to help you quick start and build with web project, code style check and test.
-
-Scripts provided in `package.json`. It's safe to modify or add additional script:
-
-### Start project
-
-```bash
-pnpm start
-```
-
-### Build project
-
-```bash
-pnpm run build
-```
-
-### Check code style
-
-```bash
-pnpm run lint
-```
-
-You can also use script to auto fix some lint error:
-
-```bash
-pnpm run lint:fix
-```
-
-### Test code
-
-```bash
-pnpm test
-```
-
-## More
-
-You can view full document on our [official website](https://pro.ant.design). And welcome any feedback in our [github](https://github.com/ant-design/ant-design-pro).
+- **构建工具**：Vite 8 + @vitejs/plugin-react
+- **核心框架**：React 19 + TypeScript
+- **UI 体系**：Ant Design 6 + @ant-design/pro-components
+- **路由管理**：react-router-dom v6 + 动态路由 + 权限守卫
+- **状态管理**：Zustand 5
+- **网络请求**：Axios（统一拦截封装）+ TanStack Query 5（接口缓存/自动状态）
+- **国际化**：react-i18next
+- **样式方案**：Tailwind CSS v4 + antd token
+- **工程基建**：ESLint + Prettier + Husky + Commitlint + Vitest
