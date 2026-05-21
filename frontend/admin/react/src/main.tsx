@@ -5,6 +5,7 @@ import {QueryClientProvider} from "@tanstack/react-query";
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 
 import {ThemeProvider} from "@/core/preferences/components/ThemeProvider";
+import {RequestTokenSetup} from "@/core/transport/rest/request-token-setup";
 
 // 样式
 import 'uno.css';
@@ -30,7 +31,9 @@ bootstrap().then(() => {
         <React.StrictMode>
             <QueryClientProvider client={queryClient}>
                 <ThemeProvider>
-                    <App/>
+                    <RequestTokenSetup>
+                        <App/>
+                    </RequestTokenSetup>
                 </ThemeProvider>
 
                 <ReactQueryDevtools initialIsOpen={false}/>

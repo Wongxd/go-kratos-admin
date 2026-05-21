@@ -1,38 +1,29 @@
 /**
  * Request Token 配置
  *
- * 用于在应用初始化时设置 AccessModel 的 token获取方法
+ * 用于在应用初始化时设置 token 获取方法
  */
 
 import React, {useEffect} from 'react';
 
 import {setGetTokenCallback} from './rest-client';
+import {useAuthStore} from '@/stores/auth';
 
 /**
- * AppInitializer 内部组件
- * 使用 useModel 来获取 access token
+ * RequestTokenSetup 组件
+ * 在应用初始化时设置 token 获取回调
  */
-function AppInitializerInner({children}: { children: React.ReactNode }) {
-  // 延迟导入 useModel，确保在正确的上下文中使用
-  const {useModel} = require('@umijs/max');
-  const access = useModel('auth.access');
-
+export function RequestTokenSetup({children}: { children: React.ReactNode }) {
   useEffect(() => {
     // 设置获取 Token 的回调函数
     setGetTokenCallback(() => {
-      return access.accessToken?.value || null;
+      const token = useAuthStore.getState().accessToken;
+      console.log('Getting access token:', token ? '***' + token.slice(-8) : 'null');
+      return token || null;
     });
 
     console.log('Request client initialized with access token getter');
-  }, [access.accessToken]);
+  }, []);
 
   return <>{children}</>;
-}
-
-/**
- * AppInitializer 主组件
- * 包装整个应用，设置 token获取回调
- */
-export function AppInitializer({children}: { children: React.ReactNode }) {
-  return <AppInitializerInner>{children}</AppInitializerInner>;
 }

@@ -1,5 +1,5 @@
 import {LoginForm, ProFormCheckbox, ProFormText} from '@ant-design/pro-components';
-import {App} from 'antd';
+import {message} from 'antd';
 import React from 'react';
 import {useAuthStore} from '@/stores';
 import {usePreferences} from '@/core/preferences';
@@ -8,7 +8,6 @@ import './login.style.less';
 import AuthLayout from "@/components/bussiness/AuthLayout";
 
 const Login: React.FC = () => {
-    const {message} = App.useApp();
     const {login, loginLoading} = useAuthStore();
     const {theme} = usePreferences();
 
