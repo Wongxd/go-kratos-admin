@@ -1,12 +1,12 @@
-import {GlobalOutlined, MoonOutlined, SunOutlined} from '@ant-design/icons';
-import {Button, Tooltip} from 'antd';
+import { GlobalOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
+import { Button, Tooltip } from 'antd';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 import SloganIcon from './icons/SloganIcon';
 import './AuthLayout.style.less';
-import {usePreferences} from '@/core/preferences/hooks/usePreferences';
-import {useLocale} from '@/core/preferences/hooks/useLocale';
+import { usePreferences } from '@/core/preferences/hooks/usePreferences';
+import { useLocale } from '@/core/preferences/hooks/useLocale';
 
 /**
  * 认证页面布局属性
@@ -32,16 +32,10 @@ export interface AuthLayoutProps {
  * 认证页面通用布局组件
  * 用于登录、注册、找回密码等页面
  */
-const AuthLayout: React.FC<AuthLayoutProps> = ({
-                                                 title,
-                                                 description,
-                                                 children,
-                                                 pageKey = 'auth',
-                                                 footerLink,
-                                               }) => {
-  const {t} = useTranslation();
-  const {theme, toggleTheme, setThemeMode, copyright} = usePreferences();
-  const {locale, toggleLocale} = useLocale();
+const AuthLayout: React.FC<AuthLayoutProps> = ({ title, description, children, footerLink }) => {
+  const { t } = useTranslation();
+  const { theme, toggleTheme, setThemeMode, copyright } = usePreferences();
+  const { locale, toggleLocale } = useLocale();
 
   // 切换主题
   const handleToggleTheme = () => {
@@ -81,17 +75,19 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         <Tooltip title={t('auth:switchLanguage')}>
           <Button
             type="text"
-            icon={<GlobalOutlined/>}
+            icon={<GlobalOutlined />}
             onClick={handleToggleLanguage}
             className={isLightMode ? 'auth-toolbar-btn-light' : 'auth-toolbar-btn-dark'}
           >
             {locale === 'zh-CN' ? '中文' : 'English'}
           </Button>
         </Tooltip>
-        <Tooltip title={theme.mode === 'light' ? t('auth:switchToDarkMode') : t('auth:switchToLightMode')}>
+        <Tooltip
+          title={theme.mode === 'light' ? t('auth:switchToDarkMode') : t('auth:switchToLightMode')}
+        >
           <Button
             type="text"
-            icon={theme.mode === 'light' ? <MoonOutlined/> : <SunOutlined/>}
+            icon={theme.mode === 'light' ? <MoonOutlined /> : <SunOutlined />}
             onClick={handleToggleTheme}
             className={isLightMode ? 'auth-toolbar-btn-light' : 'auth-toolbar-btn-dark'}
           />
@@ -112,26 +108,18 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
           <SloganIcon />
         </div>
 
-        <h2 className="auth-brand-title">
-          {t('auth:systemTitle')}
-        </h2>
-        <p className="auth-brand-description">
-          {t('auth:systemDescription')}
-        </p>
+        <h2 className="auth-brand-title">{t('auth:systemTitle')}</h2>
+        <p className="auth-brand-description">{t('auth:systemDescription')}</p>
       </div>
 
       {/* 右侧表单区 */}
       <div className="auth-form-section">
         <div className="auth-form-content">
           {/* 页面标题 */}
-          <h1 className="auth-form-title">
-            {title}
-          </h1>
+          <h1 className="auth-form-title">{title}</h1>
 
           {/* 页面描述 */}
-          <p className="auth-form-description">
-            {description}
-          </p>
+          <p className="auth-form-description">{description}</p>
 
           {/* 表单内容（由子页面传入） */}
           {children}
@@ -139,13 +127,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
           {/* 底部链接 */}
           {footerLink && (
             <div className="auth-footer-link">
-              <span className="auth-footer-text">
-                {footerLink.text}{' '}
-              </span>
-              <a
-                href={footerLink.href}
-                className="auth-footer-anchor"
-              >
+              <span className="auth-footer-text">{footerLink.text} </span>
+              <a href={footerLink.href} className="auth-footer-anchor">
                 {footerLink.linkText}
               </a>
             </div>
