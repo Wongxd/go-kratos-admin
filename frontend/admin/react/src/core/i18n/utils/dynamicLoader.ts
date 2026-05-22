@@ -1,15 +1,11 @@
 import i18n from 'i18next';
-import type { SupportedLocale } from '@/locales';
 
 /**
  * 动态加载本地 JSON 文案（Code Splitting）
  * @param lang 语言代码
  * @param namespace 命名空间标识
  */
-export const loadDynamicLocale = async (
-  lang: string,
-  namespace: string,
-): Promise<boolean> => {
+export const loadDynamicLocale = async (lang: string, namespace: string): Promise<boolean> => {
   try {
     // 使用相对路径，从 src/core/i18n/utils/ 到 src/locales/
     // 需要向上3级：utils -> i18n -> core -> src
@@ -17,13 +13,7 @@ export const loadDynamicLocale = async (
     const translations = await import(/* @vite-ignore */ modulePath);
 
     // 合并到 i18next
-    i18n.addResourceBundle(
-      lang,
-      namespace,
-      translations.default || translations,
-      true,
-      true,
-    );
+    i18n.addResourceBundle(lang, namespace, translations.default || translations, true, true);
 
     console.debug(`[i18n] Loaded dynamic locale: ${namespace}@${lang}`);
     return true;
@@ -42,10 +32,7 @@ export const loadDynamicLocale = async (
 /**
  * 批量加载多个模块
  */
-export const loadDynamicLocales = async (
-  lang: string,
-  namespaces: string[],
-): Promise<void> => {
+export const loadDynamicLocales = async (lang: string, namespaces: string[]): Promise<void> => {
   await Promise.all(namespaces.map((ns) => loadDynamicLocale(lang, ns)));
 };
 

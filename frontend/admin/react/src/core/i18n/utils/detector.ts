@@ -1,4 +1,4 @@
-import type {SupportedLocale} from '@/locales';
+import type { SupportedLocale } from '@/locales';
 
 // 配置常量（和你的 i18n 配置保持一致）
 const STORAGE_KEY = 'app_locale';
@@ -10,21 +10,23 @@ const SUPPORTED_LOCALES: readonly SupportedLocale[] = ['zh-CN', 'en-US'] as cons
  * @returns 检测到的语言代码
  */
 export const detectBrowserLocale = (): SupportedLocale => {
-    // 1. 优先读取浏览器首选语言列表
-    const browserLanguages = navigator.languages ?? [navigator.language];
+  // 1. 优先读取浏览器首选语言列表
+  const browserLanguages = navigator.languages ?? [navigator.language];
 
-    for (const lang of browserLanguages) {
-        // 完全匹配（zh-CN → zh-CN）
-        const exactMatch = SUPPORTED_LOCALES.find(supported => supported === lang);
-        if (exactMatch) return exactMatch;
+  for (const lang of browserLanguages) {
+    // 完全匹配（zh-CN → zh-CN）
+    const exactMatch = SUPPORTED_LOCALES.find((supported) => supported === lang);
+    if (exactMatch) return exactMatch;
 
-        // 前缀匹配（zh → zh-CN，en → en-US）
-        const prefixMatch = SUPPORTED_LOCALES.find(supported => supported.startsWith(lang.split('-')[0]));
-        if (prefixMatch) return prefixMatch;
-    }
+    // 前缀匹配（zh → zh-CN，en → en-US）
+    const prefixMatch = SUPPORTED_LOCALES.find((supported) =>
+      supported.startsWith(lang.split('-')[0]),
+    );
+    if (prefixMatch) return prefixMatch;
+  }
 
-    // 2. 无匹配时返回默认语言
-    return DEFAULT_LOCALE;
+  // 2. 无匹配时返回默认语言
+  return DEFAULT_LOCALE;
 };
 
 /**
@@ -32,17 +34,17 @@ export const detectBrowserLocale = (): SupportedLocale => {
  * @returns 存储的语言代码 | null
  */
 export const getStoredLocale = (): SupportedLocale | null => {
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored && SUPPORTED_LOCALES.includes(stored as SupportedLocale)) {
-            return stored as SupportedLocale;
-        }
-        return null;
-    } catch (e) {
-        // 隐私模式/存储禁用时静默失败
-        console.warn('[i18n detector] 读取本地存储失败', e);
-        return null;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored && SUPPORTED_LOCALES.includes(stored as SupportedLocale)) {
+      return stored as SupportedLocale;
     }
+    return null;
+  } catch (e) {
+    // 隐私模式/存储禁用时静默失败
+    console.warn('[i18n detector] 读取本地存储失败', e);
+    return null;
+  }
 };
 
 /**
@@ -50,11 +52,11 @@ export const getStoredLocale = (): SupportedLocale | null => {
  * @param locale 要存储的语言代码
  */
 export const setStoredLocale = (locale: SupportedLocale): void => {
-    try {
-        localStorage.setItem(STORAGE_KEY, locale);
-    } catch (e) {
-        console.warn('[i18n detector] 写入本地存储失败', e);
-    }
+  try {
+    localStorage.setItem(STORAGE_KEY, locale);
+  } catch (e) {
+    console.warn('[i18n detector] 写入本地存储失败', e);
+  }
 };
 
 /**
@@ -62,7 +64,7 @@ export const setStoredLocale = (locale: SupportedLocale): void => {
  * @returns 最终生效的语言代码
  */
 export const getFinalLocale = (): SupportedLocale => {
-    return getStoredLocale() ?? detectBrowserLocale();
+  return getStoredLocale() ?? detectBrowserLocale();
 };
 
 /**
@@ -70,5 +72,5 @@ export const getFinalLocale = (): SupportedLocale => {
  * @param locale 待校验的语言代码
  */
 export const isSupportedLocale = (locale: string): locale is SupportedLocale => {
-    return SUPPORTED_LOCALES.includes(locale as SupportedLocale);
+  return SUPPORTED_LOCALES.includes(locale as SupportedLocale);
 };

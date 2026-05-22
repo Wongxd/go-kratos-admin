@@ -1,9 +1,9 @@
 import React from 'react';
-import {Button, Input, InputNumber, Segmented, Select, Space, Switch} from 'antd';
-import {MinusOutlined, PlusOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import { Button, Input, InputNumber, Segmented, Select, Space, Switch } from 'antd';
+import { MinusOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useDynamicI18n } from '@/core/i18n';
-import {usePreferencesStore} from '../../store';
-import type {ContentCompactType, LayoutType} from '../../types';
+import { usePreferencesStore } from '../../store';
+import type { ContentCompactType, LayoutType } from '../../types';
 import './LayoutPanel.style.less';
 
 /** 布局选项 */
@@ -215,7 +215,7 @@ export const LayoutPanel: React.FC = () => {
           <Space size={4}>
             <Button
               size="small"
-              icon={<MinusOutlined/>}
+              icon={<MinusOutlined />}
               onClick={() => handleSidebarWidthChange(preferences.sidebar.width - 8)}
               disabled={preferences.sidebar.width <= 180}
             />
@@ -224,11 +224,11 @@ export const LayoutPanel: React.FC = () => {
               max={320}
               value={preferences.sidebar.width}
               onChange={handleSidebarWidthChange}
-              style={{width: 70}}  // 从80压缩到70
+              style={{ width: 70 }} // 从80压缩到70
             />
             <Button
               size="small"
-              icon={<PlusOutlined/>}
+              icon={<PlusOutlined />}
               onClick={() => handleSidebarWidthChange(preferences.sidebar.width + 8)}
               disabled={preferences.sidebar.width >= 320}
             />
@@ -455,14 +455,16 @@ export const LayoutPanel: React.FC = () => {
         <div className="preference-item">
           <span>{t('layout.preferencesPosition')}</span>
           <Select
-            style={{width: 120}}
+            style={{ width: 120 }}
             options={[
               { label: t('layout.positions.auto'), value: 'auto' },
               { label: t('layout.positions.fixed'), value: 'fixed' },
               { label: t('layout.positions.hidden'), value: 'hidden' },
             ]}
             value={preferences.app.preferencesButtonPosition}
-            onChange={(value) => setPreferences({ app: { preferencesButtonPosition: value as any } })}
+            onChange={(value) =>
+              setPreferences({ app: { preferencesButtonPosition: value as any } })
+            }
           />
         </div>
       </section>
@@ -500,7 +502,7 @@ export const LayoutPanel: React.FC = () => {
         <div className={`preference-item ${!preferences.copyright.enable ? 'disabled' : ''}`}>
           <span>{t('layout.companyName')}</span>
           <Input
-            style={{width: 200}}
+            style={{ width: 200 }}
             value={preferences.copyright.companyName}
             onChange={(e) => setPreferences({ copyright: { companyName: e.target.value } })}
             disabled={!preferences.copyright.enable}
@@ -509,7 +511,7 @@ export const LayoutPanel: React.FC = () => {
         <div className={`preference-item ${!preferences.copyright.enable ? 'disabled' : ''}`}>
           <span>{t('layout.companySite')}</span>
           <Input
-            style={{width: 200}}
+            style={{ width: 200 }}
             value={preferences.copyright.companySiteLink}
             onChange={(e) => setPreferences({ copyright: { companySiteLink: e.target.value } })}
             disabled={!preferences.copyright.enable}
@@ -518,7 +520,7 @@ export const LayoutPanel: React.FC = () => {
         <div className={`preference-item ${!preferences.copyright.enable ? 'disabled' : ''}`}>
           <span>{t('layout.date')}</span>
           <Input
-            style={{width: 200}}
+            style={{ width: 200 }}
             value={preferences.copyright.date}
             onChange={(e) => setPreferences({ copyright: { date: e.target.value } })}
             disabled={!preferences.copyright.enable}
@@ -527,7 +529,7 @@ export const LayoutPanel: React.FC = () => {
         <div className={`preference-item ${!preferences.copyright.enable ? 'disabled' : ''}`}>
           <span>{t('layout.icpNumber')}</span>
           <Input
-            style={{width: 200}}
+            style={{ width: 200 }}
             value={preferences.copyright.icp}
             onChange={(e) => setPreferences({ copyright: { icp: e.target.value } })}
             disabled={!preferences.copyright.enable}
@@ -536,7 +538,7 @@ export const LayoutPanel: React.FC = () => {
         <div className={`preference-item ${!preferences.copyright.enable ? 'disabled' : ''}`}>
           <span>{t('layout.icpLink')}</span>
           <Input
-            style={{width: 200}}
+            style={{ width: 200 }}
             value={preferences.copyright.icpLink}
             onChange={(e) => setPreferences({ copyright: { icpLink: e.target.value } })}
             disabled={!preferences.copyright.enable}

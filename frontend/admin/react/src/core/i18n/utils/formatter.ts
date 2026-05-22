@@ -1,4 +1,4 @@
-import type {SupportedLocale} from '@/locales';
+import type { SupportedLocale } from '@/locales';
 
 /**
  * 日期格式化工具
@@ -7,22 +7,20 @@ import type {SupportedLocale} from '@/locales';
  * @param options Intl.DateTimeFormat 配置
  */
 export const formatDate = (
-    date: Date | number | string,
-    locale: SupportedLocale,
-    options?: Intl.DateTimeFormatOptions
+  date: Date | number | string,
+  locale: SupportedLocale,
+  options?: Intl.DateTimeFormatOptions,
 ): string => {
-    const targetDate = typeof date === 'string' || typeof date === 'number'
-        ? new Date(date)
-        : date;
+  const targetDate = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
 
-    // 默认格式化配置
-    const defaultOptions: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    };
+  // 默认格式化配置
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  };
 
-    return new Intl.DateTimeFormat(locale, {...defaultOptions, ...options}).format(targetDate);
+  return new Intl.DateTimeFormat(locale, { ...defaultOptions, ...options }).format(targetDate);
 };
 
 /**
@@ -32,15 +30,15 @@ export const formatDate = (
  * @param options Intl.NumberFormat 配置
  */
 export const formatNumber = (
-    num: number,
-    locale: SupportedLocale,
-    options?: Intl.NumberFormatOptions
+  num: number,
+  locale: SupportedLocale,
+  options?: Intl.NumberFormatOptions,
 ): string => {
-    const defaultOptions: Intl.NumberFormatOptions = {
-        maximumFractionDigits: 2,
-    };
+  const defaultOptions: Intl.NumberFormatOptions = {
+    maximumFractionDigits: 2,
+  };
 
-    return new Intl.NumberFormat(locale, {...defaultOptions, ...options}).format(num);
+  return new Intl.NumberFormat(locale, { ...defaultOptions, ...options }).format(num);
 };
 
 /**
@@ -51,19 +49,19 @@ export const formatNumber = (
  * @param options Intl.NumberFormat 配置
  */
 export const formatCurrency = (
-    amount: number,
-    locale: SupportedLocale,
-    currency: string = 'CNY',
-    options?: Intl.NumberFormatOptions
+  amount: number,
+  locale: SupportedLocale,
+  currency: string = 'CNY',
+  options?: Intl.NumberFormatOptions,
 ): string => {
-    const defaultOptions: Intl.NumberFormatOptions = {
-        style: 'currency',
-        currency,
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    };
+  const defaultOptions: Intl.NumberFormatOptions = {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  };
 
-    return new Intl.NumberFormat(locale, {...defaultOptions, ...options}).format(amount);
+  return new Intl.NumberFormat(locale, { ...defaultOptions, ...options }).format(amount);
 };
 
 /**
@@ -73,16 +71,16 @@ export const formatCurrency = (
  * @param options Intl.NumberFormat 配置
  */
 export const formatPercent = (
-    value: number,
-    locale: SupportedLocale,
-    options?: Intl.NumberFormatOptions
+  value: number,
+  locale: SupportedLocale,
+  options?: Intl.NumberFormatOptions,
 ): string => {
-    const defaultOptions: Intl.NumberFormatOptions = {
-        style: 'percent',
-        maximumFractionDigits: 2,
-    };
+  const defaultOptions: Intl.NumberFormatOptions = {
+    style: 'percent',
+    maximumFractionDigits: 2,
+  };
 
-    return new Intl.NumberFormat(locale, {...defaultOptions, ...options}).format(value);
+  return new Intl.NumberFormat(locale, { ...defaultOptions, ...options }).format(value);
 };
 
 /**
@@ -92,37 +90,37 @@ export const formatPercent = (
  * @param options Intl.RelativeTimeFormat 配置
  */
 export const formatRelativeTime = (
-    date: Date | number,
-    locale: SupportedLocale,
-    options?: Intl.RelativeTimeFormatOptions
+  date: Date | number,
+  locale: SupportedLocale,
+  options?: Intl.RelativeTimeFormatOptions,
 ): string => {
-    const targetDate = typeof date === 'number' ? new Date(date) : date;
-    const now = Date.now();
-    const diffMs = targetDate.getTime() - now;
+  const targetDate = typeof date === 'number' ? new Date(date) : date;
+  const now = Date.now();
+  const diffMs = targetDate.getTime() - now;
 
-    // 时间单位换算
-    const SECOND = 1000;
-    const MINUTE = 60 * SECOND;
-    const HOUR = 60 * MINUTE;
-    const DAY = 24 * HOUR;
+  // 时间单位换算
+  const SECOND = 1000;
+  const MINUTE = 60 * SECOND;
+  const HOUR = 60 * MINUTE;
+  const DAY = 24 * HOUR;
 
-    let value: number;
-    let unit: Intl.RelativeTimeFormatUnit;
+  let value: number;
+  let unit: Intl.RelativeTimeFormatUnit;
 
-    const absDiff = Math.abs(diffMs);
-    if (absDiff < MINUTE) {
-        value = Math.round(diffMs / SECOND);
-        unit = 'second';
-    } else if (absDiff < HOUR) {
-        value = Math.round(diffMs / MINUTE);
-        unit = 'minute';
-    } else if (absDiff < DAY) {
-        value = Math.round(diffMs / HOUR);
-        unit = 'hour';
-    } else {
-        value = Math.round(diffMs / DAY);
-        unit = 'day';
-    }
+  const absDiff = Math.abs(diffMs);
+  if (absDiff < MINUTE) {
+    value = Math.round(diffMs / SECOND);
+    unit = 'second';
+  } else if (absDiff < HOUR) {
+    value = Math.round(diffMs / MINUTE);
+    unit = 'minute';
+  } else if (absDiff < DAY) {
+    value = Math.round(diffMs / HOUR);
+    unit = 'hour';
+  } else {
+    value = Math.round(diffMs / DAY);
+    unit = 'day';
+  }
 
-    return new Intl.RelativeTimeFormat(locale, {numeric: 'auto', ...options}).format(value, unit);
+  return new Intl.RelativeTimeFormat(locale, { numeric: 'auto', ...options }).format(value, unit);
 };

@@ -36,7 +36,7 @@ export const GeneralPanel: React.FC = () => {
           <span>{t('general.language')}</span>
           <Select
             value={preferences.app.locale}
-            options={LANGUAGE_OPTIONS.map(opt => ({ ...opt, label: t(opt.label) }))}
+            options={LANGUAGE_OPTIONS.map((opt) => ({ ...opt, label: t(opt.label) }))}
             onChange={handleLanguageChange}
             style={{ width: 200 }}
           />
