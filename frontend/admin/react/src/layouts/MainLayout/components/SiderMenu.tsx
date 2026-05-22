@@ -1,42 +1,143 @@
-import React, { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
+import { Menu } from 'antd';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { usePreferencesStore } from '@/core/preferences/store';
+import { getIconFromName } from '../utils/iconResolver';
+import ControlPanel from './ControlPanel';
 
 interface SiderMenuProps {
-  menuDom: React.ReactNode;
-  actions?: React.ReactNode;
+  menuData: any[];
   collapsed: boolean;
   isMobile: boolean;
+  isDark: boolean;
+  openKeys: string[];
+  selectedKeys: string[];
+  onCollapse: (collapsed: boolean) => void;
+  onOpenChange: (keys: string[]) => void;
+  onToggleTheme: () => void;
 }
 
-export const SiderMenu = ({ menuDom, actions, collapsed, isMobile }: SiderMenuProps) => {
-  const { navigation } = usePreferencesStore((state) => state.preferences);
+export const SiderMenu = ({
+  menuData,
+  collapsed,
+  isMobile,
+  isDark,
+  openKeys,
+  selectedKeys,
+  onCollapse,
+  onOpenChange,
+  onToggleTheme,
+}: SiderMenuProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const preferences = usePreferencesStore((state) => state.preferences);
 
-  // 菜单样式（根据偏好设置）
-  const menuStyle = useMemo(() => {
-    const style: React.CSSProperties = {};
+  // 转换菜单数据为 Ant Design Menu items 格式
+  const menuItems = useMemo(() => {
+    const transformItem = (items: any[]): any[] => {
+      return items.map((item) => ({
+        key: item.path || item.key,
+        icon: getIconFromName(item.icon),
+        label: item.name || item.label,
+        children: item.children ? transformItem(item.children) : undefined,
+      }));
+    };
+    return transformItem(menuData);
+  }, [menuData]);
 
-    // 手风琴模式
-    if (navigation.accordion) {
-      // ProLayout 通过 menu.props 传递，这里可添加 className
-    }
+  // 菜单点击
+  const handleMenuClick = useCallback(
+    (info: { key: string }) => {
+      if (info.key) {
+        navigate(info.key);
+        if (isMobile) onCollapse(true);
+      }
+    },
+    [navigate, isMobile, onCollapse],
+  );
 
-    // 分割模式（混合布局时）
-    if (navigation.split) {
-      style.borderRight = '1px solid rgba(0,0,0,0.06)';
-    }
-
-    return style;
-  }, [navigation]);
+  const sidebarWidth = collapsed ? 64 : (preferences.sidebar?.width || 224);
 
   return (
-    <div className="h-full flex flex-col" style={menuStyle}>
-      {/* 菜单区域 */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">{menuDom}</div>
+    <div
+      style={{
+        width: sidebarWidth,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: isDark ? '#141414' : '#ffffff',
+        borderRight: `1px solid ${isDark ? '#303030' : '#e5e7eb'}`,
+        transition: 'width 0.2s',
+        flexShrink: 0,
+        overflow: 'hidden',
+      }}
+    >
+      {/* Logo 区域 */}
+      <div
+        style={{
+          height: 56,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: collapsed ? 'center' : 'flex-start',
+          padding: collapsed ? 0 : '0 16px',
+          gap: 8,
+          borderBottom: `1px solid ${isDark ? '#303030' : '#e5e7eb'}`,
+          cursor: 'pointer',
+          flexShrink: 0,
+          overflow: 'hidden',
+        }}
+        onClick={() => navigate('/')}
+      >
+        {preferences.logo.enable && (
+          <img
+            src={preferences.logo.source}
+            alt="logo"
+            style={{ height: 32, width: 32, flexShrink: 0 }}
+          />
+        )}
+        {!collapsed && preferences.app.dynamicTitle && (
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: 16,
+              color: isDark ? '#ffffff' : '#262626',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {preferences.app.name}
+          </span>
+        )}
+      </div>
 
-      {/* 底部操作区（可选） */}
-      {actions && !collapsed && !isMobile && (
-        <div className="p-2 border-t border-gray-100 dark:border-gray-800">{actions}</div>
-      )}
+      {/* 菜单树形列表 */}
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', padding: '4px 0' }}>
+          <Menu
+            mode="inline"
+            inlineCollapsed={collapsed}
+            selectedKeys={selectedKeys}
+            openKeys={collapsed ? [] : openKeys}
+            onOpenChange={onOpenChange}
+            onClick={handleMenuClick}
+            items={menuItems}
+            style={{
+              background: 'transparent',
+              borderInlineEnd: 'none',
+            }}
+            theme={isDark ? 'dark' : 'light'}
+          />
+        </div>
+      </div>
+
+      {/* 底部控制面板 */}
+      <ControlPanel
+        collapsed={collapsed}
+        isDark={isDark}
+        onToggleCollapse={() => onCollapse(!collapsed)}
+        onToggleTheme={onToggleTheme}
+      />
     </div>
   );
 };

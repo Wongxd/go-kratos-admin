@@ -1,11 +1,12 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
-import { Outlet, useNavigate, useLocation, useMatches } from 'react-router-dom';
-import { ProLayout, PageContainer } from '@ant-design/pro-components';
+import { Outlet, useLocation, useMatches } from 'react-router-dom';
+import { PageContainer } from '@ant-design/pro-components';
 import { ConfigProvider } from 'antd';
 
 // 内部组件
 import HeaderContent from './components/HeaderContent';
 import SiderMenu from './components/SiderMenu';
+import TabsBar from './components/TabsBar';
 import AppFooter from './components/Footer';
 
 // Hooks
@@ -16,11 +17,9 @@ import { useLayoutState } from './hooks/useLayoutState';
 import { useUserStore, useAuthStore } from '@/stores';
 import { usePreferencesStore } from '@/core/preferences/store';
 import { useThemeConfig } from '@/core/preferences/hooks/useThemeConfig';
-import { useI18n } from '@/core/i18n';
 
 import { staticRoutes } from '@/router/config/static';
 import type { AppRouteObject } from '@/core/router/types';
-import type { MenuDataItem } from '@ant-design/pro-components';
 
 interface LayoutRouteHandle {
   title?: string;
@@ -37,7 +36,6 @@ interface MainLayoutProps {
 }
 
 export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
-  const navigate = useNavigate();
   const location = useLocation();
   const rawMatches = useMatches();
   const matches = rawMatches as LayoutRouteMatch[];
@@ -52,7 +50,6 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
 
   // Theme
   const themeConfig = useThemeConfig();
-  const { t } = useI18n('common');
   const [isDark, setIsDark] = useState(() => {
     const { theme } = preferences;
     if (theme.mode === 'dark') return true;
@@ -109,38 +106,10 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, [collapsed, setCollapsed, setIsMobile]);
 
-  // 菜单项点击
-  const handleMenuItemClick = useCallback(
-    (item: MenuDataItem) => {
-      if (item.path) {
-        if (item.path.startsWith('http')) {
-          window.open(item.path, '_blank');
-        } else {
-          navigate(item.path);
-        }
-        if (isMobile) setCollapsed(true);
-      }
-    },
-    [navigate, isMobile, setCollapsed],
-  );
-
-  // 面包屑
-  const breadcrumbRender = useCallback(
-    (routers: any[] = []) => {
-      return [
-        {
-          path: '/',
-          breadcrumbName: t('home'),
-          onClick: () => navigate('/'),
-        },
-        ...routers.map((route) => ({
-          ...route,
-          onClick: route.path ? () => navigate(route.path) : undefined,
-        })),
-      ];
-    },
-    [navigate, t],
-  );
+  // 根据当前路径计算选中的菜单项
+  const selectedKeys = useMemo(() => {
+    return [location.pathname];
+  }, [location.pathname]);
 
   // 顶栏右侧
   const rightContentRender = useCallback(() => {
@@ -172,23 +141,14 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
     );
   }, [userInfo, isFullscreen, logout, isDark, setPreferences]);
 
-  // 侧边栏折叠
-  const handleCollapse = useCallback(
-    (collapsed: boolean) => {
-      setCollapsed(collapsed);
-    },
-    [setCollapsed],
-  );
-
-  // 菜单展开
-  const handleOpenChange = useCallback(
-    (keys: string[] | false) => {
-      if (keys !== false) {
-        setOpenKeys(keys);
-      }
-    },
-    [setOpenKeys],
-  );
+  // 主题切换
+  const handleToggleTheme = useCallback(() => {
+    setPreferences({
+      theme: {
+        mode: isDark ? 'light' : 'dark',
+      },
+    });
+  }, [isDark, setPreferences]);
 
   return (
     <ConfigProvider theme={themeConfig}>
@@ -196,140 +156,76 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
         style={{
           height: '100vh',
           display: 'flex',
-          flexDirection: 'column',
           background: isDark ? '#000000' : '#f5f5f5',
         }}
       >
-        {/* 顶栏 */}
+        {/* ===== 左侧：侧边栏 ===== */}
+        <SiderMenu
+          menuData={menuData}
+          collapsed={collapsed}
+          isMobile={isMobile}
+          isDark={isDark}
+          openKeys={openKeys}
+          selectedKeys={selectedKeys}
+          onCollapse={setCollapsed}
+          onOpenChange={setOpenKeys}
+          onToggleTheme={handleToggleTheme}
+        />
+
+        {/* ===== 右侧：主内容区 ===== */}
         <div
           style={{
-            height: 56,
-            backgroundColor: isDark ? '#141414' : '#ffffff',
-            borderBottom: `1px solid ${isDark ? '#303030' : '#e5e7eb'}`,
+            flex: 1,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 24px',
-            flexShrink: 0,
-            zIndex: 100,
+            flexDirection: 'column',
+            overflow: 'hidden',
           }}
         >
-          {/* 左侧：Logo 和标题 */}
+          {/* 顶部栏 */}
           <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => navigate('/')}
-            style={{ height: '100%' }}
+            style={{
+              height: 56,
+              backgroundColor: isDark ? '#141414' : '#ffffff',
+              borderBottom: `1px solid ${isDark ? '#303030' : '#e5e7eb'}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              padding: '0 24px',
+              flexShrink: 0,
+              zIndex: 100,
+            }}
           >
-            {preferences.logo.enable && (
-              <img src={preferences.logo.source} alt="logo" style={{ height: 32, width: 32 }} />
-            )}
-            {preferences.app.dynamicTitle && (
-              <span
-                className="font-bold text-lg truncate"
-                style={{
-                  color: isDark ? '#ffffff' : '#262626',
-                  maxWidth: 140,
-                }}
-              >
-                {preferences.app.name}
-              </span>
-            )}
+            {rightContentRender()}
           </div>
 
-          {/* 右侧：操作按钮 */}
-          {rightContentRender()}
-        </div>
+          {/* 标签栏 */}
+          <TabsBar />
 
-        {/* 主体区域 */}
-        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-          <ProLayout
-            // 核心配置
-            layout="side"
-            contentWidth="Fluid"
-            fixedHeader={false}
-            fixSiderbar={true}
-            location={{ pathname: location.pathname }}
-            // 侧边栏配置
-            collapsed={collapsed}
-            onCollapse={handleCollapse}
-            siderWidth={256}
-            menu={{
-              autoClose: isMobile ? undefined : false,
-              type: 'group',
-            }}
-            menuData={menuData as MenuDataItem[]}
-            openKeys={openKeys}
-            onOpenChange={handleOpenChange}
-            menuItemRender={(item, dom) => (
-              <div onClick={() => handleMenuItemClick(item)} className="w-full h-full">
-                {dom}
-              </div>
-            )}
-            // 面包屑
-            breadcrumbRender={breadcrumbRender}
-            breadcrumbProps={{
-              separator: '/',
-              itemRender: (route, _params, routes) => {
-                const last = routes.indexOf(route) === routes.length - 1;
-                return last ? (
-                  <span>{route.title}</span>
-                ) : (
-                  <span
-                    className="cursor-pointer hover:text-blue-400 transition-colors"
-                    onClick={() => route.path && navigate(route.path)}
-                  >
-                    {route.title}
-                  </span>
-                );
-              },
-            }}
-            // 页脚
-            footerRender={() => (preferences.footer.enable ? <AppFooter /> : false)}
-            // 侧边栏渲染
-            menuContentRender={(_, defaultDom) => (
-              <SiderMenu menuDom={defaultDom} collapsed={collapsed} isMobile={isMobile} />
-            )}
-            // 内容区
-            token={{
-              sider: {
-                colorMenuBackground: isDark ? '#141414' : '#ffffff',
-                colorTextMenu: isDark ? '#a6a6a6' : '#595959',
-                colorTextMenuSelected: '#1677ff',
-                colorBgMenuItemSelected: isDark ? '#1f1f1f' : '#e6f7ff',
-                colorBgMenuItemHover: isDark ? '#1f1f1f' : '#f5f5f5',
-                colorTextMenuActive: '#1677ff',
-                colorTextMenuTitle: isDark ? '#ffffff' : '#262626',
-                colorBgMenuItemCollapsedElevated: isDark ? '#1f1f1f' : '#f5f5f5',
-              },
-              colorPrimary: '#1677ff',
-            }}
-            breakpoint={false}
+          {/* 内容区 */}
+          <div
             style={{
               flex: 1,
-              background: 'transparent',
+              overflow: 'auto',
+              backgroundColor: isDark ? '#000000' : '#f5f5f5',
             }}
           >
-            <div
+            <PageContainer
+              ghost={true}
+              header={{
+                title: matches.at(-1)?.handle?.title || '',
+                breadcrumb: {},
+              }}
               style={{
-                minHeight: 'calc(100vh - 56px)',
-                backgroundColor: isDark ? '#000000' : '#f5f5f5',
+                padding: '24px',
+                background: 'transparent',
               }}
             >
-              <PageContainer
-                ghost={true}
-                header={{
-                  title: matches.at(-1)?.handle?.title || '',
-                  breadcrumb: {},
-                }}
-                style={{
-                  padding: '24px',
-                  background: 'transparent',
-                }}
-              >
-                <Outlet />
-              </PageContainer>
-            </div>
-          </ProLayout>
+              <Outlet />
+            </PageContainer>
+          </div>
+
+          {/* 页脚 */}
+          {preferences.footer.enable && <AppFooter />}
         </div>
       </div>
     </ConfigProvider>
