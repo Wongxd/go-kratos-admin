@@ -101,15 +101,19 @@ export const GeneralPanel: React.FC = () => {
             {TRANSITION_OPTIONS.map((option) => (
               <div
                 key={option.value}
-                className={`transition-item ${preferences.transition.name === option.value ? 'active' : ''}`}
+                className="transition-wrapper"
                 onClick={() => {
                   if (preferences.transition.enable) {
                     setPreferences({ transition: { name: option.value } });
                   }
                 }}
               >
-                <div className="transition-preview">
-                  <div className={`animation-box ${option.value}`} />
+                <div
+                  className={`transition-item ${preferences.transition.name === option.value ? 'active' : ''}`}
+                >
+                  <div className="transition-preview">
+                    <div className={`animation-box ${option.value}`} />
+                  </div>
                 </div>
                 <span className="transition-label">{t(option.label)}</span>
               </div>

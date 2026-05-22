@@ -1,5 +1,5 @@
 import React from 'react';
-import { Radio, Segmented, Switch } from 'antd';
+import { Segmented, Switch } from 'antd';
 import { BulbOutlined, LaptopOutlined, MoonOutlined, BgColorsOutlined } from '@ant-design/icons';
 import { useDynamicI18n } from '@/core/i18n';
 import { usePreferencesStore } from '../../store';
@@ -61,32 +61,28 @@ export const AppearancePanel: React.FC = () => {
       {/* 主题模式 */}
       <section className="appearance-section">
         <h3 className="section-title">{t('appearance.theme')}</h3>
-        <Radio.Group
-          value={preferences.theme.mode}
-          onChange={(e) => handleThemeModeChange(e.target.value)}
-          className="theme-mode-group"
-        >
-          <div className="theme-mode-options">
-            <Radio.Button value="light" className="theme-mode-btn">
-              <div className="theme-mode-content">
-                <BulbOutlined className="theme-icon" />
-                <span>{t('appearance.lightMode')}</span>
-              </div>
-            </Radio.Button>
-            <Radio.Button value="dark" className="theme-mode-btn">
-              <div className="theme-mode-content">
-                <MoonOutlined className="theme-icon" />
-                <span>{t('appearance.darkMode')}</span>
-              </div>
-            </Radio.Button>
-            <Radio.Button value="auto" className="theme-mode-btn">
-              <div className="theme-mode-content">
-                <LaptopOutlined className="theme-icon" />
-                <span>{t('appearance.followSystem')}</span>
-              </div>
-            </Radio.Button>
+        <div className="theme-mode-options">
+          <div className="theme-mode-wrapper" onClick={() => handleThemeModeChange('light')}>
+            <div
+              className={`theme-mode-item ${preferences.theme.mode === 'light' ? 'active' : ''}`}
+            >
+              <BulbOutlined className="theme-icon" />
+            </div>
+            <span className="theme-mode-label">{t('appearance.lightMode')}</span>
           </div>
-        </Radio.Group>
+          <div className="theme-mode-wrapper" onClick={() => handleThemeModeChange('dark')}>
+            <div className={`theme-mode-item ${preferences.theme.mode === 'dark' ? 'active' : ''}`}>
+              <MoonOutlined className="theme-icon" />
+            </div>
+            <span className="theme-mode-label">{t('appearance.darkMode')}</span>
+          </div>
+          <div className="theme-mode-wrapper" onClick={() => handleThemeModeChange('auto')}>
+            <div className={`theme-mode-item ${preferences.theme.mode === 'auto' ? 'active' : ''}`}>
+              <LaptopOutlined className="theme-icon" />
+            </div>
+            <span className="theme-mode-label">{t('appearance.followSystem')}</span>
+          </div>
+        </div>
       </section>
 
       {/* 深色侧边栏和顶栏 */}
@@ -114,17 +110,21 @@ export const AppearancePanel: React.FC = () => {
           {BUILTIN_THEMES.map((theme) => (
             <div
               key={theme.type}
-              className={`builtin-theme-item ${preferences.theme.builtinType === theme.type ? 'active' : ''}`}
+              className="builtin-theme-wrapper"
               onClick={() => handleBuiltinThemeChange(theme.type)}
             >
               <div
-                className="theme-color-preview"
-                style={{
-                  backgroundColor: theme.type === 'custom' ? 'transparent' : theme.color,
-                  border: theme.type === 'custom' ? '1px dashed #666' : 'none',
-                }}
+                className={`builtin-theme-item ${preferences.theme.builtinType === theme.type ? 'active' : ''}`}
               >
-                {theme.type === 'custom' && <BgColorsOutlined className="custom-icon" />}
+                <div
+                  className="theme-color-preview"
+                  style={{
+                    backgroundColor: theme.type === 'custom' ? 'transparent' : theme.color,
+                    border: theme.type === 'custom' ? '1px dashed #666' : 'none',
+                  }}
+                >
+                  {theme.type === 'custom' && <BgColorsOutlined className="custom-icon" />}
+                </div>
               </div>
               <span className="theme-name">{t(theme.nameKey)}</span>
             </div>

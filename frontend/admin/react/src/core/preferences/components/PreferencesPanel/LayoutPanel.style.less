@@ -75,19 +75,26 @@
 
   .layout-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);  // 恢复2列布局
     gap: 8px;  // 从12px压缩到8px
+    justify-items: start;  // 让grid item左对齐
   }
 
-  .layout-item {
+  .layout-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;  // 从8px压缩到6px
+    gap: 6px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 120px;  // 限制最大宽度，防止单个选项太宽
+  }
+
+  .layout-item {
+    width: 100%;
     padding: 8px 6px;  // 从12px 10px压缩到8px 6px
     border: 1px solid var(--ant-border-color);
     border-radius: 4px;  // 从6px压缩到4px
-    cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent;
 
@@ -97,7 +104,7 @@
       transform: translateY(-1px);
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);  // 从0 2px 8px压缩到0 1px 4px
 
-      .layout-label {
+      ~ .layout-label {
         span {
           color: var(--ant-color-primary);
           font-weight: 500;
@@ -106,10 +113,10 @@
     }
 
     &.active {
-      border: 1px solid var(--ant-color-primary);  // 从2px改为1px
+      border: 2px solid var(--ant-color-primary);  // 与主题、主题色保持一致
       background: transparent;
 
-      .layout-label {
+      ~ .layout-label {
         span {
           color: var(--ant-color-primary);
           font-weight: 500;
@@ -118,7 +125,7 @@
     }
 
     .layout-preview {
-      width: 95px;  // 从110px压缩到95px
+      width: 100%;  // 占满 wrapper 宽度
       height: 65px;  // 从75px压缩到65px
       background: var(--ant-color-fill-secondary);
       border-radius: 4px;  // 从5px压缩到4px
@@ -541,19 +548,26 @@
 
   .content-compact-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);  // 恢复2列布局
     gap: 8px;  // 从12px压缩到8px
+    justify-items: start;  // 让grid item左对齐
   }
 
-  .content-compact-item {
+  .content-compact-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;  // 从8px压缩到6px
+    gap: 6px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 120px;  // 限制最大宽度，防止单个选项太宽
+  }
+
+  .content-compact-item {
+    width: 100%;
     padding: 8px 6px;  // 从12px 10px压缩到8px 6px
     border: 1px solid var(--ant-border-color);
     border-radius: 4px;  // 从6px压缩到4px
-    cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent;
 
@@ -563,24 +577,24 @@
       transform: translateY(-1px);
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);  // 从0 2px 8px压缩到0 1px 4px
 
-      span {
+      ~ span {
         color: var(--ant-color-primary);
         font-weight: 500;
       }
     }
 
     &.active {
-      border: 1px solid var(--ant-color-primary);  // 从2px改为1px
+      border: 2px solid var(--ant-color-primary);  // 与主题、主题色保持一致
       background: transparent;
 
-      span {
+      ~ span {
         color: var(--ant-color-primary);
         font-weight: 500;
       }
     }
 
     .content-preview {
-      width: 95px;  // 从110px压缩到95px
+      width: 100%;  // 占满 wrapper 宽度
       height: 65px;  // 从75px压缩到65px
       background: var(--ant-color-fill-secondary);
       border-radius: 4px;  // 从5px压缩到4px

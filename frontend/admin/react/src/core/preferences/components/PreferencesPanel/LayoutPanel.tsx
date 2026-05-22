@@ -68,10 +68,13 @@ export const LayoutPanel: React.FC = () => {
           {LAYOUT_OPTIONS.map((option) => (
             <div
               key={option.value}
-              className={`layout-item ${preferences.app.layout === option.value ? 'active' : ''}`}
+              className="layout-wrapper"
               onClick={() => handleLayoutChange(option.value as LayoutType)}
             >
-              <div className="layout-preview">
+              <div
+                className={`layout-item ${preferences.app.layout === option.value ? 'active' : ''}`}
+              >
+                <div className="layout-preview">
                 {/* 渲染真实的布局示意图 */}
                 {option.value === 'sidebar-nav' && (
                   <div className="layout-visual sidebar-nav">
@@ -156,6 +159,7 @@ export const LayoutPanel: React.FC = () => {
                     </div>
                   </div>
                 )}
+                </div>
               </div>
               <div className="layout-label">
                 <span>{t(option.label)}</span>
@@ -173,11 +177,15 @@ export const LayoutPanel: React.FC = () => {
           {CONTENT_COMPACT_OPTIONS.map((option) => (
             <div
               key={option.value}
-              className={`content-compact-item ${preferences.app.contentCompact === option.value ? 'active' : ''}`}
+              className="content-compact-wrapper"
               onClick={() => handleContentCompactChange(option.value as ContentCompactType)}
             >
-              <div className="content-preview">
+              <div
+                className={`content-compact-item ${preferences.app.contentCompact === option.value ? 'active' : ''}`}
+              >
+                <div className="content-preview">
                 <div className={`preview-bar ${option.value === 'compact' ? 'narrow' : 'wide'}`} />
+                </div>
               </div>
               <span>{t(option.label)}</span>
             </div>
