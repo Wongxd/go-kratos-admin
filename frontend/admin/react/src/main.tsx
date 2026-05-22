@@ -2,7 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import {QueryClientProvider} from "@tanstack/react-query";
-import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
+
+// Devtools 仅在开发环境导入，生产构建时自动 tree-shake
+const ReactQueryDevtools =
+    import.meta.env.DEV
+        ? await import('@tanstack/react-query-devtools').then(m => m.ReactQueryDevtools)
+        : () => null;
 
 import {ThemeProvider} from "@/core/preferences/components/ThemeProvider";
 import {RequestTokenSetup} from "@/core/transport/rest/request-token-setup";
