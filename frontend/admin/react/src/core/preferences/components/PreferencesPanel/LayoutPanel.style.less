@@ -3,17 +3,17 @@
 .layout-panel {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;  // 从16px压缩到12px
 }
 
 .layout-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;  // 从12px压缩到8px
 
   .section-title {
-    margin: 0 0 16px;
-    font-size: 15px;
+    margin: 0 0 8px;  // 从12px压缩到8px
+    font-size: 13px;  // 从14px压缩到13px
     font-weight: 600;
     color: var(--ant-text-color);
   }
@@ -23,7 +23,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 6px 0;  // 从8px压缩到6px
 
     &.disabled {
       opacity: 0.4;
@@ -31,7 +31,7 @@
     }
 
     &.width-control {
-      gap: 12px;
+      gap: 6px;  // 从8px压缩到6px
     }
 
     .ant-switch {
@@ -48,54 +48,461 @@
   .layout-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 8px;  // 从12px压缩到8px
   }
 
   .layout-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    padding: 16px 12px;
+    gap: 6px;  // 从8px压缩到6px
+    padding: 8px 6px;  // 从12px 10px压缩到8px 6px
     border: 1px solid var(--ant-border-color);
-    border-radius: 8px;
+    border-radius: 4px;  // 从6px压缩到4px
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent;
 
     &:hover {
       border-color: var(--ant-color-primary);
+      background: var(--ant-color-primary-bg);
+      transform: translateY(-1px);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);  // 从0 2px 8px压缩到0 1px 4px
+
+      .layout-label {
+        span {
+          color: var(--ant-color-primary);
+          font-weight: 500;
+        }
+      }
     }
 
     &.active {
-      border-color: var(--ant-color-primary);
-      border-width: 2px;
+      border: 1px solid var(--ant-color-primary);  // 从2px改为1px
+      background: transparent;
+
+      .layout-label {
+        span {
+          color: var(--ant-color-primary);
+          font-weight: 500;
+        }
+      }
     }
 
     .layout-preview {
-      width: 90px;
-      height: 68px;
+      width: 95px;  // 从110px压缩到95px
+      height: 65px;  // 从75px压缩到65px
       background: var(--ant-color-fill-secondary);
-      border-radius: 6px;
+      border-radius: 4px;  // 从5px压缩到4px
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
+      padding: 2px;  // 从3px压缩到2px
 
-      .layout-icon {
-        font-size: 28px;
+      .layout-visual {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        gap: 2px;
+        position: relative;
+
+        .sidebar {
+          width: 12px;  // 从16px压缩到12px
+          background: var(--ant-color-primary);
+          border-radius: 2px;
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 2px 0;  // 从3px压缩到2px
+          gap: 2px;
+
+          // 灰色侧边栏
+          &.gray {
+            background: var(--ant-color-fill);
+            border: 1px solid var(--ant-color-border);
+
+            &::before {
+              background: var(--ant-color-text-secondary);
+            }
+
+            &::after {
+              background: var(--ant-color-text-tertiary);
+              box-shadow: 
+                0 5px 0 var(--ant-color-text-tertiary), 
+                0 10px 0 var(--ant-color-text-tertiary),
+                0 15px 0 var(--ant-color-text-tertiary);
+            }
+          }
+
+          // 侧边栏顶部图标
+          &::before {
+            content: '';
+            width: 6px;  // 从8px压缩到6px
+            height: 6px;  // 从8px压缩到6px
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 1.5px;  // 从2px压缩到1.5px
+            flex-shrink: 0;
+          }
+
+          // 侧边栏菜单项
+          &::after {
+            content: '';
+            width: 8px;  // 从10px压缩到8px
+            height: 1.5px;  // 从2px压缩到1.5px
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 1px;
+            box-shadow: 
+              0 3px 0 rgba(255, 255, 255, 0.9),  // 从4px压缩到3px
+              0 6px 0 rgba(255, 255, 255, 0.9),   // 从8px压缩到6px
+              0 9px 0 rgba(255, 255, 255, 0.9);   // 从12px压缩到9px
+          }
+
+          &.thin {
+            width: 6px;  // 从7px压缩到6px
+
+            &::before,
+            &::after {
+              left: 1px;
+              right: 1px;
+            }
+
+            // 灰色细侧边栏不显示顶部图标
+            &.gray::before {
+              display: none;
+            }
+          }
+        }
+
+        .main-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          .header-bar {
+            height: 8px;  // 从10px压缩到8px
+            background: var(--ant-color-primary);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2px;
+
+            // 灰色顶栏
+            &.gray {
+              background: var(--ant-color-fill);
+              border: 1px solid var(--ant-color-border);
+
+              &::before {
+                background: var(--ant-color-text-secondary);
+                box-shadow: 
+                  6px 0 0 var(--ant-color-text-secondary),
+                  12px 0 0 var(--ant-color-text-secondary);
+              }
+            }
+
+            // 窗口控制按钮
+            &::before {
+              content: '';
+              width: 2.5px;  // 从3px压缩到2.5px
+              height: 2.5px;  // 从3px压缩到2.5px
+              background: rgba(255, 255, 255, 0.9);
+              border-radius: 50%;
+              box-shadow: 
+                4px 0 0 rgba(255, 255, 255, 0.9),   // 从5px压缩到4px
+                8px 0 0 rgba(255, 255, 255, 0.9);   // 从10px压缩到8px
+              flex-shrink: 0;
+            }
+
+            &.full-width {
+              width: 100%;
+              position: relative;
+              top: auto;
+              left: auto;
+            }
+
+            .menu-item {
+              display: inline-block;
+              width: 6px;  // 从8px压缩到6px
+              height: 2.5px;  // 从3px压缩到2.5px
+              background: rgba(255, 255, 255, 0.8);
+              border-radius: 1px;
+              margin-right: 2px;  // 从3px压缩到2px
+
+              &:last-child {
+                margin-right: 0;
+              }
+            }
+          }
+
+          .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;  // 从3px压缩到2px
+            padding: 0;
+
+            &.full-width {
+              width: 100%;
+            }
+
+            // 第一行：两个并排的方块
+            .block-row {
+              flex: 1;
+              display: flex;
+              gap: 2px;  // 从3px压缩到2px
+
+              .block {
+                flex: 1;
+                background: var(--ant-color-fill);
+                border-radius: 1.5px;  // 从2px压缩到1.5px
+              }
+            }
+
+            // 第二行：一个大的长条方块
+            .block:nth-child(2) {
+              flex: 1.2;
+              background: var(--ant-color-fill);
+              border-radius: 1.5px;  // 从2px压缩到1.5px
+            }
+          }
+        }
+
+        // 双列菜单布局
+        &.sidebar-mixed-nav {
+          gap: 2px;  // 从3px压缩到2px
+
+          .sidebar.primary {
+            // 主侧边栏
+          }
+          
+          .sidebar.gray {
+            // 次级灰色侧边栏
+            &::before {
+              background: var(--ant-color-text-secondary);
+              box-shadow: none;
+            }
+            
+            &::after {
+              background: var(--ant-color-text-tertiary);
+              box-shadow: 
+                0 5px 0 var(--ant-color-text-tertiary), 
+                0 10px 0 var(--ant-color-text-tertiary),
+                0 15px 0 var(--ant-color-text-tertiary);
+            }
+          }
+        }
+
+        // 水平布局
+        &.header-nav {
+          flex-direction: column;
+          gap: 0;
+
+          .content-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;  // 从3px压缩到2px
+          }
+
+          .header-bar {
+            width: 100%;
+            // 确保是蓝色（主题色）
+            background: var(--ant-color-primary);
+            display: flex;
+            align-items: center;
+            padding: 0 2px;  // 从3px压缩到2px
+            gap: 2px;  // 从3px压缩到2px
+
+            // 窗口控制按钮保持白色
+            &::before {
+              background: rgba(255, 255, 255, 0.9);
+              box-shadow: 
+                5px 0 0 rgba(255, 255, 255, 0.9),   // 从6px压缩到5px
+                10px 0 0 rgba(255, 255, 255, 0.9);   // 从12px压缩到10px
+            }
+
+            .menu-item {
+              display: inline-block;
+              width: 8px;  // 从10px压缩到8px
+              height: 3px;  // 从4px压缩到3px
+              background: rgba(255, 255, 255, 0.8);
+              border-radius: 1px;
+            }
+          }
+
+          .content-area {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;  // 从3px压缩到2px
+            padding: 0;
+
+            // 第一行：两个并排的方块
+            .block-row {
+              flex: 1;
+              display: flex;
+              gap: 2px;  // 从3px压缩到2px
+
+              .block {
+                flex: 1;
+                background: var(--ant-color-fill);
+                border-radius: 1.5px;  // 从2px压缩到1.5px
+              }
+            }
+
+            // 第二行：一个大的长条方块
+            .block:nth-child(2) {
+              flex: 1.2;
+              background: var(--ant-color-fill);
+              border-radius: 1.5px;  // 从2px压缩到1.5px
+            }
+          }
+        }
+
+        // 混合菜单
+        &.mixed-nav {
+          .content-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+          }
+
+          .header-bar {
+            width: 100%;
+            // 蓝色顶栏
+            background: var(--ant-color-primary);
+            display: flex;
+            align-items: center;
+            padding: 0 3px;  // 从4px压缩到3px
+            gap: 3px;  // 从4px压缩到3px
+
+            &::before {
+              background: rgba(255, 255, 255, 0.9);
+              box-shadow: 
+                5px 0 0 rgba(255, 255, 255, 0.9),   // 从6px压缩到5px
+                10px 0 0 rgba(255, 255, 255, 0.9);   // 从12px压缩到10px
+            }
+
+            .menu-item {
+              display: inline-block;
+              width: 8px;  // 从10px压缩到8px
+              height: 3px;  // 从4px压缩到3px
+              background: rgba(255, 255, 255, 0.8);
+              border-radius: 1px;
+            }
+          }
+
+          .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            gap: 2px;  // 从3px压缩到2px
+
+            .content-area {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              gap: 2px;  // 从4px压缩到2px
+              padding: 0;
+
+              // 第一行：两个并排的方块
+              .block-row {
+                flex: 1;
+                display: flex;
+                gap: 2px;  // 从4px压缩到2px
+
+                .block {
+                  flex: 1;
+                  background: var(--ant-color-fill);
+                  border-radius: 1.5px;  // 从3px压缩到1.5px
+                }
+              }
+
+              // 第二行：一个大的长条方块
+              .block:nth-child(2) {
+                flex: 1.2;
+                background: var(--ant-color-fill);
+                border-radius: 1.5px;  // 从3px压缩到1.5px
+              }
+            }
+          }
+
+          .sidebar {
+            &.thin {
+              width: 6px;  // 从8px压缩到6px
+              
+              &::before {
+                display: none;  // 灰色细侧边栏不显示顶部图标
+              }
+              
+              &::after {
+                background: var(--ant-color-text-tertiary);
+                box-shadow: 
+                  0 5px 0 var(--ant-color-text-tertiary), 
+                  0 10px 0 var(--ant-color-text-tertiary),
+                  0 15px 0 var(--ant-color-text-tertiary);
+              }
+            }
+            
+            &.gray {
+              background: var(--ant-color-fill);
+              border: 1px solid var(--ant-color-border);
+            }
+          }
+        }
+
+        // 内容全屏
+        &.full-content {
+          .content-area {
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;  // 从4px压缩到2px
+
+            // 第一行：两个并排的方块
+            .block-row {
+              flex: 1;
+              display: flex;
+              gap: 2px;  // 从4px压缩到2px
+
+              .block {
+                flex: 1;
+                background: var(--ant-color-fill);
+                border-radius: 1.5px;  // 从3px压缩到1.5px
+              }
+            }
+
+            // 第二行：一个大的长条方块
+            .block:nth-child(2) {
+              flex: 1.2;
+              background: var(--ant-color-fill);
+              border-radius: 1.5px;  // 从3px压缩到1.5px
+            }
+          }
+        }
       }
     }
 
     .layout-label {
       display: flex;
       align-items: center;
-      gap: 4px;
-      font-size: 13px;
+      gap: 2px;  // 从3px压缩到2px
+      font-size: 11px;  // 从12px压缩到11px
       font-weight: 400;
       color: var(--ant-text-color-secondary);
 
       .help-icon {
-        font-size: 13px;
+        font-size: 11px;  // 从12px压缩到11px
         color: var(--ant-text-color-tertiary);
         cursor: help;
       }
@@ -107,57 +514,126 @@
   .content-compact-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 8px;  // 从12px压缩到8px
   }
 
   .content-compact-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    padding: 16px 12px;
+    gap: 6px;  // 从8px压缩到6px
+    padding: 8px 6px;  // 从12px 10px压缩到8px 6px
     border: 1px solid var(--ant-border-color);
-    border-radius: 8px;
+    border-radius: 4px;  // 从6px压缩到4px
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent;
 
     &:hover {
       border-color: var(--ant-color-primary);
+      background: var(--ant-color-primary-bg);
+      transform: translateY(-1px);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);  // 从0 2px 8px压缩到0 1px 4px
+
+      span {
+        color: var(--ant-color-primary);
+        font-weight: 500;
+      }
     }
 
     &.active {
-      border-color: var(--ant-color-primary);
-      border-width: 2px;
+      border: 1px solid var(--ant-color-primary);  // 从2px改为1px
+      background: transparent;
+
+      span {
+        color: var(--ant-color-primary);
+        font-weight: 500;
+      }
     }
 
     .content-preview {
-      width: 90px;
-      height: 68px;
+      width: 95px;  // 从110px压缩到95px
+      height: 65px;  // 从75px压缩到65px
       background: var(--ant-color-fill-secondary);
-      border-radius: 6px;
+      border-radius: 4px;  // 从5px压缩到4px
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 2px;  // 从3px压缩到2px
+      position: relative;
+      overflow: hidden;
+
+      // 顶部导航条
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 8px;  // 从10px压缩到8px
+        background: var(--ant-color-primary);
+        border-radius: 4px 4px 0 0;  // 从5px压缩到4px
+
+        // 窗口控制按钮
+        &::after {
+          content: '';
+          position: absolute;
+          right: 5px;  // 从6px压缩到5px
+          top: 3px;  // 从4px压缩到3px
+          width: 3px;  // 从4px压缩到3px
+          height: 3px;  // 从4px压缩到3px
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 50%;
+          box-shadow: 
+            -5px 0 0 rgba(255, 255, 255, 0.9),   // 从6px压缩到5px
+            -10px 0 0 rgba(255, 255, 255, 0.9);   // 从12px压缩到10px
+        }
+      }
 
       .preview-bar {
-        height: 100%;
-        border-radius: 4px;
-        background: var(--ant-color-primary);
+        margin-top: 12px;  // 从14px压缩到12px
+        height: calc(100% - 16px);  // 从18px调整到16px
+        border-radius: 2px;  // 从3px压缩到2px
+        background: var(--ant-color-fill);
+        display: flex;
+        flex-direction: column;
+        gap: 2px;  // 从3px压缩到2px
+        padding: 2px;  // 从3px压缩到2px
 
         &.narrow {
-          width: 60%;
+          width: 70%;
+          margin-left: auto;
+          margin-right: auto;
+
+          // 内容区域
+          &::before {
+            content: '';
+            flex: 1;
+            background: var(--ant-color-bg-container);
+            border-radius: 1.5px;  // 从2px压缩到1.5px
+            box-shadow: 
+              0 0 0 1px var(--ant-color-border);
+          }
         }
 
         &.wide {
           width: 100%;
+
+          // 内容区域
+          &::before {
+            content: '';
+            flex: 1;
+            background: var(--ant-color-bg-container);
+            border-radius: 1.5px;  // 从2px压缩到1.5px
+            box-shadow: 
+              0 0 0 1px var(--ant-color-border);
+          }
         }
       }
     }
 
     span {
-      font-size: 13px;
+      font-size: 11px;  // 从12px压缩到11px
       font-weight: 400;
       color: var(--ant-text-color-secondary);
     }

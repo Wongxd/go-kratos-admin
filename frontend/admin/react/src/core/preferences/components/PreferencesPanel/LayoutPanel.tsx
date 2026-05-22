@@ -70,7 +70,90 @@ export const LayoutPanel: React.FC = () => {
               onClick={() => handleLayoutChange(option.value as LayoutType)}
             >
               <div className="layout-preview">
-                <div className="layout-icon">{option.icon}</div>
+                {/* 渲染真实的布局示意图 */}
+                {option.value === 'sidebar-nav' && (
+                  <div className="layout-visual sidebar-nav">
+                    <div className="sidebar" />
+                    <div className="main-content">
+                      <div className="header-bar gray" />
+                      <div className="content-area">
+                        <div className="block-row">
+                          <div className="block" />
+                          <div className="block" />
+                        </div>
+                        <div className="block" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {option.value === 'sidebar-mixed-nav' && (
+                  <div className="layout-visual sidebar-mixed-nav">
+                    <div className="sidebar thin primary" />
+                    <div className="sidebar thin gray" />
+                    <div className="main-content">
+                      <div className="header-bar gray" />
+                      <div className="content-area">
+                        <div className="block-row">
+                          <div className="block" />
+                          <div className="block" />
+                        </div>
+                        <div className="block" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {option.value === 'header-nav' && (
+                  <div className="layout-visual header-nav">
+                    <div className="content-wrapper">
+                      <div className="header-bar full-width">
+                        <div className="menu-item" />
+                        <div className="menu-item" />
+                        <div className="menu-item" />
+                        <div className="menu-item" />
+                        <div className="menu-item" />
+                      </div>
+                      <div className="content-area">
+                        <div className="block-row">
+                          <div className="block" />
+                          <div className="block" />
+                        </div>
+                        <div className="block" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {option.value === 'mixed-nav' && (
+                  <div className="layout-visual mixed-nav">
+                    <div className="content-wrapper">
+                      <div className="header-bar full-width">
+                        <div className="menu-item" />
+                        <div className="menu-item" />
+                        <div className="menu-item" />
+                      </div>
+                      <div className="main-content">
+                        <div className="sidebar thin gray" />
+                        <div className="content-area">
+                          <div className="block-row">
+                            <div className="block" />
+                            <div className="block" />
+                          </div>
+                          <div className="block" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {option.value === 'full-content' && (
+                  <div className="layout-visual full-content">
+                    <div className="content-area full-width">
+                      <div className="block-row">
+                        <div className="block" />
+                        <div className="block" />
+                      </div>
+                      <div className="block" />
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="layout-label">
                 <span>{option.label}</span>
@@ -127,7 +210,7 @@ export const LayoutPanel: React.FC = () => {
         </div>
         <div className="preference-item width-control">
           <span>宽度</span>
-          <Space>
+          <Space size={4}>
             <Button
               size="small"
               icon={<MinusOutlined/>}
@@ -139,7 +222,7 @@ export const LayoutPanel: React.FC = () => {
               max={320}
               value={preferences.sidebar.width}
               onChange={handleSidebarWidthChange}
-              style={{width: 80}}
+              style={{width: 70}}  // 从80压缩到70
             />
             <Button
               size="small"
