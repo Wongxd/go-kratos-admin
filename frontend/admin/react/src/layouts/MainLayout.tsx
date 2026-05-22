@@ -1,10 +1,10 @@
-import {useState} from 'react';
 import {Outlet, useNavigate, useLocation} from 'react-router-dom';
 import {ProLayout} from '@ant-design/pro-components';
 import {ConfigProvider, theme} from 'antd';
+import {useMemo} from 'react';
 
 import {useUserStore, useAuthStore} from '@/stores';
-import {defaultSettings} from '@/config/settings';
+import {usePreferences} from '@/core/preferences';
 import {staticRoutes} from '@/router/config/static';
 import {transformRoutesToMenu} from "@/core/router/utils/menu.ts";
 
@@ -13,30 +13,39 @@ const MainLayout = () => {
     const location = useLocation();
     const {userInfo, userRoles} = useUserStore();
     const {logout} = useAuthStore();
-    const [collapsed, setCollapsed] = useState(false);
+    const {sidebar, app, logo, isDark} = usePreferences();
 
-    // 转换静态路由为菜单数据（这里简单使用 userRoles 作为权限过滤依据）
-    const menuData = transformRoutesToMenu(staticRoutes, userRoles);
+    // 根据偏好设置计算 Ant Design 主题算法
+    const algorithm = useMemo(() => {
+        return isDark ? theme.darkAlgorithm : theme.defaultAlgorithm;
+    }, [isDark]);
+
+    // 转换静态路由为菜单数据
+    const menuData = useMemo(() => {
+        return transformRoutesToMenu(staticRoutes, userRoles);
+    }, [userRoles]);
 
     return (
         <ConfigProvider
             theme={{
-                algorithm: theme.defaultAlgorithm,
+                algorithm,
                 token: {
-                    colorPrimary: defaultSettings.colorPrimary,
-                    borderRadius: defaultSettings.borderRadius,
+                    colorPrimary: '#1677ff',
+                    borderRadius: 6,
                 },
             }}
         >
             <ProLayout
-                title="Go Admin"
-                logo="/logo.svg"
-                layout={defaultSettings.layout}
-                contentWidth={defaultSettings.contentWidth}
-                fixedHeader={defaultSettings.fixedHeader}
-                fixSiderbar={defaultSettings.fixSiderbar}
-                collapsed={collapsed}
-                onCollapse={setCollapsed}
+                title={app.name}
+                logo={logo.enable ? logo.source : false}
+                layout="side"
+                contentWidth="Fluid"
+                fixedHeader={true}
+                fixSiderbar={true}
+                collapsed={sidebar.collapsed}
+                onCollapse={(collapsed) => {
+                    // 可以通过 updatePreferences 更新侧边栏状态
+                }}
                 location={location}
                 route={{routes: menuData}}
                 menuItemRender={(item, dom) => (
@@ -49,7 +58,7 @@ const MainLayout = () => {
                     </div>
                 )}
                 avatarProps={{
-                    src: userInfo?.avatar,
+                    src: userInfo?.avatar || app.defaultAvatar,
                     title: userInfo?.username,
                     size: 'small',
                     render: (_props, dom) => {

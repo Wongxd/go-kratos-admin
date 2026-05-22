@@ -15,5 +15,15 @@
     "comingSoon": "Coming Soon",
     "offlineError": "Offline",
     "offlineErrorDesc": "Network connection has been lost. Please check your network settings."
+  },
+  "requestError": {
+    "networkError": "Network connection error, please check your network settings and try again",
+    "timeout": "Request timeout, please check your network connection and try again",
+    "badRequest": "Bad request",
+    "unauthorized": "Unauthorized, please login",
+    "forbidden": "Insufficient permissions",
+    "notFound": "The requested resource does not exist",
+    "requestTimeout": "Request timeout",
+    "internalServerError": "Internal server error, please try again later"
   }
 }

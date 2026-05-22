@@ -29,16 +29,13 @@ const Login: React.FC = () => {
                 },
             );
 
-            message.success('登录成功');
-
             // 等待一小段时间确保 localStorage 写入完成，然后跳转
             setTimeout(() => {
                 const urlParams = new URL(window.location.href).searchParams;
                 window.location.href = urlParams.get('redirect') || '/';
             }, 300);
         } catch (error: any) {
-            // 错误已在 store 中处理
-            message.error(error?.message || '登录失败');
+            // 错误已在 store 中处理，这里不需要再次弹出 message
         }
     };
 

@@ -1,4 +1,5 @@
 import {message} from 'antd';
+import i18next from 'i18next';
 
 import {
     authenticateResponseInterceptor,
@@ -89,24 +90,28 @@ export function createRequestClient(baseURL: string) {
         }),
     );
 
-    // 错误消息映射
-    const errorMessages: Record<string, string> = {
-        'network.error': '网络连接错误,请检查网络设置后重试',
-        'error.timeout': '请求超时,请检查网络连接后重试',
-        'error.badRequest': '请求参数错误',
-        'error.unauthorized': '未授权,请登录',
-        'error.forbidden': '权限不足',
-        'error.notFound': '请求的资源不存在',
-        'error.requestTimeout': '请求超时',
-        'error.internalServerError': '服务器内部错误,请稍后重试',
+    // 错误消息 i18n 映射（使用 common 命名空间下的 requestError）
+    const errorKeyMap: Record<string, string> = {
+        'network.error': 'common:requestError.networkError',
+        'error.timeout': 'common:requestError.timeout',
+        'error.badRequest': 'common:requestError.badRequest',
+        'error.unauthorized': 'common:requestError.unauthorized',
+        'error.forbidden': 'common:requestError.forbidden',
+        'error.notFound': 'common:requestError.notFound',
+        'error.requestTimeout': 'common:requestError.requestTimeout',
+        'error.internalServerError': 'common:requestError.internalServerError',
     };
 
-    // 通用的错误处理,如果没有进入上面的错误处理逻辑,就会进入这里
+    // 通用的错误处理
     client.addResponseInterceptor(
-        errorMessageResponseInterceptor((msg: string) => {
-            // 使用映射表获取错误消息,如果没有则使用原始消息
-            const errorMessage = errorMessages[msg] || msg;
-            message.error(errorMessage);
+        errorMessageResponseInterceptor((msg: string, error?: unknown) => {
+            // 使用 i18n 映射表获取翻译后的错误消息
+            const i18nKey = errorKeyMap[msg] || `common:requestError.${msg}`;
+            const errorMessage = i18next.exists(i18nKey)
+                ? i18next.t(i18nKey)
+                : msg;
+            // 使用 key 防止重复弹出相同类型的错误消息
+            message.error({content: errorMessage, key: msg});
         }),
     );
 

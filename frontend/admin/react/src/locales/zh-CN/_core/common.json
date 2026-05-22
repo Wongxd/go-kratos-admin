@@ -15,5 +15,15 @@
     "comingSoon": "即将推出",
     "offlineError": "网络离线",
     "offlineErrorDesc": "网络连接已断开，请检查您的网络设置。"
+  },
+  "requestError": {
+    "networkError": "网络连接错误,请检查网络设置后重试",
+    "timeout": "请求超时,请检查网络连接后重试",
+    "badRequest": "请求参数错误",
+    "unauthorized": "未授权,请登录",
+    "forbidden": "权限不足",
+    "notFound": "请求的资源不存在",
+    "requestTimeout": "请求超时",
+    "internalServerError": "服务器内部错误,请稍后重试"
   }
 }

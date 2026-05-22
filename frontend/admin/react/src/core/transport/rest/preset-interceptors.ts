@@ -79,7 +79,6 @@ export const errorMessageResponseInterceptor = (
 
             const err = String(error ?? '');
             let errMsg = '';
-            // TODO: 需要集成 i18n 翻译
             if (err?.includes('Network Error')) {
                 errMsg = 'network.error';
             } else if (error && typeof error === 'object' && 'message' in error && String(error.message).includes('timeout')) {
@@ -101,8 +100,8 @@ export const errorMessageResponseInterceptor = (
                     break;
                 }
                 case 401: {
-                    errorMessage = 'error.unauthorized';
-                    break;
+                    // 401 已由 authenticateResponseInterceptor 处理（重新认证），不再重复弹 message
+                    return Promise.reject(error);
                 }
                 case 403: {
                     errorMessage = 'error.forbidden';
