@@ -72,6 +72,7 @@
     "unpin": "取消固定",
     "pin": "固定",
     "maximize": "最大化",
+    "exitMaximize": "退出最大化",
     "reload": "重新加载",
     "openInNewWindow": "在新窗口打开",
     "closeLeft": "关闭左侧标签页",

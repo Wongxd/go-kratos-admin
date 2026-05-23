@@ -72,6 +72,7 @@
     "unpin": "Unpin",
     "pin": "Pin",
     "maximize": "Maximize",
+    "exitMaximize": "Exit Maximize",
     "reload": "Reload",
     "openInNewWindow": "Open in new window",
     "closeLeft": "Close tabs to the left",
