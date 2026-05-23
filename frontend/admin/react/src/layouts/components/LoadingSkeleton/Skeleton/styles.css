@@ -1,4 +1,4 @@
-/* 🔹 基础骨架块 */
+/*  基础骨架块 */
 .skeleton-block {
     position: relative;
     overflow: hidden;
@@ -11,14 +11,14 @@
     border-radius: 50% !important;
 }
 
-/* 🔹 容器布局 */
+/*  容器布局 */
 .skeleton-container {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-/* 🔹 动画：波浪效果（默认） */
+/*  动画：波浪效果（默认） */
 @keyframes skeleton-wave {
     0% {
         background-position: -200% 0;
@@ -45,7 +45,7 @@
     pointer-events: none;
 }
 
-/* 🔹 动画：脉冲效果 */
+/*  动画：脉冲效果 */
 @keyframes skeleton-pulse {
     0%, 100% {
         opacity: 0.6;
@@ -59,7 +59,7 @@
     animation: skeleton-pulse 1.2s ease-in-out infinite;
 }
 
-/* 🔹 暗黑模式适配 */
+/*  暗黑模式适配 */
 .dark .animate-wave::after {
     background: linear-gradient(
             90deg,
@@ -69,7 +69,7 @@
     );
 }
 
-/* 🔹 减少动画（用户偏好） */
+/*  减少动画（用户偏好） */
 @media (prefers-reduced-motion: reduce) {
     .animate-wave::after,
     .animate-pulse {
@@ -77,7 +77,7 @@
     }
 }
 
-/* 🔹 段落预设优化 */
+/*  段落预设优化 */
 .skeleton-paragraph {
     display: flex;
     flex-direction: column;
@@ -92,14 +92,14 @@
     width: 60% !important;
 }
 
-/* 🔹 行内骨架优化 */
+/*  行内骨架优化 */
 .skeleton-inline {
     display: inline-flex;
     align-items: center;
     gap: 8px;
 }
 
-/* 🔹 响应式适配 */
+/*  响应式适配 */
 @media (max-width: 768px) {
     .skeleton-container {
         gap: 6px;

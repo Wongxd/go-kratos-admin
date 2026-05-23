@@ -14,7 +14,7 @@ import { useMenuData } from './hooks/useMenuData';
 import { useLayoutState } from './hooks/useLayoutState';
 
 // Stores & Preferences
-import { useUserStore, useAuthStore } from '@/stores';
+import { useUserStore, useAuthStore, usePageRefreshStore } from '@/stores';
 import { usePreferencesStore } from '@/core/preferences/store';
 import { useThemeConfig } from '@/core/preferences/hooks/useThemeConfig';
 import { PreferencesPanel } from '@/core/preferences/components';
@@ -97,12 +97,8 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
   // 设置面板
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  // 刷新 key（用于强制重渲染内容区）
-  const [, setRefreshKey] = useState(0);
-
-  const handleRefresh = useCallback(() => {
-    setRefreshKey((k) => k + 1);
-  }, []);
+  // 页面刷新
+  const triggerPageRefresh = usePageRefreshStore((state) => state.triggerRefresh);
 
   // 窗口大小监听
   useEffect(() => {
@@ -138,7 +134,7 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
         collapsed={collapsed}
         isFullscreen={isFullscreen}
         onToggleCollapse={() => setCollapsed(!collapsed)}
-        onRefresh={handleRefresh}
+        onRefresh={triggerPageRefresh}
         onToggleFullscreen={() => {
           if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
@@ -154,7 +150,7 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
         onOpenSettings={() => setSettingsOpen(true)}
       />
     );
-  }, [userInfo, collapsed, isFullscreen, logout, isDark, setPreferences, handleRefresh]);
+  }, [userInfo, collapsed, isFullscreen, logout, isDark, setPreferences, triggerPageRefresh]);
 
   // 主题切换
   useCallback(() => {

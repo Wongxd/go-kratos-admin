@@ -1,8 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { PageContainer as ProPageContainer } from '@ant-design/pro-components';
-import { Skeleton, Alert } from 'antd';
+import { Skeleton, Alert, Button, Space } from 'antd';
+import { ReloadOutlined, FullscreenOutlined, FullscreenExitOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/stores/user';
 import { useI18n } from '@/core/i18n';
+import { usePageRefreshStore } from '@/stores/pageRefresh';
 import { useBreadcrumb } from './hooks/useBreadcrumb';
 import { usePageTitle } from './hooks/usePageTitle';
 import { checkPagePermission } from './utils/permission';
@@ -32,14 +35,61 @@ export const PageContainer = ({
   contentPadding = true,
   contentClassName,
   keepAlive,
-  pageKey,
+  pageKey: customPageKey,
+  showRefresh,
+  onRefresh,
+  showFullscreen,
   render,
   ...restProps
 }: PageContainerProps) => {
+  const location = useLocation();
+  
   // 用户权限（从 userInfo 中获取 permissions）
   const { userInfo } = useUserStore();
   const userPermissions = userInfo?.permissions || [];
   const { t } = useI18n('common');
+
+  // 全屏状态
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // 刷新加载状态
+  const [refreshing, setRefreshing] = useState(false);
+
+  // 页面刷新管理
+  const { setRefreshCallback, removeRefreshCallback } = usePageRefreshStore();
+
+  // 生成页面唯一 key
+  const pageKey = useMemo(() => {
+    return customPageKey || location.pathname;
+  }, [customPageKey, location.pathname]);
+
+  // 注册/移除刷新回调
+  useEffect(() => {
+    if (onRefresh) {
+      setRefreshCallback(pageKey, onRefresh);
+    }
+    
+    return () => {
+      removeRefreshCallback(pageKey);
+    };
+  }, [pageKey, onRefresh, setRefreshCallback, removeRefreshCallback]);
+
+  // 处理刷新（用于 PageContainer 内部的刷新按钮）
+  const handleRefresh = useCallback(async () => {
+    if (!onRefresh) return;
+    
+    setRefreshing(true);
+    try {
+      await onRefresh();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [onRefresh]);
+
+  // 切换全屏
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen(prev => !prev);
+  }, []);
 
   // 计算面包屑
   const breadcrumb = useBreadcrumb({
@@ -61,7 +111,53 @@ export const PageContainer = ({
     return checkPagePermission(permission, userPermissions);
   }, [permission, userPermissions]);
 
-  // 渲染 fallback（无权限时）
+  // 操作按钮
+  const actionButtons = useMemo(() => {
+    const buttons = [];
+
+    if (showRefresh) {
+      buttons.push(
+        <Button
+          key="refresh"
+          type="text"
+          icon={<ReloadOutlined spin={refreshing} />}
+          onClick={handleRefresh}
+          loading={refreshing}
+        />
+      );
+    }
+
+    if (showFullscreen) {
+      buttons.push(
+        <Button
+          key="fullscreen"
+          type="text"
+          icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+          onClick={toggleFullscreen}
+        />
+      );
+    }
+
+    return buttons.length > 0 ? buttons : undefined;
+  }, [showRefresh, showFullscreen, refreshing, isFullscreen, handleRefresh, toggleFullscreen]);
+
+  // 全屏样式
+  const fullscreenStyles = isFullscreen
+    ? {
+        position: 'fixed' as const,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999,
+        background: 'inherit',
+        overflow: 'auto' as const,
+      }
+    : undefined;
+
+  // 全屏时隐藏面包屑和标题
+  const effectiveBreadcrumb = isFullscreen ? false : breadcrumb;
+  const effectiveHeader = isFullscreen ? false : header;
   const renderForbidden = useMemo(() => {
     if (forbiddenFallback) return forbiddenFallback;
 
@@ -102,13 +198,15 @@ export const PageContainer = ({
     return (
       <ProPageContainer
         ghost={ghost}
-        header={header === false ? undefined : (header as any)}
-        title={header === false ? undefined : pageTitle}
+        header={effectiveHeader === false ? undefined : (effectiveHeader as any)}
+        title={effectiveHeader === false ? undefined : pageTitle}
         breadcrumb={
-          breadcrumb === false
+          effectiveBreadcrumb === false
             ? undefined
-            : (breadcrumb as any)
+            : (effectiveBreadcrumb as any)
         }
+        extra={actionButtons ? <Space>{actionButtons}</Space> : extra}
+        style={fullscreenStyles}
         {...restProps}
       >
         {renderForbidden}
@@ -121,13 +219,15 @@ export const PageContainer = ({
     return (
       <ProPageContainer
         ghost={ghost}
-        header={header === false ? undefined : (header as any)}
-        title={header === false ? undefined : pageTitle}
+        header={effectiveHeader === false ? undefined : (effectiveHeader as any)}
+        title={effectiveHeader === false ? undefined : pageTitle}
         breadcrumb={
-          breadcrumb === false
+          effectiveBreadcrumb === false
             ? undefined
-            : (breadcrumb as any)
+            : (effectiveBreadcrumb as any)
         }
+        extra={actionButtons ? <Space>{actionButtons}</Space> : extra}
+        style={fullscreenStyles}
         {...restProps}
       >
         {renderLoading}
@@ -139,21 +239,22 @@ export const PageContainer = ({
   return (
     <ProPageContainer
       ghost={ghost}
-      header={header === false ? undefined : (header as any)}
-      title={header === false ? undefined : pageTitle}
+      header={effectiveHeader === false ? undefined : (effectiveHeader as any)}
+      title={effectiveHeader === false ? undefined : pageTitle}
       breadcrumb={
-        breadcrumb === false
+        effectiveBreadcrumb === false
           ? undefined
-          : (breadcrumb as any)
+          : (effectiveBreadcrumb as any)
       }
-      extra={extra}
+      extra={actionButtons ? <Space>{actionButtons}</Space> : extra}
       footer={footer}
+      style={fullscreenStyles}
       {...restProps}
     >
       {/* 内容区域增强 */}
       <div
         className={`
-          ${contentPadding ? 'p-4 md:p-6' : ''}
+          ${isFullscreen ? '' : contentPadding ? 'p-4 md:p-6' : ''}
           ${contentClassName || ''}
         `.trim()}
         data-page-key={pageKey}

@@ -121,6 +121,7 @@ declare global {
   const useOptimistic: typeof import('react').useOptimistic
   const useOutlet: typeof import('react-router-dom').useOutlet
   const useOutletContext: typeof import('react-router-dom').useOutletContext
+  const usePageRefreshStore: typeof import('../src/stores/pageRefresh').usePageRefreshStore
   const useParams: typeof import('react-router-dom').useParams
   const useReducer: typeof import('react').useReducer
   const useRef: typeof import('react').useRef
