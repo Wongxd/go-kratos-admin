@@ -226,9 +226,7 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
                   title: matches.at(-1)?.handle?.title || '',
                 },
               }}
-              header={{
-                breadcrumb: undefined,
-              }}
+              header={false}
               contentPadding={false}
               style={{
                 padding: '0',
