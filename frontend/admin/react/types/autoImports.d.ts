@@ -132,6 +132,7 @@ declare global {
   const useSingleTab: typeof import('../src/hooks/useSingleTab').useSingleTab
   const useState: typeof import('react').useState
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
+  const useTabsStore: typeof import('../src/stores/tabs').useTabsStore
   const useTimes: typeof import('../src/hooks/useTime').useTimes
   const useTitle: typeof import('../src/hooks/useTitle').useTitle
   const useToken: typeof import('../src/hooks/useToken').useToken
@@ -144,6 +145,6 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { ThemeLoadingProps, TokenPayload, AuthState, UserState, AuthLayoutProps, BusinessComponents, RangeValue, SearchModalProps, Langs, ApiFn, ApiSelectProps, ApiTreeSelectProps, ApiPageSelectProps, CheckboxList, InitTableState, TableAction, ECOption, FC } from './autoImports.d'
+  export type { TabItem, ThemeLoadingProps, TokenPayload, AuthState, UserState, AuthLayoutProps, BusinessComponents, RangeValue, SearchModalProps, Langs, ApiFn, ApiSelectProps, ApiTreeSelectProps, ApiPageSelectProps, CheckboxList, InitTableState, TableAction, ECOption, FC } from './autoImports.d'
   import('./autoImports.d')
 }
