@@ -118,6 +118,56 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
     return [location.pathname];
   }, [location.pathname]);
 
+  // 根据当前路径和菜单数据计算应该展开的菜单项
+  useEffect(() => {
+    const calculateOpenKeys = (
+      menuItems: any[],
+      targetPath: string,
+      parentKeys: string[] = [],
+      parentPath: string = '',
+    ): string[] => {
+      for (const item of menuItems) {
+        // 处理相对路径：拼接父路径
+        const itemPath = item.path?.startsWith('/')
+          ? item.path
+          : `${parentPath}/${item.path}`.replace(/\/+/g, '/');
+        const itemKey = item.key || itemPath;
+
+        // 如果当前项就是目标路径，返回所有父级 key
+        if (itemPath === targetPath || itemKey === targetPath) {
+          return parentKeys;
+        }
+        // 如果有子菜单，递归查找
+        if (item.children && item.children.length > 0) {
+          const found = calculateOpenKeys(
+            item.children,
+            targetPath,
+            [...parentKeys, itemPath],
+            itemPath,
+          );
+          if (found.length > 0) {
+            return found;
+          }
+          // 如果子项中直接匹配到目标路径，也要展开当前项
+          if (
+            item.children.some((child: any) => {
+              const childPath = child.path?.startsWith('/')
+                ? child.path
+                : `${itemPath}/${child.path}`.replace(/\/+/g, '/');
+              return childPath === targetPath || child.key === targetPath;
+            })
+          ) {
+            return [...parentKeys, itemPath];
+          }
+        }
+      }
+      return [];
+    };
+
+    const openKeys = calculateOpenKeys(menuData, location.pathname);
+    setOpenKeys(openKeys);
+  }, [location.pathname, menuData, setOpenKeys]);
+
   // 顶栏右侧
   const headerContentRender = useCallback(() => {
     const toggleTheme = () => {
