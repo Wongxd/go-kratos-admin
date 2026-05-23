@@ -37,6 +37,7 @@ export const Index = () => {
   const matches = useMatches();
   const preferences = usePreferencesStore((state) => state.preferences);
   const tabbarConfig = preferences.tabbar;
+  const widgetConfig = preferences.widget;
 
   // 计算实际的暗色模式（支持 auto 模式）
   const [isDark, setIsDark] = useState(() => {
@@ -592,7 +593,7 @@ export const Index = () => {
         )}
 
         {/* 最大化按钮 */}
-        {tabbarConfig.showMaximize && (
+        {tabbarConfig.showMaximize && widgetConfig.fullscreen && (
           <Button
             type="text"
             size="small"

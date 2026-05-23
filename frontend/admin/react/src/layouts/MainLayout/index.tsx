@@ -215,9 +215,18 @@ export const MainLayout = ({ routes: dynamicRoutes }: MainLayoutProps) => {
         isDark={isDark}
         onToggleTheme={toggleTheme}
         onOpenSettings={() => setSettingsOpen(true)}
+        widgetConfig={{
+          fullscreen: preferences.widget.fullscreen,
+          globalSearch: preferences.widget.globalSearch,
+          languageToggle: preferences.widget.languageToggle,
+          notification: preferences.widget.notification,
+          themeToggle: preferences.widget.themeToggle,
+          refresh: preferences.widget.refresh,
+          sidebarToggle: preferences.widget.sidebarToggle,
+        }}
       />
     );
-  }, [userInfo, sidebarHidden, isFullscreen, logout, isDark, setPreferences, triggerPageRefresh]);
+  }, [userInfo, sidebarHidden, isFullscreen, logout, isDark, setPreferences, triggerPageRefresh, preferences.widget]);
 
   // 主题切换
   useCallback(() => {

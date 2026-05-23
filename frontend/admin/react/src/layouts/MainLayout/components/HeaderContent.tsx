@@ -32,6 +32,15 @@ interface HeaderContentProps {
   isDark: boolean;
   onToggleTheme: () => void;
   onOpenSettings: () => void;
+  widgetConfig: {
+    fullscreen: boolean;
+    globalSearch: boolean;
+    languageToggle: boolean;
+    notification: boolean;
+    themeToggle: boolean;
+    refresh: boolean;
+    sidebarToggle: boolean;
+  };
 }
 
 export const HeaderContent = ({
@@ -45,6 +54,7 @@ export const HeaderContent = ({
   isDark,
   onToggleTheme,
   onOpenSettings,
+  widgetConfig,
 }: HeaderContentProps) => {
   const { t } = useI18n('common');
   const navigate = useNavigate();
@@ -152,26 +162,30 @@ export const HeaderContent = ({
       {/* ========== 左侧区域：折叠按钮 + 刷新 + 面包屑 ========== */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1, minWidth: 0 }}>
         {/* 隐藏/显示侧边栏 */}
-        <Tooltip title={collapsed ? t('header.expandSidebar') : t('header.collapseSidebar')}>
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={onToggleCollapse}
-            size="small"
-            style={btnStyle}
-          />
-        </Tooltip>
+        {widgetConfig.sidebarToggle && (
+          <Tooltip title={collapsed ? t('header.expandSidebar') : t('header.collapseSidebar')}>
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={onToggleCollapse}
+              size="small"
+              style={btnStyle}
+            />
+          </Tooltip>
+        )}
 
         {/* 刷新按钮 */}
-        <Tooltip title={t('header.refresh')}>
-          <Button
-            type="text"
-            icon={<ReloadOutlined />}
-            onClick={onRefresh}
-            size="small"
-            style={btnStyle}
-          />
-        </Tooltip>
+        {widgetConfig.refresh && (
+          <Tooltip title={t('header.refresh')}>
+            <Button
+              type="text"
+              icon={<ReloadOutlined />}
+              onClick={onRefresh}
+              size="small"
+              style={btnStyle}
+            />
+          </Tooltip>
+        )}
 
         {/* 分割线 */}
         <div
@@ -218,74 +232,76 @@ export const HeaderContent = ({
       {/* ========== 右侧区域：搜索 + 设置 + 主题 + 语言 + 全屏 + 通知 + 头像 ========== */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
         {/* 搜索按钮（带快捷键提示） */}
-        <Popover
-          trigger="click"
-          placement="bottomRight"
-          content={
-            <div style={{ width: 320, padding: 8 }}>
-              <Input.Search
-                placeholder={t('header.searchPlaceholder')}
-                size="large"
-                onSearch={(value) => {
-                  console.log('Search:', value);
-                  // 后续可实现全局搜索逻辑
-                }}
-                autoFocus
-              />
-            </div>
-          }
-        >
-          <div
-            className="search-trigger-btn"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '6px 12px',
-              borderRadius: 20,
-              backgroundColor: isDark ? '#2a2a2a' : '#f5f5f5',
-              border: `1px solid ${isDark ? '#404040' : '#d9d9d9'}`,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = isDark ? '#363636' : '#e8e8e8';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = isDark ? '#2a2a2a' : '#f5f5f5';
-            }}
+        {widgetConfig.globalSearch && (
+          <Popover
+            trigger="click"
+            placement="bottomRight"
+            content={
+              <div style={{ width: 320, padding: 8 }}>
+                <Input.Search
+                  placeholder={t('header.searchPlaceholder')}
+                  size="large"
+                  onSearch={(value) => {
+                    console.log('Search:', value);
+                    // 后续可实现全局搜索逻辑
+                  }}
+                  autoFocus
+                />
+              </div>
+            }
           >
-            <SearchOutlined
+            <div
+              className="search-trigger-btn"
               style={{
-                color: isDark ? '#a6a6a6' : '#8c8c8c',
-                fontSize: 14,
-              }}
-            />
-            <span
-              style={{
-                color: isDark ? '#a6a6a6' : '#8c8c8c',
-                fontSize: 13,
-              }}
-            >
-              {t('header.search')}
-            </span>
-            <kbd
-              style={{
-                display: 'inline-block',
-                padding: '2px 6px',
-                fontSize: 11,
-                fontFamily: 'monospace',
-                lineHeight: 1.4,
-                color: isDark ? '#8c8c8c' : '#595959',
-                backgroundColor: isDark ? '#1f1f1f' : '#e8e8e8',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '6px 12px',
+                borderRadius: 20,
+                backgroundColor: isDark ? '#2a2a2a' : '#f5f5f5',
                 border: `1px solid ${isDark ? '#404040' : '#d9d9d9'}`,
-                borderRadius: 3,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = isDark ? '#363636' : '#e8e8e8';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = isDark ? '#2a2a2a' : '#f5f5f5';
               }}
             >
-              {t('header.searchShortcut')}
-            </kbd>
-          </div>
-        </Popover>
+              <SearchOutlined
+                style={{
+                  color: isDark ? '#a6a6a6' : '#8c8c8c',
+                  fontSize: 14,
+                }}
+              />
+              <span
+                style={{
+                  color: isDark ? '#a6a6a6' : '#8c8c8c',
+                  fontSize: 13,
+                }}
+              >
+                {t('header.search')}
+              </span>
+              <kbd
+                style={{
+                  display: 'inline-block',
+                  padding: '2px 6px',
+                  fontSize: 11,
+                  fontFamily: 'monospace',
+                  lineHeight: 1.4,
+                  color: isDark ? '#8c8c8c' : '#595959',
+                  backgroundColor: isDark ? '#1f1f1f' : '#e8e8e8',
+                  border: `1px solid ${isDark ? '#404040' : '#d9d9d9'}`,
+                  borderRadius: 3,
+                }}
+              >
+                {t('header.searchShortcut')}
+              </kbd>
+            </div>
+          </Popover>
+        )}
 
         {/* 设置按钮 */}
         <Tooltip title={t('header.settings')}>
@@ -299,40 +315,48 @@ export const HeaderContent = ({
         </Tooltip>
 
         {/* 主题切换 */}
-        <Tooltip title={isDark ? t('header.switchToLight') : t('header.switchToDark')}>
-          <Button
-            type="text"
-            icon={isDark ? <SunOutlined /> : <MoonOutlined />}
-            onClick={onToggleTheme}
-            size="small"
-            style={btnStyle}
-          />
-        </Tooltip>
+        {widgetConfig.themeToggle && (
+          <Tooltip title={isDark ? t('header.switchToLight') : t('header.switchToDark')}>
+            <Button
+              type="text"
+              icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+              onClick={onToggleTheme}
+              size="small"
+              style={btnStyle}
+            />
+          </Tooltip>
+        )}
 
         {/* 语言切换 - 下拉菜单 */}
-        <Dropdown menu={{ items: languageMenuItems }} trigger={['click']} placement="bottomRight">
-          <Tooltip title={t('header.switchLanguage')}>
-            <Button type="text" icon={<GlobalOutlined />} size="small" style={btnStyle} />
-          </Tooltip>
-        </Dropdown>
+        {widgetConfig.languageToggle && (
+          <Dropdown menu={{ items: languageMenuItems }} trigger={['click']} placement="bottomRight">
+            <Tooltip title={t('header.switchLanguage')}>
+              <Button type="text" icon={<GlobalOutlined />} size="small" style={btnStyle} />
+            </Tooltip>
+          </Dropdown>
+        )}
 
         {/* 全屏切换 */}
-        <Tooltip title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}>
-          <Button
-            type="text"
-            icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
-            onClick={onToggleFullscreen}
-            size="small"
-            style={btnStyle}
-          />
-        </Tooltip>
+        {widgetConfig.fullscreen && (
+          <Tooltip title={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')}>
+            <Button
+              type="text"
+              icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+              onClick={onToggleFullscreen}
+              size="small"
+              style={btnStyle}
+            />
+          </Tooltip>
+        )}
 
         {/* 通知 */}
-        <Badge count={3} size="small" offset={[0, 4]}>
-          <Tooltip title={t('header.notification')}>
-            <Button type="text" icon={<BellOutlined />} size="small" style={btnStyle} />
-          </Tooltip>
-        </Badge>
+        {widgetConfig.notification && (
+          <Badge count={3} size="small" offset={[0, 4]}>
+            <Tooltip title={t('header.notification')}>
+              <Button type="text" icon={<BellOutlined />} size="small" style={btnStyle} />
+            </Tooltip>
+          </Badge>
+        )}
 
         {/* 用户头像 + 下拉菜单 */}
         <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
