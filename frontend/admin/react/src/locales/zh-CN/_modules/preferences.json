@@ -97,9 +97,10 @@
     "showMaximizeButton": "显示最大化按钮",
     "tabbarStyle": "标签页风格",
     "tabbarStyles": {
-      "chrome": "谷歌",
+      "chrome": "Chrome",
       "card": "卡片",
-      "minimal": "极简"
+      "brisk": "轻快",
+      "plain": "简洁"
     },
     "widgets": "小部件",
     "globalSearch": "启用全局搜索",

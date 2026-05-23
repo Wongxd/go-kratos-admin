@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
-import { Tabs, Dropdown, type MenuProps, type TabsProps } from 'antd';
+import { Tabs, Dropdown, Button, Space, type MenuProps, type TabsProps } from 'antd';
 import { useLocation, useNavigate, useMatches } from 'react-router-dom';
 import {
   CloseOutlined,
@@ -11,18 +11,24 @@ import {
   LeftOutlined,
   RightOutlined,
   CloseCircleOutlined,
+  MoreOutlined,
 } from '@ant-design/icons';
 import { usePreferencesStore } from '@/core/preferences/store';
 import { useTabsStore } from '@/stores/tabs';
 import { useI18n } from '@/core/i18n';
+import './tabsbar.css';
 
 interface TabItem {
   key: string;
-  label: string;
+  label: React.ReactNode; // 支持图标 + 文本
   closable?: boolean;
 }
 
-export const TabsBar = () => {
+/**
+ * TabsBar 组件 - 多标签页导航栏
+ * 支持 4 种风格：brisk | card | chrome | plain
+ */
+export const Index = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const matches = useMatches();
@@ -31,6 +37,9 @@ export const TabsBar = () => {
   const tabbarConfig = preferences.tabbar;
 
   const { t } = useI18n('common');
+
+  // 右键菜单状态
+  const [contextMenuTabKey, setContextMenuTabKey] = useState<string>('');
 
   // 标签页管理
   const {
@@ -45,8 +54,27 @@ export const TabsBar = () => {
     reloadTab,
   } = useTabsStore();
 
-  // 右键菜单状态
-  const [contextMenuTabKey, setContextMenuTabKey] = useState<string>('');
+  // 获取当前风格对应的 CSS 类名
+  const tabbarClassName = useMemo(() => {
+    const baseClass = 'tabsbar-container';
+    const styleClass = `tabsbar-${tabbarConfig.styleType}`;
+    return `${baseClass} ${styleClass}`;
+  }, [tabbarConfig.styleType]);
+
+  // 根据 styleType 映射 antd Tabs type
+  const tabsType = useMemo(() => {
+    switch (tabbarConfig.styleType) {
+      case 'chrome':
+        return 'editable-card';
+      case 'card':
+        return 'card';
+      case 'brisk':
+      case 'plain':
+        return 'line';
+      default:
+        return 'editable-card';
+    }
+  }, [tabbarConfig.styleType]);
 
   // 当前标签
   const currentTab = useMemo(() => {
@@ -65,21 +93,30 @@ export const TabsBar = () => {
     addTab(currentTab);
   }, [currentTab, addTab]);
 
-  // 构建标签列表
+  // 构建标签列表（支持图标显示）
   const tabItems: TabItem[] = useMemo(() => {
     return tabs.map((tab) => ({
       key: tab.key,
-      label: tab.title,
+      label: (
+        <span className="tabsbar-tab-label">
+          {tabbarConfig.showIcon && tab.icon && (
+            <span className="tabsbar-tab-icon" style={{ marginRight: 4 }}>
+              {tab.icon}
+            </span>
+          )}
+          {tab.title}
+        </span>
+      ),
       closable: tab.closable,
     }));
-  }, [tabs]);
+  }, [tabs, tabbarConfig.showIcon]);
 
   // 处理标签切换
   const handleTabChange = useCallback(
     (key: string) => {
       navigate(key);
     },
-    [navigate]
+    [navigate],
   );
 
   // 处理标签关闭
@@ -102,7 +139,7 @@ export const TabsBar = () => {
         }
       }
     },
-    [closeTab, location.pathname, tabs, navigate]
+    [closeTab, location.pathname, tabs, navigate],
   );
 
   // 右键菜单
@@ -202,48 +239,109 @@ export const TabsBar = () => {
             closeAllTabs();
             navigate('/');
           },
-        }
+        },
       );
     }
 
     return items;
-  }, [contextMenuTabKey, tabs, t, handleTabRemove, togglePinTab, reloadTab, closeLeftTabs, closeRightTabs, closeOtherTabs, closeAllTabs, location.pathname, navigate]);
+  }, [
+    contextMenuTabKey,
+    tabs,
+    t,
+    handleTabRemove,
+    togglePinTab,
+    reloadTab,
+    closeLeftTabs,
+    closeRightTabs,
+    closeOtherTabs,
+    closeAllTabs,
+    location.pathname,
+    navigate,
+  ]);
 
-  // 自定义渲染 TabBar，添加右键菜单
+  // 更多操作菜单
+  const moreMenuItems: MenuProps['items'] = useMemo(() => {
+    return [
+      {
+        key: 'closeLeft',
+        label: t('tabs.closeLeft'),
+        icon: <LeftOutlined />,
+        onClick: () => {
+          if (location.pathname !== '/') {
+            closeLeftTabs(location.pathname);
+            navigate(location.pathname);
+          }
+        },
+      },
+      {
+        key: 'closeRight',
+        label: t('tabs.closeRight'),
+        icon: <RightOutlined />,
+        onClick: () => {
+          closeRightTabs(location.pathname);
+          navigate(location.pathname);
+        },
+      },
+      {
+        key: 'closeOthers',
+        label: t('tabs.closeOthers'),
+        icon: <CloseCircleOutlined />,
+        disabled: tabs.filter((t) => t.closable && t.key !== location.pathname).length === 0,
+        onClick: () => {
+          closeOtherTabs(location.pathname);
+          navigate(location.pathname);
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        key: 'closeAll',
+        label: t('tabs.closeAll'),
+        icon: <CloseOutlined />,
+        onClick: () => {
+          closeAllTabs();
+          navigate('/');
+        },
+      },
+    ];
+  }, [
+    tabs,
+    location.pathname,
+    t,
+    closeLeftTabs,
+    closeRightTabs,
+    closeOtherTabs,
+    closeAllTabs,
+    navigate,
+  ]);
+
+  // 自定义渲染 TabBar，添加右键菜单和拖拽功能
   const renderTabBar: TabsProps['renderTabBar'] = useCallback(
     (props: any, DefaultTabBar: React.ComponentType<any>) => {
       // 为整个 TabBar 添加右键事件监听
       const handleContextMenu = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        
-        console.log('[TabsBar] Context menu event triggered');
-        
+
         // 从事件目标中查找最近的 tab 元素
         const target = e.target as HTMLElement;
-        console.log('[TabsBar] Target element:', target);
-        console.log('[TabsBar] Target className:', target.className);
-        
+
         // 尝试多种方式查找 tab 元素
-        const tabElement = 
-          target.closest('.ant-tabs-tab') || 
+        const tabElement =
+          target.closest('.ant-tabs-tab') ||
           target.closest('.ant-tabs-tab-btn') ||
           target.parentElement?.closest('.ant-tabs-tab');
-        
-        console.log('[TabsBar] Found tab element:', tabElement);
-        
+
         if (tabElement) {
           // 获取 tab 的 key（Ant Design v6 使用 data-node-key）
-          const tabKey = tabElement.getAttribute('data-node-key') || 
-                        tabElement.getAttribute('aria-controls')?.replace('panel-', '');
-          console.log('[TabsBar] Found tab key:', tabKey);
-          
+          const tabKey =
+            tabElement.getAttribute('data-node-key') ||
+            tabElement.getAttribute('aria-controls')?.replace('panel-', '');
+
           if (tabKey) {
             setContextMenuTabKey(tabKey);
           }
-        } else {
-          // 如果没找到 tab 元素，可能是点击在 TabBar 空白区域
-          console.log('[TabsBar] No tab element found');
         }
       };
 
@@ -252,27 +350,31 @@ export const TabsBar = () => {
         onContextMenu: handleContextMenu,
       };
 
+      // 如果启用了拖拽，这里可以集成 react-dnd 或其他拖拽库
+      // 目前先使用默认的 Tabs 行为
+
       return (
         <Dropdown
           menu={{ items: contextMenuItems }}
           trigger={['contextMenu']}
           onOpenChange={(visible) => {
-            console.log('[TabsBar] Dropdown visible:', visible);
             if (!visible) setContextMenuTabKey('');
           }}
           open={!!contextMenuTabKey}
+          className="tabsbar-context-menu"
         >
           <DefaultTabBar {...enhancedProps} />
         </Dropdown>
       );
     },
-    [contextMenuItems, contextMenuTabKey]
+    [contextMenuItems, contextMenuTabKey],
   );
 
   if (!tabbarConfig.enable) return null;
 
   return (
     <div
+      className={tabbarClassName}
       style={{
         height: tabbarConfig.height,
         borderBottom: `1px solid ${isDark ? '#303030' : '#e5e7eb'}`,
@@ -286,7 +388,7 @@ export const TabsBar = () => {
       <Tabs
         activeKey={location.pathname}
         size="small"
-        type="editable-card"
+        type={tabsType}
         hideAdd
         items={tabItems}
         onChange={handleTabChange}
@@ -296,11 +398,29 @@ export const TabsBar = () => {
           }
         }}
         renderTabBar={renderTabBar}
-        style={{ width: '100%', margin: 0 }}
+        style={{ width: '100%', margin: 0, flex: 1 }}
         tabBarStyle={{ margin: 0 }}
+        // 如果启用了 keepAlive，可以在这里配置缓存逻辑
+        // destroyInactiveTabPane={!tabbarConfig.keepAlive}
       />
+
+      {/* 更多操作按钮 */}
+      {tabbarConfig.showMore && tabs.length > 1 && (
+        <Space size={4} style={{ marginLeft: 8 }}>
+          <Dropdown menu={{ items: moreMenuItems }} trigger={['click']} placement="bottomRight">
+            <Button
+              type="text"
+              size="small"
+              icon={<MoreOutlined />}
+              style={{
+                color: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)',
+              }}
+            />
+          </Dropdown>
+        </Space>
+      )}
     </div>
   );
 };
 
-export default TabsBar;
+export default Index;

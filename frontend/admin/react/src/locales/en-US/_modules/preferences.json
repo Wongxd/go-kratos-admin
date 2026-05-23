@@ -99,7 +99,8 @@
     "tabbarStyles": {
       "chrome": "Chrome",
       "card": "Card",
-      "minimal": "Minimal"
+      "brisk": "Brisk",
+      "plain": "Plain"
     },
     "widgets": "Widgets",
     "globalSearch": "Global Search",

@@ -389,11 +389,13 @@ export const LayoutPanel: React.FC = () => {
         </div>
         <div className="preference-item">
           <span>{t('layout.tabbarStyle')}</span>
-          <Segmented
+          <Select
+            style={{ width: 120 }}
             options={[
               { label: t('layout.tabbarStyles.chrome'), value: 'chrome' },
               { label: t('layout.tabbarStyles.card'), value: 'card' },
-              { label: t('layout.tabbarStyles.minimal'), value: 'minimal' },
+              { label: t('layout.tabbarStyles.brisk'), value: 'brisk' },
+              { label: t('layout.tabbarStyles.plain'), value: 'plain' },
             ]}
             value={preferences.tabbar.styleType}
             onChange={(value) => setPreferences({ tabbar: { styleType: value as any } })}
