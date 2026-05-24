@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type internal_messageservicev1_ListInternalMessageResponse,
   type internal_messageservicev1_InternalMessage,
@@ -39,29 +44,24 @@ import {
 // ==============================
 // 内部消息管理
 // ==============================
-
 export function useListInternalMessages(
-  options?: UseMutationOptions<
-    internal_messageservicev1_ListInternalMessageResponse,
-    Error,
-    PaginationQuery
-  >,
+  query: PaginationQuery,
+  options?: UseQueryOptions<internal_messageservicev1_ListInternalMessageResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listInternalMessages(query),
+  return useQuery({
+    queryKey: ['listInternalMessages', query],
+    queryFn: () => listInternalMessages(query),
     ...options,
   });
 }
 
 export function useGetInternalMessage(
-  options?: UseMutationOptions<
-    internal_messageservicev1_InternalMessage,
-    Error,
-    internal_messageservicev1_GetInternalMessageRequest
-  >,
+  req: internal_messageservicev1_GetInternalMessageRequest,
+  options?: UseQueryOptions<internal_messageservicev1_InternalMessage, Error>,
 ) {
-  return useMutation({
-    mutationFn: (data) => getInternalMessage(data),
+  return useQuery({
+    queryKey: ['getInternalMessage', req],
+    queryFn: () => getInternalMessage(req),
     ...options,
   });
 }
@@ -109,29 +109,24 @@ export function useRevokeMessage(
 // ==============================
 // 消息分类管理
 // ==============================
-
 export function useListMessageCategories(
-  options?: UseMutationOptions<
-    internal_messageservicev1_ListInternalMessageCategoryResponse,
-    Error,
-    PaginationQuery
-  >,
+  query: PaginationQuery,
+  options?: UseQueryOptions<internal_messageservicev1_ListInternalMessageCategoryResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listMessageCategories(query),
+  return useQuery({
+    queryKey: ['listMessageCategories', query],
+    queryFn: () => listMessageCategories(query),
     ...options,
   });
 }
 
 export function useGetMessageCategory(
-  options?: UseMutationOptions<
-    internal_messageservicev1_InternalMessageCategory,
-    Error,
-    internal_messageservicev1_GetInternalMessageCategoryRequest
-  >,
+  req: internal_messageservicev1_GetInternalMessageCategoryRequest,
+  options?: UseQueryOptions<internal_messageservicev1_InternalMessageCategory, Error>,
 ) {
-  return useMutation({
-    mutationFn: (data) => getMessageCategory(data),
+  return useQuery({
+    queryKey: ['getMessageCategory', req],
+    queryFn: () => getMessageCategory(req),
     ...options,
   });
 }
@@ -178,16 +173,13 @@ export function useDeleteMessageCategory(
 // ==============================
 // 消息接收者管理（用户收件箱）
 // ==============================
-
 export function useListUserInbox(
-  options?: UseMutationOptions<
-    internal_messageservicev1_ListUserInboxResponse,
-    Error,
-    PaginationQuery
-  >,
+  query: PaginationQuery,
+  options?: UseQueryOptions<internal_messageservicev1_ListUserInboxResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listUserInbox(query),
+  return useQuery({
+    queryKey: ['listUserInbox', query],
+    queryFn: () => listUserInbox(query),
     ...options,
   });
 }

@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type dictservicev1_DictType,
   type dictservicev1_ListDictTypeResponse,
@@ -9,6 +14,7 @@ import {
   type dictservicev1_UpdateDictEntryRequest,
   type dictservicev1_DeleteDictEntryRequest,
   type dictservicev1_CreateDictTypeRequest,
+  type dictservicev1_GetDictTypeRequest,
 } from '@/api/generated/admin/service/v1';
 import { type PaginationQuery } from '@/core/transport/rest';
 import {
@@ -28,19 +34,23 @@ import {
 // ==============================
 
 export function useListDictTypes(
-  options?: UseMutationOptions<dictservicev1_ListDictTypeResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<dictservicev1_ListDictTypeResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listDictTypes(query),
+  return useQuery({
+    queryKey: ['listDictTypes', query],
+    queryFn: () => listDictTypes(query),
     ...options,
   });
 }
 
 export function useGetDictType(
-  options?: UseMutationOptions<dictservicev1_DictType, Error, number>,
+  req: dictservicev1_GetDictTypeRequest,
+  options?: UseQueryOptions<dictservicev1_DictType, Error>,
 ) {
-  return useMutation({
-    mutationFn: (id) => getDictType(id),
+  return useQuery({
+    queryKey: ['getDictType', req],
+    queryFn: () => getDictType(req),
     ...options,
   });
 }
@@ -77,10 +87,12 @@ export function useDeleteDictType(
 // ==============================
 
 export function useListDictEntries(
-  options?: UseMutationOptions<dictservicev1_ListDictEntryResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<dictservicev1_ListDictEntryResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listDictEntries(query),
+  return useQuery({
+    queryKey: ['listDictEntries', query],
+    queryFn: () => listDictEntries(query),
     ...options,
   });
 }

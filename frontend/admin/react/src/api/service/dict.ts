@@ -7,6 +7,7 @@ import {
   type dictservicev1_CreateDictEntryRequest,
   type dictservicev1_DeleteDictEntryRequest,
   type dictservicev1_UpdateDictEntryRequest,
+  type dictservicev1_GetDictTypeRequest,
 } from '@/api/generated/admin/service/v1';
 import { type PaginationQuery, requestApi } from '@/core';
 
@@ -36,8 +37,8 @@ export async function listDictTypes(query: PaginationQuery) {
   return getDictTypeService().List(params);
 }
 
-export async function getDictType(id: number) {
-  return getDictTypeService().Get({ id });
+export async function getDictType(request: dictservicev1_GetDictTypeRequest) {
+  return getDictTypeService().Get(request);
 }
 
 export async function createDictType(request: dictservicev1_CreateDictTypeRequest) {

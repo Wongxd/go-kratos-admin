@@ -1,4 +1,4 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import {
   type auditservicev1_ApiAuditLog,
   type auditservicev1_GetApiAuditLogRequest,
@@ -12,23 +12,23 @@ import { listApiAuditLogs, getApiAuditLog } from '@/api/service/api-audit-log';
 // ==============================
 
 export function useListApiAuditLogs(
-  options?: UseMutationOptions<auditservicev1_ListApiAuditLogResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<auditservicev1_ListApiAuditLogResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listApiAuditLogs(query),
+  return useQuery({
+    queryKey: ['listApiAuditLogs', query],
+    queryFn: () => listApiAuditLogs(query),
     ...options,
   });
 }
 
 export function useGetApiAuditLog(
-  options?: UseMutationOptions<
-    auditservicev1_ApiAuditLog,
-    Error,
-    auditservicev1_GetApiAuditLogRequest
-  >,
+  req: auditservicev1_GetApiAuditLogRequest,
+  options?: UseQueryOptions<auditservicev1_ApiAuditLog, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getApiAuditLog(req),
+  return useQuery({
+    queryKey: ['getApiAuditLog', req],
+    queryFn: () => getApiAuditLog(req),
     ...options,
   });
 }

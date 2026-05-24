@@ -1,4 +1,4 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import {
   type auditservicev1_GetPermissionAuditLogRequest,
   type auditservicev1_ListPermissionAuditLogResponse,
@@ -12,27 +12,23 @@ import { listPermissionAuditLogs, getPermissionAuditLog } from '@/api/service/pe
 // ==============================
 
 export function useListPermissionAuditLogs(
-  options?: UseMutationOptions<
-    auditservicev1_ListPermissionAuditLogResponse,
-    Error,
-    PaginationQuery
-  >,
+  query: PaginationQuery,
+  options?: UseQueryOptions<auditservicev1_ListPermissionAuditLogResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listPermissionAuditLogs(query),
+  return useQuery({
+    queryKey: ['listPermissionAuditLogs', query],
+    queryFn: () => listPermissionAuditLogs(query),
     ...options,
   });
 }
 
 export function useGetPermissionAuditLog(
-  options?: UseMutationOptions<
-    auditservicev1_PermissionAuditLog,
-    Error,
-    auditservicev1_GetPermissionAuditLogRequest
-  >,
+  req: auditservicev1_GetPermissionAuditLogRequest,
+  options?: UseQueryOptions<auditservicev1_PermissionAuditLog, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getPermissionAuditLog(req),
+  return useQuery({
+    queryKey: ['getPermissionAuditLog', req],
+    queryFn: () => getPermissionAuditLog(req),
     ...options,
   });
 }

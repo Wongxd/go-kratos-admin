@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type authenticationservicev1_DeleteLoginPolicyRequest,
   type authenticationservicev1_GetLoginPolicyRequest,
@@ -7,34 +12,36 @@ import {
   type authenticationservicev1_UpdateLoginPolicyRequest,
 } from '@/api/generated/admin/service/v1';
 import { type PaginationQuery } from '@/core';
-import { listLoginPolicies, getLoginPolicy, createLoginPolicy, updateLoginPolicy, deleteLoginPolicy } from '@/api/service/login-policy';
+import {
+  listLoginPolicies,
+  getLoginPolicy,
+  createLoginPolicy,
+  updateLoginPolicy,
+  deleteLoginPolicy,
+} from '@/api/service/login-policy';
 
 // ==============================
 // 登录策略管理
 // ==============================
 
 export function useListLoginPolicies(
-  options?: UseMutationOptions<
-    authenticationservicev1_ListLoginPolicyResponse,
-    Error,
-    PaginationQuery
-  >,
+  query: PaginationQuery,
+  options?: UseQueryOptions<authenticationservicev1_ListLoginPolicyResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listLoginPolicies(query),
+  return useQuery({
+    queryKey: ['listLoginPolicies', query],
+    queryFn: () => listLoginPolicies(query),
     ...options,
   });
 }
 
 export function useGetLoginPolicy(
-  options?: UseMutationOptions<
-    authenticationservicev1_LoginPolicy,
-    Error,
-    authenticationservicev1_GetLoginPolicyRequest
-  >,
+  req: authenticationservicev1_GetLoginPolicyRequest,
+  options?: UseQueryOptions<authenticationservicev1_LoginPolicy, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getLoginPolicy(req),
+  return useQuery({
+    queryKey: ['getLoginPolicy', req],
+    queryFn: () => getLoginPolicy(req),
     ...options,
   });
 }

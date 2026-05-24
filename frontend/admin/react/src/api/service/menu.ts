@@ -2,6 +2,7 @@ import {
   createMenuServiceClient,
   type resourceservicev1_CreateMenuRequest,
   type resourceservicev1_DeleteMenuRequest,
+  type resourceservicev1_GetMenuRequest,
   type resourceservicev1_UpdateMenuRequest,
 } from '@/api/generated/admin/service/v1';
 import { type PaginationQuery, requestApi } from '@/core';
@@ -20,8 +21,8 @@ export async function listMenus(query: PaginationQuery) {
   return getMenuService().List(params);
 }
 
-export async function getMenu(id: number) {
-  return getMenuService().Get({ id });
+export async function getMenu(req: resourceservicev1_GetMenuRequest) {
+  return getMenuService().Get(req);
 }
 
 export async function createMenu(request: resourceservicev1_CreateMenuRequest) {

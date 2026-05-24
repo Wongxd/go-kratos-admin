@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type resourceservicev1_Api,
   type resourceservicev1_CreateApiRequest,
@@ -15,19 +20,23 @@ import { listApis, getApi, createApi, updateApi, deleteApi } from '@/api/service
 // ==============================
 
 export function useListApis(
-  options?: UseMutationOptions<resourceservicev1_ListApiResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<resourceservicev1_ListApiResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listApis(query),
+  return useQuery({
+    queryKey: ['listApis', query],
+    queryFn: () => listApis(query),
     ...options,
   });
 }
 
 export function useGetApi(
-  options?: UseMutationOptions<resourceservicev1_Api, Error, resourceservicev1_GetApiRequest>,
+  req: resourceservicev1_GetApiRequest,
+  options?: UseQueryOptions<resourceservicev1_Api, Error>,
 ) {
-  return useMutation({
-    mutationFn: (data) => getApi(data),
+  return useQuery({
+    queryKey: ['getApi', req],
+    queryFn: () => getApi(req),
     ...options,
   });
 }

@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type permissionservicev1_CreatePermissionGroupRequest,
   type permissionservicev1_DeletePermissionGroupRequest,
@@ -8,34 +13,36 @@ import {
   type permissionservicev1_UpdatePermissionGroupRequest,
 } from '@/api/generated/admin/service/v1';
 import { type PaginationQuery } from '@/core';
-import { listPermissionGroups, getPermissionGroup, createPermissionGroup, updatePermissionGroup, deletePermissionGroup } from '@/api/service/permission-group';
+import {
+  listPermissionGroups,
+  getPermissionGroup,
+  createPermissionGroup,
+  updatePermissionGroup,
+  deletePermissionGroup,
+} from '@/api/service/permission-group';
 
 // ==============================
 // 权限组管理
 // ==============================
 
 export function useListPermissionGroups(
-  options?: UseMutationOptions<
-    permissionservicev1_ListPermissionGroupResponse,
-    Error,
-    PaginationQuery
-  >,
+  query: PaginationQuery,
+  options?: UseQueryOptions<permissionservicev1_ListPermissionGroupResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listPermissionGroups(query),
+  return useQuery({
+    queryKey: ['listPermissionGroups', query],
+    queryFn: () => listPermissionGroups(query),
     ...options,
   });
 }
 
 export function useGetPermissionGroup(
-  options?: UseMutationOptions<
-    permissionservicev1_PermissionGroup,
-    Error,
-    permissionservicev1_GetPermissionGroupRequest
-  >,
+  req: permissionservicev1_GetPermissionGroupRequest,
+  options?: UseQueryOptions<permissionservicev1_PermissionGroup, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getPermissionGroup(req),
+  return useQuery({
+    queryKey: ['getPermissionGroup', req],
+    queryFn: () => getPermissionGroup(req),
     ...options,
   });
 }

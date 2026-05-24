@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type identityservicev1_CreateOrgUnitRequest,
   type identityservicev1_DeleteOrgUnitRequest,
@@ -8,30 +13,36 @@ import {
   type identityservicev1_UpdateOrgUnitRequest,
 } from '@/api/generated/admin/service/v1';
 import { type PaginationQuery } from '@/core';
-import { listOrgUnits, getOrgUnit, createOrgUnit, updateOrgUnit, deleteOrgUnit } from '@/api/service/org-unit';
+import {
+  listOrgUnits,
+  getOrgUnit,
+  createOrgUnit,
+  updateOrgUnit,
+  deleteOrgUnit,
+} from '@/api/service/org-unit';
 
 // ==============================
 // 组织架构管理
 // ==============================
 
 export function useListOrgUnits(
-  options?: UseMutationOptions<identityservicev1_ListOrgUnitResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<identityservicev1_ListOrgUnitResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listOrgUnits(query),
+  return useQuery({
+    queryKey: ['listOrgUnits', query],
+    queryFn: () => listOrgUnits(query),
     ...options,
   });
 }
 
 export function useGetOrgUnit(
-  options?: UseMutationOptions<
-    identityservicev1_OrgUnit,
-    Error,
-    identityservicev1_GetOrgUnitRequest
-  >,
+  req: identityservicev1_GetOrgUnitRequest,
+  options?: UseQueryOptions<identityservicev1_OrgUnit, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getOrgUnit(req),
+  return useQuery({
+    queryKey: ['getOrgUnit', req],
+    queryFn: () => getOrgUnit(req),
     ...options,
   });
 }

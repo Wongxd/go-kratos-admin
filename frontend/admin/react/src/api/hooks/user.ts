@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type identityservicev1_User,
   type identityservicev1_ListUserResponse,
@@ -24,12 +29,12 @@ import { queryClient } from '@/core';
 // 获取用户列表
 // ==============================
 export function useListUsers(
-  options?: UseMutationOptions<identityservicev1_ListUserResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<identityservicev1_ListUserResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: async (query) => {
-      return listUsers(query);
-    },
+  return useQuery({
+    queryKey: ['listUsers', query],
+    queryFn: () => listUsers(query),
     ...options,
   });
 }
@@ -49,10 +54,12 @@ export async function fetchListUsers(params: PaginationQuery) {
 // 获取单个用户
 // ==============================
 export function useGetUser(
-  options?: UseMutationOptions<identityservicev1_User, Error, identityservicev1_GetUserRequest>,
+  req: identityservicev1_GetUserRequest,
+  options?: UseQueryOptions<identityservicev1_User, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getUser(req),
+  return useQuery({
+    queryKey: ['getUser', req],
+    queryFn: () => getUser(req),
     ...options,
   });
 }

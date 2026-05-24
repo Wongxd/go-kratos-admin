@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type storageservicev1_CreateFileRequest,
   type storageservicev1_UpdateFileRequest,
@@ -15,19 +20,23 @@ import { listFiles, getFile, createFile, updateFile, deleteFile } from '@/api/se
 // ==============================
 
 export function useListFiles(
-  options?: UseMutationOptions<storageservicev1_ListFileResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<storageservicev1_ListFileResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listFiles(query),
+  return useQuery({
+    queryKey: ['listFiles', query],
+    queryFn: () => listFiles(query),
     ...options,
   });
 }
 
 export function useGetFile(
-  options?: UseMutationOptions<storageservicev1_File, Error, storageservicev1_GetFileRequest>,
+  req: storageservicev1_GetFileRequest,
+  options?: UseQueryOptions<storageservicev1_File, Error>,
 ) {
-  return useMutation({
-    mutationFn: (data) => getFile(data),
+  return useQuery({
+    queryKey: ['getFile', req],
+    queryFn: () => getFile(req),
     ...options,
   });
 }
@@ -58,4 +67,3 @@ export function useDeleteFile(
     ...options,
   });
 }
-

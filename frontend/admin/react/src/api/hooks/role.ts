@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type permissionservicev1_CreateRoleRequest,
   type permissionservicev1_DeleteRoleRequest,
@@ -15,19 +20,23 @@ import { listRoles, getRole, createRole, updateRole, deleteRole } from '@/api/se
 // ==============================
 
 export function useListRoles(
-  options?: UseMutationOptions<permissionservicev1_ListRoleResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<permissionservicev1_ListRoleResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listRoles(query),
+  return useQuery({
+    queryKey: ['listRoles', query],
+    queryFn: () => listRoles(query),
     ...options,
   });
 }
 
 export function useGetRole(
-  options?: UseMutationOptions<permissionservicev1_Role, Error, permissionservicev1_GetRoleRequest>,
+  req: permissionservicev1_GetRoleRequest,
+  options?: UseQueryOptions<permissionservicev1_Role, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getRole(req),
+  return useQuery({
+    queryKey: ['getRole', req],
+    queryFn: () => getRole(req),
     ...options,
   });
 }

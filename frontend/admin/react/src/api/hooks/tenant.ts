@@ -29,7 +29,7 @@ export function useListTenants(
   options?: UseQueryOptions<identityservicev1_ListTenantResponse, Error>,
 ) {
   return useQuery({
-    queryKey: ['tenants', query],
+    queryKey: ['listTenants', query],
     queryFn: () => listTenants(query),
     ...options,
   });
@@ -39,10 +39,12 @@ export function useListTenants(
 // 获取单个租户
 // ==============================
 export function useGetTenant(
-  options?: UseMutationOptions<identityservicev1_Tenant, Error, identityservicev1_GetTenantRequest>,
+  req: identityservicev1_GetTenantRequest,
+  options?: UseQueryOptions<identityservicev1_Tenant, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getTenant(req),
+  return useQuery({
+    queryKey: ['getTenant', req],
+    queryFn: () => getTenant(req),
     ...options,
   });
 }

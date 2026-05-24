@@ -1,11 +1,17 @@
 import {
   type resourceservicev1_CreateMenuRequest,
   type resourceservicev1_DeleteMenuRequest,
+  type resourceservicev1_GetMenuRequest,
   type resourceservicev1_ListMenuResponse,
   type resourceservicev1_Menu,
   type resourceservicev1_UpdateMenuRequest,
 } from '@/api/generated/admin/service/v1';
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import { type PaginationQuery } from '@/core';
 import { listMenus, getMenu, createMenu, updateMenu, deleteMenu } from '@/api/service/menu';
 
@@ -14,17 +20,23 @@ import { listMenus, getMenu, createMenu, updateMenu, deleteMenu } from '@/api/se
 // ==============================
 
 export function useListMenus(
-  options?: UseMutationOptions<resourceservicev1_ListMenuResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<resourceservicev1_ListMenuResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listMenus(query),
+  return useQuery({
+    queryKey: ['listMenus', query],
+    queryFn: () => listMenus(query),
     ...options,
   });
 }
 
-export function useGetMenu(options?: UseMutationOptions<resourceservicev1_Menu, Error, number>) {
-  return useMutation({
-    mutationFn: (id) => getMenu(id),
+export function useGetMenu(
+  req: resourceservicev1_GetMenuRequest,
+  options?: UseQueryOptions<resourceservicev1_Menu, Error>,
+) {
+  return useQuery({
+    queryKey: ['getMenu', req],
+    queryFn: () => getMenu(req),
     ...options,
   });
 }

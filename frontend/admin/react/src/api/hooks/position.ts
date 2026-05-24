@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type identityservicev1_CreatePositionRequest,
   type identityservicev1_DeletePositionRequest,
@@ -8,30 +13,36 @@ import {
   type identityservicev1_UpdatePositionRequest,
 } from '@/api/generated/admin/service/v1';
 import { type PaginationQuery } from '@/core';
-import { listPositions, getPosition, createPosition, updatePosition, deletePosition } from '@/api/service/position';
+import {
+  listPositions,
+  getPosition,
+  createPosition,
+  updatePosition,
+  deletePosition,
+} from '@/api/service/position';
 
 // ==============================
 // 职位管理
 // ==============================
 
 export function useListPositions(
-  options?: UseMutationOptions<identityservicev1_ListPositionResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<identityservicev1_ListPositionResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listPositions(query),
+  return useQuery({
+    queryKey: ['listPositions', query],
+    queryFn: () => listPositions(query),
     ...options,
   });
 }
 
 export function useGetPosition(
-  options?: UseMutationOptions<
-    identityservicev1_Position,
-    Error,
-    identityservicev1_GetPositionRequest
-  >,
+  req: identityservicev1_GetPositionRequest,
+  options?: UseQueryOptions<identityservicev1_Position, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getPosition(req),
+  return useQuery({
+    queryKey: ['getPosition', req],
+    queryFn: () => getPosition(req),
     ...options,
   });
 }

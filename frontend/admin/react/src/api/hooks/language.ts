@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type dictservicev1_CreateLanguageRequest,
   type dictservicev1_DeleteLanguageRequest,
@@ -9,26 +14,37 @@ import {
   type dictservicev1_BatchCreateLanguagesRequest,
 } from '@/api/generated/admin/service/v1';
 import { type PaginationQuery } from '@/core';
-import { listLanguages, getLanguage, createLanguage, updateLanguage, deleteLanguage, batchCreateLanguages } from '@/api/service/language';
+import {
+  listLanguages,
+  getLanguage,
+  createLanguage,
+  updateLanguage,
+  deleteLanguage,
+  batchCreateLanguages,
+} from '@/api/service/language';
 
 // ==============================
 // 语言管理
 // ==============================
 
 export function useListLanguages(
-  options?: UseMutationOptions<dictservicev1_ListLanguageResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<dictservicev1_ListLanguageResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listLanguages(query),
+  return useQuery({
+    queryKey: ['listLanguages', query],
+    queryFn: () => listLanguages(query),
     ...options,
   });
 }
 
 export function useGetLanguage(
-  options?: UseMutationOptions<dictservicev1_Language, Error, dictservicev1_GetLanguageRequest>,
+  req: dictservicev1_GetLanguageRequest,
+  options?: UseQueryOptions<dictservicev1_Language, Error>,
 ) {
-  return useMutation({
-    mutationFn: (data) => getLanguage(data),
+  return useQuery({
+    queryKey: ['getLanguage', req],
+    queryFn: () => getLanguage(req),
     ...options,
   });
 }

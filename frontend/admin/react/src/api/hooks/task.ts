@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type taskservicev1_CreateTaskRequest,
   type taskservicev1_DeleteTaskRequest,
@@ -15,19 +20,23 @@ import { listTasks, getTask, createTask, updateTask, deleteTask } from '@/api/se
 // ==============================
 
 export function useListTasks(
-  options?: UseMutationOptions<taskservicev1_ListTaskResponse, Error, PaginationQuery>,
+  query: PaginationQuery,
+  options?: UseQueryOptions<taskservicev1_ListTaskResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listTasks(query),
+  return useQuery({
+    queryKey: ['listTasks', query],
+    queryFn: () => listTasks(query),
     ...options,
   });
 }
 
 export function useGetTask(
-  options?: UseMutationOptions<taskservicev1_Task, Error, taskservicev1_GetTaskRequest>,
+  req: taskservicev1_GetTaskRequest,
+  options?: UseQueryOptions<taskservicev1_Task, Error>,
 ) {
-  return useMutation({
-    mutationFn: (req) => getTask(req),
+  return useQuery({
+    queryKey: ['getTask', req],
+    queryFn: () => getTask(req),
     ...options,
   });
 }

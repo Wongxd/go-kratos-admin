@@ -1,38 +1,37 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import {
   type permissionservicev1_PolicyEvaluationLog,
   type permissionservicev1_GetPolicyEvaluationLogRequest,
   type permissionservicev1_ListPolicyEvaluationLogResponse,
 } from '@/api/generated/admin/service/v1';
 import { type PaginationQuery } from '@/core';
-import { listPolicyEvaluationLogs, getPolicyEvaluationLog } from '@/api/service/policy-evaluation-log';
+import {
+  listPolicyEvaluationLogs,
+  getPolicyEvaluationLog,
+} from '@/api/service/policy-evaluation-log';
 
 // ==============================
 // 策略评估日志管理
 // ==============================
 
 export function useListPolicyEvaluationLogs(
-  options?: UseMutationOptions<
-    permissionservicev1_ListPolicyEvaluationLogResponse,
-    Error,
-    PaginationQuery
-  >,
+  query: PaginationQuery,
+  options?: UseQueryOptions<permissionservicev1_ListPolicyEvaluationLogResponse, Error>,
 ) {
-  return useMutation({
-    mutationFn: (query) => listPolicyEvaluationLogs(query),
+  return useQuery({
+    queryKey: ['listPolicyEvaluationLogs', query],
+    queryFn: () => listPolicyEvaluationLogs(query),
     ...options,
   });
 }
 
 export function useGetPolicyEvaluationLog(
-  options?: UseMutationOptions<
-    permissionservicev1_PolicyEvaluationLog,
-    Error,
-    permissionservicev1_GetPolicyEvaluationLogRequest
-  >,
+  req: permissionservicev1_GetPolicyEvaluationLogRequest,
+  options?: UseQueryOptions<permissionservicev1_PolicyEvaluationLog, Error>,
 ) {
-  return useMutation({
-    mutationFn: (data) => getPolicyEvaluationLog(data),
+  return useQuery({
+    queryKey: ['getPolicyEvaluationLog', req],
+    queryFn: () => getPolicyEvaluationLog(req),
     ...options,
   });
 }

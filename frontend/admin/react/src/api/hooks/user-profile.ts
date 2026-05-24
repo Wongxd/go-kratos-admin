@@ -1,4 +1,9 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   type identityservicev1_User,
   type identityservicev1_UpdateUserRequest,
@@ -19,15 +24,10 @@ import {
 } from '@/api/service/user-profile';
 import { queryClient } from '@/core';
 
-// ==============================
-// React Hooks（用于组件中，支持缓存和重试）
-// ==============================
-
-export function useGetUserProfile(
-  options?: UseMutationOptions<identityservicev1_User | null, Error>,
-) {
-  return useMutation({
-    mutationFn: () => getMe(),
+export function useGetUserProfile(options?: UseQueryOptions<identityservicev1_User | null, Error>) {
+  return useQuery({
+    queryKey: ['getMe'],
+    queryFn: () => getMe(),
     ...options,
   });
 }
@@ -49,17 +49,6 @@ export function useUpdateUserProfile(
   return useMutation({
     mutationFn: (data) => updateMyUserInfo(data),
     ...options,
-  });
-}
-
-// ==============================================
-// 更新用户资料 【给 Store / 外部调用】不带 Hook 的方法
-// ==============================================
-export async function fetchUpdateUserProfile(params: identityservicev1_UpdateUserRequest) {
-  return queryClient.fetchQuery({
-    queryKey: ['updateUserProfile', params],
-    queryFn: () => updateMyUserInfo(params),
-    retry: 0,
   });
 }
 
