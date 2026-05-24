@@ -1,9 +1,9 @@
 import {
   type authenticationservicev1_LoginRequest,
+  type authenticationservicev1_RegisterUserRequest,
   createAuthenticationServiceClient,
 } from '@/api/generated/admin/service/v1';
 import { requestApi } from '@/core';
-import { encryptPassword } from '@/utils';
 
 let _instance: ReturnType<typeof createAuthenticationServiceClient> | null = null;
 
@@ -25,12 +25,8 @@ export async function logout() {
   return getAuthService().Logout({});
 }
 
-export async function register(username: string, password: string, tenantCode: string = '') {
-  return await getAuthService().RegisterUser({
-    username,
-    password: encryptPassword(password),
-    tenantCode: tenantCode,
-  });
+export async function registerUser(request: authenticationservicev1_RegisterUserRequest) {
+  return await getAuthService().RegisterUser(request);
 }
 
 export async function generateCaptcha() {

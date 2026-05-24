@@ -4,11 +4,11 @@ import { persist } from 'zustand/middleware';
 import { encryptPassword } from '@/utils';
 import {
   type authenticationservicev1_LoginRequest,
-  fetchLogin,
-  fetchLogout,
-  fetchRefreshToken,
-  fetchRegister,
   fetchUserProfile,
+  loginMutation,
+  logoutMutation,
+  refreshTokenMutation,
+  registerMutation,
 } from '@/api';
 
 /**
@@ -75,7 +75,7 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           // 1. 调用登录接口
-          const response = await fetchLogin({
+          const response = await loginMutation.execute({
             ...params,
             password: encryptPassword(params.password || ''),
           });
@@ -151,9 +151,15 @@ export const useAuthStore = create<AuthState>()(
       register: async (params) => {
         set({ registerLoading: true, error: null });
 
+        const password = encryptPassword(params.password);
+
         try {
           // 调用注册 API（API 内部已处理密码加密）
-          await fetchRegister(params.username, params.password);
+          await registerMutation.execute({
+            username: params.username,
+            password: password,
+            tenantCode: '',
+          });
         } catch (err: any) {
           const errorMsg = err?.message || '注册失败';
           set({ error: errorMsg });
@@ -166,7 +172,7 @@ export const useAuthStore = create<AuthState>()(
       // 登出
       logout: async (redirect = true) => {
         try {
-          await fetchLogout().catch(() => {}); // 忽略接口错误
+          await logoutMutation.execute({}).catch(() => {}); // 忽略接口错误
         } finally {
           // 清除 localStorage 中的持久化数据
           localStorage.removeItem('auth-storage');
@@ -199,7 +205,7 @@ export const useAuthStore = create<AuthState>()(
         }
 
         try {
-          const response = await fetchRefreshToken(refreshVal);
+          const response = await refreshTokenMutation.execute(refreshVal);
 
           const now = Date.now();
           set({

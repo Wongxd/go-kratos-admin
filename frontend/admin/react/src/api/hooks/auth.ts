@@ -11,7 +11,7 @@ import {
   type authenticationservicev1_RegisterUserRequest,
   type authenticationservicev1_RegisterUserResponse,
 } from '@/api/generated/admin/service/v1';
-import { login, logout, register, refreshToken, generateCaptcha } from '@/api/service/auth';
+import { login, logout, refreshToken, generateCaptcha, registerUser } from '@/api/service/auth';
 import { queryClient } from '@/core';
 
 // ------------------------------
@@ -30,16 +30,14 @@ export function useLogin(
   });
 }
 
-// ==============================================
-// 登录 【给 Store / 外部调用】不带 Hook 的方法
-// ==============================================
-export async function fetchLogin(params: authenticationservicev1_LoginRequest) {
-  return queryClient.fetchQuery({
-    queryKey: ['login', params],
-    queryFn: () => login(params),
-    retry: 0,
-  });
-}
+// ------------------------------
+// 登录（Mutation - GET）
+// ------------------------------
+export const loginMutation = queryClient.getMutationCache().build(queryClient, {
+  mutationKey: ['login'],
+  mutationFn: login,
+  retry: 0,
+});
 
 // ------------------------------
 // 登出（Mutation）
@@ -51,16 +49,14 @@ export function useLogout(options?: UseMutationOptions<{}, Error, {}>) {
   });
 }
 
-// ==============================================
-// 登出 【给 Store / 外部调用】不带 Hook 的方法
-// ==============================================
-export async function fetchLogout() {
-  return queryClient.fetchQuery({
-    queryKey: ['logout'],
-    queryFn: () => logout(),
-    retry: 0,
-  });
-}
+// ------------------------------
+// 登出（Mutation - GET）
+// ------------------------------
+export const logoutMutation = queryClient.getMutationCache().build(queryClient, {
+  mutationKey: ['logout'],
+  mutationFn: logout,
+  retry: 0,
+});
 
 // ------------------------------
 // 注册用户（Mutation）
@@ -73,21 +69,19 @@ export function useRegisterUser(
   >,
 ) {
   return useMutation({
-    mutationFn: (req) => register(req.username || '', req.password || '', req.tenantCode),
+    mutationFn: (req) => registerUser(req),
     ...options,
   });
 }
 
-// ==============================================
-// 注册用户 【给 Store / 外部调用】不带 Hook 的方法
-// ==============================================
-export async function fetchRegister(username: string, password: string, tenantCode: string = '') {
-  return queryClient.fetchQuery({
-    queryKey: ['register', { username, password, tenantCode }],
-    queryFn: () => register(username, password, tenantCode),
-    retry: 0,
-  });
-}
+// ------------------------------
+// 注册用户（Mutation - GET）
+// ------------------------------
+export const registerMutation = queryClient.getMutationCache().build(queryClient, {
+  mutationKey: ['register'],
+  mutationFn: registerUser,
+  retry: 0,
+});
 
 // ------------------------------
 // 刷新 Token（Mutation）
@@ -105,16 +99,14 @@ export function useRefreshToken(
   });
 }
 
-// ==============================================
-// 刷新 Token 【给 Store / 外部调用】不带 Hook 的方法
-// ==============================================
-export async function fetchRefreshToken(refreshTokenValue: string) {
-  return queryClient.fetchQuery({
-    queryKey: ['refreshToken', refreshTokenValue],
-    queryFn: () => refreshToken(refreshTokenValue),
-    retry: 0,
-  });
-}
+// ------------------------------
+// 刷新 Token（Mutation - GET）
+// ------------------------------
+export const refreshTokenMutation = queryClient.getMutationCache().build(queryClient, {
+  mutationKey: ['refreshToken'],
+  mutationFn: refreshToken,
+  retry: 0,
+});
 
 // ------------------------------
 // 获取验证码（Query - GET）
