@@ -263,7 +263,7 @@ const handleToolbarClick = (name: string) => {
 
 // 展开所有节点
 const expandAll = () => {
-  const tableRef = contentRef.value?.getTableRef();
+  const tableRef = contentRef.value?.tableRef;
   if (tableRef) {
     tableRef.setAllTreeExpand(true);
   }
@@ -271,7 +271,7 @@ const expandAll = () => {
 
 // 折叠所有节点
 const collapseAll = () => {
-  const tableRef = contentRef.value?.getTableRef();
+  const tableRef = contentRef.value?.tableRef;
   if (tableRef) {
     tableRef.clearTreeExpand();
   }

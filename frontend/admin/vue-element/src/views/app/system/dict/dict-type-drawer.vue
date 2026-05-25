@@ -42,7 +42,11 @@
 
       <ElFormItem :label="$t('common.table.status')" prop="isEnabled">
         <ElRadioGroup v-model="formData.isEnabled">
-          <ElRadioButton v-for="item in enableBoolList" :key="item.value" :value="item.value">
+          <ElRadioButton
+            v-for="item in enableBoolList"
+            :key="String(item.value)"
+            :value="item.value"
+          >
             {{ item.label }}
           </ElRadioButton>
         </ElRadioGroup>

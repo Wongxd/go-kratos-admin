@@ -215,7 +215,7 @@ const title = computed(() =>
 async function loadTypeNameOptions() {
   try {
     const result = await taskStore.listTaskTypeName();
-    typeNameOptions.value = result.typeNames.map((item: any) => ({
+    typeNameOptions.value = (result.typeNames ?? []).map((item: any) => ({
       label: item,
       value: item,
     }));

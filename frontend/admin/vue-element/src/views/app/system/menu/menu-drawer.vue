@@ -32,7 +32,7 @@
           :placeholder="$t('common.placeholder.input')"
           clearable
         >
-          <template #append v-if="titleSuffix">
+          <template v-if="titleSuffix" #append>
             {{ titleSuffix }}
           </template>
         </ElInput>
@@ -42,7 +42,7 @@
         <ElTreeSelect
           v-model="formData.parentId"
           :data="menuTreeData"
-          :props="{ label: 'meta.title', value: 'id', children: 'children' }"
+          :props="{ label: 'meta.title', value: 'id', children: 'children' } as any"
           :placeholder="$t('common.placeholder.select')"
           filterable
           clearable

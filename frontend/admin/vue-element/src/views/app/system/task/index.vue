@@ -23,7 +23,7 @@
           :loading="row.pending"
           :active-text="$t('common.switch.active')"
           :inactive-text="$t('common.switch.inactive')"
-          @change="(value: boolean) => handleEnableChanged(row, value)"
+          @change="(value: string | number | boolean) => handleEnableChanged(row, !!value)"
         />
       </template>
 

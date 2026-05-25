@@ -86,6 +86,7 @@ const isRead = ref(false);
 
 interface Model extends authenticationservicev1_RegisterUserRequest {
   confirmPassword: string;
+  rememberMe: boolean;
 }
 
 const model = ref<Model>({
@@ -93,6 +94,7 @@ const model = ref<Model>({
   password: "123456",
   confirmPassword: "",
   rememberMe: false,
+  tenantCode: undefined,
 });
 
 const rules = computed(() => {

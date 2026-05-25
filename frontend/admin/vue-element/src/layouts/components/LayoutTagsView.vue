@@ -104,7 +104,7 @@ const scrollbarRef = ref();
 // 路由映射缓存，提升查找性能
 const routePathMap = computed(() => {
   const map = new Map<string, TagView>();
-  visitedViews.value.forEach((tag) => {
+  visitedViews.value.forEach((tag: { path: string }) => {
     map.set(tag.path, tag);
   });
   return map;

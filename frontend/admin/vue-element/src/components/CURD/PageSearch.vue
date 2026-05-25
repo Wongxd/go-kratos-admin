@@ -105,6 +105,7 @@ const componentMap = new Map<ISearchComponent, any>([
   ["time-picker", markRaw(ElTimePicker)], // @ts-ignore
   ["time-select", markRaw(ElTimeSelect)], // @ts-ignore
   ["tree-select", markRaw(ElTreeSelect)], // @ts-ignore
+  ["api-tree-select", markRaw(ElTreeSelect)], // @ts-ignore
   ["input-tag", markRaw(ElInputTag)], // @ts-ignore
   ["custom-tag", markRaw(InputTag)],
 ]);
@@ -156,6 +157,13 @@ onMounted(() => {
   formItems.forEach((item) => {
     if (item?.initFn) {
       item.initFn(item);
+    }
+    // api-tree-select: 通过 api 函数异步加载数据并注入到 attrs.data
+    if (item.type === "api-tree-select" && typeof (item as any).api === "function") {
+      (item as any).api().then((data: any[]) => {
+        if (!item.attrs) item.attrs = {};
+        item.attrs.data = data;
+      });
     }
     if (["input-tag", "custom-tag", "cascader"].includes(item?.type ?? "")) {
       queryParams[item.prop] = Array.isArray(item.initialValue) ? item.initialValue : [];

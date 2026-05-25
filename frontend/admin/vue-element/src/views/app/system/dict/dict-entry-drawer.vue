@@ -59,7 +59,11 @@
 
       <ElFormItem :label="$t('common.table.status')" prop="isEnabled">
         <ElRadioGroup v-model="formData.isEnabled">
-          <ElRadioButton v-for="item in enableBoolList" :key="item.value" :value="item.value">
+          <ElRadioButton
+            v-for="item in enableBoolList"
+            :key="String(item.value)"
+            :value="item.value"
+          >
             {{ item.label }}
           </ElRadioButton>
         </ElRadioGroup>
@@ -168,7 +172,7 @@ const i18nTableData = ref<any[]>([]);
 const i18nDataMap = ref<Record<string, { entryLabel?: string; description?: string }>>({});
 
 // 字典类型列表
-const dictTypeList = ref<DictType[]>([]);
+const dictTypeList = ref<(DictType & { id: number })[]>([]);
 
 // 表单验证规则
 const formRules = {
@@ -193,7 +197,9 @@ async function loadDictTypeList() {
     const result = await dictStore.listDictType(undefined, {
       is_enabled: "true",
     });
-    dictTypeList.value = result.items || [];
+    dictTypeList.value = (result.items || []).filter(
+      (item): item is DictType & { id: number } => item.id != null
+    );
   } catch (error) {
     console.error("Failed to load dict type list:", error);
   }
@@ -245,7 +251,7 @@ async function handleSaveRow(row: any) {
         i18n: i18nDataMap.value,
       });
       ElMessage.success($t("common.notification.save_success"));
-    } catch (error) {
+    } catch {
       ElMessage.error($t("common.notification.update_failed"));
       // 恢复原值
       if (row._backup) {
@@ -305,7 +311,7 @@ async function open(data?: { create: boolean; row?: any }) {
       isEnabled: data.row.isEnabled ?? true,
     });
   } else {
-    formData.typeId = dictViewStore.currentTypeId;
+    formData.typeId = dictViewStore.currentTypeId ?? undefined;
   }
 
   // 加载语言列表

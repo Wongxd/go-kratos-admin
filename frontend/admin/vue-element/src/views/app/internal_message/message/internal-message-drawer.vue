@@ -196,9 +196,10 @@ async function handleSubmit() {
 
     if (isCreate.value) {
       await internalMessageStore.sendMessage({
+        targetUserIds: undefined,
         ...formData,
         targetAll: true,
-      });
+      } as any);
       ElMessage.success($t("common.notification.createSuccess"));
     } else {
       await internalMessageStore.updateMessage(currentId.value!, formData);

@@ -117,8 +117,8 @@ const drawerRef = ref();
 // 搜索配置
 const searchConfig: ISearchConfig = {
   grid: true,
-  collapsed: true,
-  showCollapseButton: true,
+  // collapsed: true,
+  // showCollapseButton: true,
   formItems: [
     {
       type: "input",

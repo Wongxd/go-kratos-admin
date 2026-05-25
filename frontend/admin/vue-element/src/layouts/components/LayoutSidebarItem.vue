@@ -12,9 +12,9 @@
           :index="resolvePath(item.path)"
           :class="{ 'submenu-title-noDropdown': !isNest }"
         >
-          <MenuIcon :icon="item.meta?.icon" />
+          <MenuIcon :icon="getMetaIcon(item.meta)" />
           <span v-if="item.meta?.title" class="menu-title">
-            {{ translateRouteTitle(item.meta.title) }}
+            {{ translateRouteTitle(getMetaTitle(item.meta)) }}
           </span>
         </el-menu-item>
       </AppLink>
@@ -24,9 +24,9 @@
     <el-sub-menu v-else :index="resolvePath(item.path)" :data-path="item.path" teleported>
       <template #title>
         <template v-if="item.meta">
-          <MenuIcon :icon="item.meta.icon" />
+          <MenuIcon :icon="getMetaIcon(item.meta)" />
           <span v-if="item.meta.title" class="menu-title">
-            {{ translateRouteTitle(item.meta.title) }}
+            {{ translateRouteTitle(getMetaTitle(item.meta)) }}
           </span>
         </template>
       </template>
@@ -109,6 +109,20 @@ const props = defineProps({
     default: false,
   },
 });
+
+/**
+ * 安全获取菜单图标
+ */
+function getMetaIcon(meta?: RouteRecordRaw["meta"]): string | undefined {
+  return (meta as Record<string, unknown>)?.icon as string | undefined;
+}
+
+/**
+ * 安全获取菜单标题
+ */
+function getMetaTitle(meta?: RouteRecordRaw["meta"]): string {
+  return (meta as Record<string, unknown>)?.title as string;
+}
 
 /**
  * 判断是否有可见的子节点
