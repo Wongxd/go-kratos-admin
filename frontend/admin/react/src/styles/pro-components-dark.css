@@ -1,0 +1,56 @@
+/* ========== ProPageContainer ========== */
+.ant-pro-page-container {
+  background-color: var(--ant-color-bg-layout) !important;
+}
+.ant-pro-page-container-children-content {
+  background-color: transparent !important;
+}
+
+/* ========== ProTable ========== */
+.ant-pro-table {
+  background-color: transparent !important;
+}
+.ant-pro-table .ant-table {
+  background-color: var(--ant-color-bg-container) !important;
+}
+.ant-pro-table .ant-table-thead > tr > th {
+  background-color: var(--ant-color-bg-container) !important;
+  color: var(--ant-color-text);
+}
+.ant-pro-table .ant-table-tbody > tr > td {
+  background-color: var(--ant-color-bg-container) !important;
+  color: var(--ant-color-text);
+}
+.ant-pro-table .ant-table-tbody > tr:hover > td {
+  background-color: var(--ant-color-fill-secondary) !important;
+}
+
+/* ========== 分页器 ========== */
+.ant-pagination {
+  background-color: transparent !important;
+}
+.ant-pagination-item {
+  background-color: var(--ant-color-bg-container) !important;
+  border-color: var(--ant-color-border) !important;
+}
+.ant-pagination-item-active {
+  background-color: var(--ant-color-primary) !important;
+  border-color: var(--ant-color-primary) !important;
+}
+.ant-pagination-item-active a {
+  color: #fff !important;
+}
+
+/* ========== 搜索表单 ========== */
+.ant-pro-table-search {
+  background-color: var(--ant-color-bg-container) !important;
+  border-color: var(--ant-color-border) !important;
+}
+
+/* ========== 暗黑模式专属修正 ========== */
+[data-theme='dark'] .ant-pro-table .ant-table-placeholder {
+  background-color: var(--ant-color-bg-container) !important;
+}
+[data-theme='dark'] .ant-empty-normal {
+  color: var(--ant-color-text-secondary) !important;
+}

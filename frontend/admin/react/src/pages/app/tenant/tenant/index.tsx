@@ -275,6 +275,7 @@ const TenantList = () => {
             }}
             size="middle"
             bordered
+            cardBordered={false}
             scroll={{
               y: tableScrollY,
               x: 1300,

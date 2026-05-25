@@ -19,6 +19,7 @@ import 'nprogress/nprogress.css';
 
 import './styles/global.css';
 import './styles/pro-layout-overrides.css';
+import './styles/pro-components-dark.css';
 
 import './index.css';
 import App from './App.tsx';
