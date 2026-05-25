@@ -11,12 +11,9 @@
 /* ========================================
  * ProTable 在 ContentContainer 中撑满高度
  *
- * 使用方式：ContentContainer > .page-container-content > ProTable
- *
- * 策略：
- *   CSS 只负责外层 flex 骨架，不穿透 antd 内部 DOM。
- *   scroll.y 由 useProTableScrollY 精确计算像素值，
- *   确保表格体 + 分页器恰好填满容器剩余空间。
+ * 策略：CSS 只负责最外层 flex 骨架。
+ * antd 内部的高度由 useProTableScrollY 通过 JS
+ * 直接操作 .ant-table-body.style 来控制。
  * ======================================== */
 
 /* 中间容器：占满 ContentContainer 内容区 */
@@ -29,9 +26,4 @@
 /* ProTable 根元素：占满中间容器 */
 .page-container-content > .ant-pro-table {
   height: 100%;
-}
-
-/* 搜索表单保持自适应高度 */
-.page-container-content > .ant-pro-table > .ant-pro-table-search {
-  flex: none;
 }

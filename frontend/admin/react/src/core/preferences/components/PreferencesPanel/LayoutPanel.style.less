@@ -615,21 +615,22 @@
         height: 8px;  // 从10px压缩到8px
         background: var(--ant-color-primary);
         border-radius: 4px 4px 0 0;  // 从5px压缩到4px
+      }
 
-        // 窗口控制按钮
-        &::after {
-          content: '';
-          position: absolute;
-          right: 5px;  // 从6px压缩到5px
-          top: 3px;  // 从4px压缩到3px
-          width: 3px;  // 从4px压缩到3px
-          height: 3px;  // 从4px压缩到3px
-          background: rgba(255, 255, 255, 0.9);
-          border-radius: 50%;
-          box-shadow: 
-            -5px 0 0 rgba(255, 255, 255, 0.9),   // 从6px压缩到5px
-            -10px 0 0 rgba(255, 255, 255, 0.9);   // 从12px压缩到10px
-        }
+      // 窗口控制按钮（在导航条右上角）
+      &::after {
+        content: '';
+        position: absolute;
+        right: 5px;  // 从6px压缩到5px
+        top: 3px;  // 从4px压缩到3px
+        width: 3px;  // 从4px压缩到3px
+        height: 3px;  // 从4px压缩到3px
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        box-shadow: 
+          -5px 0 0 rgba(255, 255, 255, 0.9),   // 从6px压缩到5px
+          -10px 0 0 rgba(255, 255, 255, 0.9);   // 从12px压缩到10px
+        z-index: 1;
       }
 
       .preview-bar {

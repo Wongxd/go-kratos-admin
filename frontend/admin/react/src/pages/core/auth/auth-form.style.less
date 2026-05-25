@@ -47,62 +47,60 @@
 .auth-form-item {
   margin-bottom: 24px;
 
-  :global {
-    .ant-input-affix-wrapper,
-    .ant-input-password {
-      height: 44px;
-      border-radius: 6px;
-      transition: all 0.3s ease;
+  .ant-input-affix-wrapper,
+  .ant-input-password {
+    height: 44px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
 
-      .user-layout-wrapper.light-mode & {
-        background: #fafafa;
-        border-color: #e8e8e8;
+    .user-layout-wrapper.light-mode & {
+      background: #fafafa;
+      border-color: #e8e8e8;
 
-        &:hover,
-        &:focus,
-        &.ant-input-affix-wrapper-focused {
-          background: #fff;
-          border-color: #1677ff;
-          box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
-        }
-      }
-
-      .user-layout-wrapper:not(.light-mode) & {
-        background: rgba(255, 255, 255, 0.04);
-        border-color: rgba(255, 255, 255, 0.12);
-        color: rgba(255, 255, 255, 0.85);
-
-        &:hover,
-        &:focus,
-        &.ant-input-affix-wrapper-focused {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: #1677ff;
-          box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.2);
-        }
-
-        .ant-input {
-          background: transparent;
-          color: rgba(255, 255, 255, 0.85);
-
-          &::placeholder {
-            color: rgba(255, 255, 255, 0.45);
-          }
-        }
-
-        .anticon {
-          color: rgba(255, 255, 255, 0.45);
-        }
+      &:hover,
+      &:focus,
+      &.ant-input-affix-wrapper-focused {
+        background: #fff;
+        border-color: #1677ff;
+        box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
       }
     }
 
-    .ant-input {
-      height: 42px;
-      font-size: 14px;
+    .user-layout-wrapper:not(.light-mode) & {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.85);
 
-      &::placeholder {
-        .user-layout-wrapper.light-mode & {
-          color: rgba(0, 0, 0, 0.35);
+      &:hover,
+      &:focus,
+      &.ant-input-affix-wrapper-focused {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: #1677ff;
+        box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.2);
+      }
+
+      .ant-input {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.85);
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.45);
         }
+      }
+
+      .anticon {
+        color: rgba(255, 255, 255, 0.45);
+      }
+    }
+  }
+
+  .ant-input {
+    height: 42px;
+    font-size: 14px;
+
+    &::placeholder {
+      .user-layout-wrapper.light-mode & {
+        color: rgba(0, 0, 0, 0.35);
       }
     }
   }
@@ -110,17 +108,15 @@
 
 /* 记住账号复选框 */
 .auth-remember-checkbox {
-  :global {
-    .ant-checkbox-wrapper {
-      font-size: 13px;
+  .ant-checkbox-wrapper {
+    font-size: 13px;
 
-      .user-layout-wrapper.light-mode & {
-        color: rgba(0, 0, 0, 0.7);
-      }
+    .user-layout-wrapper.light-mode & {
+      color: rgba(0, 0, 0, 0.7);
+    }
 
-      .user-layout-wrapper:not(.light-mode) & {
-        color: rgba(255, 255, 255, 0.75);
-      }
+    .user-layout-wrapper:not(.light-mode) & {
+      color: rgba(255, 255, 255, 0.75);
     }
   }
 }
