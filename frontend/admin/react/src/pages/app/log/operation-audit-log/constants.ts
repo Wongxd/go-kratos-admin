@@ -34,10 +34,12 @@ export function getActionOptions(t: TFn) {
 // ========== 成功状态 ==========
 
 /** 成功状态列表 */
-export const SUCCESS_STATUS_LIST = [
-  { label: '成功', value: 'true' },
-  { label: '失败', value: 'false' },
-];
+export function getSuccessStatusList(t: TFn) {
+  return [
+    { label: t('success.true'), value: 'true' },
+    { label: t('success.false'), value: 'false' },
+  ];
+}
 
 /** 根据成功状态获取颜色 */
 export function successToColor(success: boolean | undefined): string {
@@ -47,8 +49,8 @@ export function successToColor(success: boolean | undefined): string {
 }
 
 /** 根据成功状态和状态码获取显示文本 */
-export function successToName(success: boolean | undefined, statusCode?: number): string {
-  if (success === true) return `成功${statusCode ? ` (${statusCode})` : ''}`;
-  if (success === false) return `失败${statusCode ? ` (${statusCode})` : ''}`;
+export function successToName(t: TFn, success: boolean | undefined, statusCode?: number): string {
+  if (success === true) return `${t('success.true')}${statusCode ? ` (${statusCode})` : ''}`;
+  if (success === false) return `${t('success.false')}${statusCode ? ` (${statusCode})` : ''}`;
   return '-';
 }

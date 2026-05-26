@@ -89,6 +89,13 @@
   "app": {
     "defaultName": "管理系统"
   },
+  "clipboard": {
+    "copyFailed": "复制失败，请手动复制",
+    "copyDenied": "复制操作被拒绝"
+  },
+  "placeholder": {
+    "underDevelopment": "{{pageName}} - 开发中"
+  },
   "requestError": {
     "networkError": "网络连接错误,请检查网络设置后重试",
     "timeout": "请求超时,请检查网络连接后重试",

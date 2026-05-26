@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import i18next from 'i18next';
 
 import { isDarkMode } from './utils';
 
@@ -76,7 +77,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         return { parsed, formatted };
       } catch (error) {
         const err = error as Error;
-        setParseError(`JSON解析错误: ${err.message || '未知错误'}`);
+        setParseError(i18next.t('editor:jsonParseError', { error: err.message || i18next.t('editor:unknownError') }));
         onError?.(err);
         return { parsed: null, formatted: val };
       }

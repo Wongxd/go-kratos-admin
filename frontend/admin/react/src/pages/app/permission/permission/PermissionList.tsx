@@ -113,7 +113,7 @@ const PermissionList: React.FC<PermissionListProps> = ({ groupId }) => {
   // 如果没有选中分组，显示提示
   if (!groupId) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+      <div className="page-container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
         <Empty description={t('selectGroupFirst')} />
       </div>
     );
@@ -121,7 +121,7 @@ const PermissionList: React.FC<PermissionListProps> = ({ groupId }) => {
 
   return (
     <>
-      <div ref={containerRef} className="page-container-content" style={{ padding: '0 8px' }}>
+      <div ref={containerRef} className="page-container-content" style={{ padding: '0 8px', height: '100%' }}>
         <ProTable<any>
           actionRef={actionRef}
           columns={columns}

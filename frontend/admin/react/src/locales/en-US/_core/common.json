@@ -89,6 +89,13 @@
   "app": {
     "defaultName": "Admin"
   },
+  "clipboard": {
+    "copyFailed": "Copy failed, please copy manually",
+    "copyDenied": "Copy operation was denied"
+  },
+  "placeholder": {
+    "underDevelopment": "{{pageName}} - Under Development"
+  },
   "requestError": {
     "networkError": "Network connection error, please check your network settings and try again",
     "timeout": "Request timeout, please check your network connection and try again",

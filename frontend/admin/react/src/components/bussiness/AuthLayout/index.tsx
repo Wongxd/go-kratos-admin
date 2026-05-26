@@ -33,7 +33,7 @@ export interface AuthLayoutProps {
  * 用于登录、注册、找回密码等页面
  */
 const AuthLayout: React.FC<AuthLayoutProps> = ({ title, description, children, footerLink }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
   const { theme, toggleTheme, setThemeMode, copyright } = usePreferences();
   const { locale, toggleLocale } = useLocale();
 
@@ -72,18 +72,18 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ title, description, children, f
     <div className={`auth-layout-wrapper${isLightMode ? ' light-mode' : ''}`}>
       {/* 右上角工具栏 */}
       <div className="auth-toolbar">
-        <Tooltip title={t('auth:switchLanguage')}>
+        <Tooltip title={t('switchLanguage')}>
           <Button
             type="text"
             icon={<GlobalOutlined />}
             onClick={handleToggleLanguage}
             className={isLightMode ? 'auth-toolbar-btn-light' : 'auth-toolbar-btn-dark'}
           >
-            {locale === 'zh-CN' ? '中文' : 'English'}
+            {locale === 'zh-CN' ? t('langZhCN') : t('langEnUS')}
           </Button>
         </Tooltip>
         <Tooltip
-          title={theme.mode === 'light' ? t('auth:switchToDarkMode') : t('auth:switchToLightMode')}
+          title={theme.mode === 'light' ? t('switchToDarkMode') : t('switchToLightMode')}
         >
           <Button
             type="text"
@@ -108,8 +108,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ title, description, children, f
           <SloganIcon />
         </div>
 
-        <h2 className="auth-brand-title">{t('auth:systemTitle')}</h2>
-        <p className="auth-brand-description">{t('auth:systemDescription')}</p>
+        <h2 className="auth-brand-title">{t('systemTitle')}</h2>
+        <p className="auth-brand-description">{t('systemDescription')}</p>
       </div>
 
       {/* 右侧表单区 */}

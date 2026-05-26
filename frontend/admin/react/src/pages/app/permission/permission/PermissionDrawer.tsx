@@ -85,7 +85,7 @@ const PermissionDrawer: React.FC<PermissionDrawerProps> = ({
       setApiTreeLoading(true);
       fetchListApis(new PaginationQuery({}))
         .then((res) => {
-          setApiTreeData(buildApiTree(res?.items));
+          setApiTreeData(buildApiTree(res?.items, t));
         })
         .catch(() => setApiTreeData([]))
         .finally(() => setApiTreeLoading(false));

@@ -12,7 +12,7 @@ import ContentContainer from '@/layouts/components/PageContainer/ContentContaine
 import {
   getAccessTypeMap,
   getAccessTypeOptions,
-  SUCCESS_STATUS_LIST,
+  getSuccessStatusList,
   successToColor,
   successToName,
 } from './constants';
@@ -58,13 +58,13 @@ const DataAccessAuditLogPage = () => {
       width: 100,
       valueType: 'select',
       valueEnum: Object.fromEntries(
-        SUCCESS_STATUS_LIST.map((item) => [
+        getSuccessStatusList(t).map((item) => [
           item.value,
           { text: item.label, status: item.value === 'true' ? 'Success' : 'Error' },
         ]),
       ),
       render: (_, record) => (
-        <Tag color={successToColor(record.success)}>{successToName(record.success)}</Tag>
+        <Tag color={successToColor(record.success)}>{successToName(t, record.success)}</Tag>
       ),
     },
     {

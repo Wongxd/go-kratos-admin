@@ -61,5 +61,7 @@
   "splitCell": "Split Cell",
   "toggleHeaderRow": "Toggle Header Row",
   "toggleHeaderColumn": "Toggle Header Column",
-  "toggleHeaderCell": "Toggle Header Cell"
+  "toggleHeaderCell": "Toggle Header Cell",
+  "jsonParseError": "JSON parse error: {{error}}",
+  "unknownError": "Unknown error"
 }

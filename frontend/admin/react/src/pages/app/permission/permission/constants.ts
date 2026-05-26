@@ -4,6 +4,9 @@
 
 type TFn = (key: string, options?: Record<string, any>) => string;
 
+// 通用 fallback：在非组件环境下的默认翻译
+const defaultT = (key: string) => key;
+
 // ========== 状态映射 ==========
 
 export const STATUS_COLORS: Record<string, string> = {
@@ -175,13 +178,14 @@ export function buildApiTree(
     name?: string;
     module?: string;
   }> | null,
+  t?: TFn,
 ): TreeNode[] {
   if (!items || items.length === 0) return [];
 
   const moduleMap = new Map<string, any[]>();
 
   items.forEach((item) => {
-    const mod = item.module || '其他';
+    const mod = item.module || (t || defaultT)('permission-group:moduleOther');
     if (!moduleMap.has(mod)) {
       moduleMap.set(mod, []);
     }

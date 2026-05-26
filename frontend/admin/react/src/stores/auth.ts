@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import i18next from 'i18next';
 
 import { encryptPassword } from '@/utils';
 import {
@@ -139,7 +140,7 @@ export const useAuthStore = create<AuthState>()(
             window.location.href = userInfo.homePath;
           }
         } catch (err: any) {
-          const errorMsg = err?.message || '登录失败';
+          const errorMsg = err?.message || i18next.t('auth:loginFailed');
           set({ error: errorMsg });
           throw err;
         } finally {
@@ -161,7 +162,7 @@ export const useAuthStore = create<AuthState>()(
             tenantCode: '',
           });
         } catch (err: any) {
-          const errorMsg = err?.message || '注册失败';
+          const errorMsg = err?.message || i18next.t('auth:registerFailed');
           set({ error: errorMsg });
           throw err;
         } finally {
@@ -232,7 +233,7 @@ export const useAuthStore = create<AuthState>()(
       // 重认证（兜底）
       reauthenticate: () => {
         console.warn('Token invalid, please re-login');
-        set({ error: '认证已过期，请重新登录' });
+        set({ error: i18next.t('auth:sessionExpired') });
         // 可选：自动跳转登录页
         // window.location.href = '/auth/login';
       },

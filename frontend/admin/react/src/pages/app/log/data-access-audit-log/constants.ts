@@ -37,10 +37,12 @@ export function getAccessTypeOptions(t: TFn) {
 // ========== 成功状态 ==========
 
 /** 成功状态列表 */
-export const SUCCESS_STATUS_LIST = [
-  { label: '成功', value: 'true' },
-  { label: '失败', value: 'false' },
-];
+export function getSuccessStatusList(t: TFn) {
+  return [
+    { label: t('success.true'), value: 'true' },
+    { label: t('success.false'), value: 'false' },
+  ];
+}
 
 /** 根据成功状态获取颜色 */
 export function successToColor(success: boolean | undefined): string {
@@ -50,8 +52,8 @@ export function successToColor(success: boolean | undefined): string {
 }
 
 /** 根据成功状态获取显示文本 */
-export function successToName(success: boolean | undefined): string {
-  if (success === true) return '成功';
-  if (success === false) return '失败';
+export function successToName(t: TFn, success: boolean | undefined): string {
+  if (success === true) return t('success.true');
+  if (success === false) return t('success.false');
   return '-';
 }

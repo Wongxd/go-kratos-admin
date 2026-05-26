@@ -31,5 +31,6 @@
   "statusMap": {
     "ON": "Active",
     "OFF": "Inactive"
-  }
+  },
+  "moduleOther": "Other"
 }

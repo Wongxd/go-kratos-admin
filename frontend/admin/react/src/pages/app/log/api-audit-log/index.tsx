@@ -13,9 +13,9 @@ import ContentContainer from '@/layouts/components/PageContainer/ContentContaine
 /**
  * 成功状态列表
  */
-const successStatusList = [
-  { label: '成功', value: 'true' },
-  { label: '失败', value: 'false' },
+const getSuccessStatusList = (t: (key: string) => string) => [
+  { label: t('success.true'), value: 'true' },
+  { label: t('success.false'), value: 'false' },
 ];
 
 /**
@@ -30,9 +30,9 @@ function successToColor(success: boolean | undefined): string {
 /**
  * 根据成功状态和状态码获取显示文本
  */
-function successToName(success: boolean | undefined, statusCode?: number): string {
-  if (success === true) return `成功${statusCode ? ` (${statusCode})` : ''}`;
-  if (success === false) return `失败${statusCode ? ` (${statusCode})` : ''}`;
+function successToName(t: (key: string) => string, success: boolean | undefined, statusCode?: number): string {
+  if (success === true) return `${t('success.true')}${statusCode ? ` (${statusCode})` : ''}`;
+  if (success === false) return `${t('success.false')}${statusCode ? ` (${statusCode})` : ''}`;
   return '-';
 }
 
@@ -74,14 +74,14 @@ const ApiAuditLog = () => {
       width: 100,
       valueType: 'select',
       valueEnum: Object.fromEntries(
-        successStatusList.map((item) => [
+        getSuccessStatusList(t).map((item) => [
           item.value,
           { text: item.label, status: item.value === 'true' ? 'Success' : 'Error' },
         ]),
       ),
       render: (_, record) => (
         <Tag color={successToColor(record.success)}>
-          {successToName(record.success, record.statusCode)}
+          {successToName(t, record.success, record.statusCode)}
         </Tag>
       ),
     },

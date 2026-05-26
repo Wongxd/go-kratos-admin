@@ -3,6 +3,7 @@ import {useCallback, useMemo} from 'react';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
 import type {Locale} from 'antd/es/locale';
+import {useTranslation} from 'react-i18next';
 
 import {usePreferences} from './usePreferences';
 import type {SupportedLanguagesType} from '../types/layout';
@@ -61,14 +62,16 @@ export function useLocale() {
         setLocale(newLocale);
     }, [locale, setLocale]);
 
+    const {t} = useTranslation('auth');
+
     // 获取语言显示名称
     const getLocaleName = useCallback((lang: SupportedLanguagesType): string => {
         const names: Record<SupportedLanguagesType, string> = {
-            'zh-CN': '简体中文',
-            'en-US': 'English',
+            'zh-CN': t('langZhCN'),
+            'en-US': t('langEnUS'),
         };
         return names[lang];
-    }, []);
+    }, [t]);
 
     // 当前语言的显示名称
     const localeName = getLocaleName(locale);
@@ -78,8 +81,8 @@ export function useLocale() {
         value: SupportedLanguagesType;
         label: string;
     }> = [
-        {value: 'zh-CN', label: '简体中文'},
-        {value: 'en-US', label: 'English'},
+        {value: 'zh-CN', label: t('langZhCN')},
+        {value: 'en-US', label: t('langEnUS')},
     ];
 
     return {

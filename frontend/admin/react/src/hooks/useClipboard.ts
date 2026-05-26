@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import i18next from 'i18next';
 
 type CopyHandler = (text: string) => Promise<boolean>;
 
@@ -38,9 +39,9 @@ export function useClipboard(): [boolean, string, CopyHandler] {
                 return true;
             }
 
-            throw new Error('复制失败，请手动复制');
+            throw new Error(i18next.t('common:clipboard.copyFailed'));
         } catch (err) {
-            const message = err instanceof Error ? err.message : '复制操作被拒绝';
+            const message = err instanceof Error ? err.message : i18next.t('common:clipboard.copyDenied');
             setError(message);
             setIsCopied(false);
             return false;

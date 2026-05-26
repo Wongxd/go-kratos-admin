@@ -156,7 +156,7 @@ const PermissionGroupList: React.FC<PermissionGroupListProps> = ({
 
   return (
     <>
-      <div ref={containerRef} className="page-container-content" style={{ padding: '0 8px' }}>
+      <div ref={containerRef} className="page-container-content" style={{ padding: '0 8px', height: '100%' }}>
         <ProTable<any>
           actionRef={actionRef}
           columns={columns}

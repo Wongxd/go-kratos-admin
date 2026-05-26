@@ -61,5 +61,7 @@
   "splitCell": "拆分单元格",
   "toggleHeaderRow": "切换表头行",
   "toggleHeaderColumn": "切换表头列",
-  "toggleHeaderCell": "切换表头单元格"
+  "toggleHeaderCell": "切换表头单元格",
+  "jsonParseError": "JSON解析错误: {{error}}",
+  "unknownError": "未知错误"
 }
