@@ -27,12 +27,15 @@ declare global {
   const BaseTransfer: typeof import('../src/components/Transfer/BaseTransfer').default
   const BaseTreeSelect: typeof import('../src/components/common/Selects/index').BaseTreeSelect
   const BaseUpload: typeof import('../src/components/Upload/BaseUpload').default
+  const CodeEditor: typeof import('../src/components/common/Editor/src/CodeEditor').default
   const CopyBtn: typeof import('../src/components/Copy/CopyBtn').default
   const CopyInput: typeof import('../src/components/Copy/CopyInput').default
   const Count: typeof import('../src/components/Count/index').default
   const CreateBusiness: typeof import('../src/components/common/Business/index').CreateBusiness
   const DeleteBtn: typeof import('../src/components/Buttons/index').DeleteBtn
   const DragContent: typeof import('../src/components/Table/components/DragContent').default
+  const Editor: typeof import('../src/components/common/Editor/src/Editor').default
+  const EditorType: typeof import('../src/components/common/Editor/types').EditorType
   const Ellipsis: typeof import('../src/components/Ellipsis/index').default
   const EllipsisText: typeof import('../src/components/Table/components/EllipsisText').default
   const Fragment: typeof import('react').Fragment
@@ -41,16 +44,19 @@ declare global {
   const Github: typeof import('../src/components/common/Github/index').default
   const GlobalSearch: typeof import('../src/components/common/GlobalSearch/index').default
   const I18n: typeof import('../src/components/common/I18n/index').default
+  const JsonEditor: typeof import('../src/components/common/Editor/src/JsonEditor').default
   const Link: typeof import('react-router-dom').Link
   const Loading: typeof import('../src/components/common/Loading/index').default
   const LoadingComponent: typeof import('../src/components/common/Form/components/LoadingComponent').default
   const MAX_TAG_COUNT: typeof import('../src/components/common/Selects/index').MAX_TAG_COUNT
+  const MarkdownEditor: typeof import('../src/components/common/Editor/src/MarkdownEditor').default
   const NavLink: typeof import('react-router-dom').NavLink
   const Navigate: typeof import('react-router-dom').Navigate
   const Outlet: typeof import('react-router-dom').Outlet
   const PageContainer: typeof import('../src/components/common/PageContainer/index').default
   const PartnerSelect: typeof import('../src/components/common/Business/Selects/PartnerSelect').default
   const PasswordStrength: typeof import('../src/components/PasswordStrength/index').default
+  const PlainTextEditor: typeof import('../src/components/common/Editor/src/PlainTextEditor').default
   const ResizableTitle: typeof import('../src/components/Table/components/ResizableTitle').default
   const Route: typeof import('react-router-dom').Route
   const Routes: typeof import('react-router-dom').Routes
@@ -65,6 +71,7 @@ declare global {
   const TableFilter: typeof import('../src/components/Table/components/TableFilter').default
   const Theme: typeof import('../src/components/common/Theme/index').default
   const ThemeLoading: typeof import('../src/components/common/Loading/index').ThemeLoading
+  const TiptapEditor: typeof import('../src/components/common/Editor/src/TiptapEditor').default
   const UpdateBtn: typeof import('../src/components/Buttons/index').UpdateBtn
   const VirtualWrapper: typeof import('../src/components/Table/components/VirtualWrapper').default
   const addComponent: typeof import('../src/components/common/Form/utils/componentMap').addComponent
@@ -85,8 +92,11 @@ declare global {
   const handleRowHeight: typeof import('../src/components/Table/utils/helper').handleRowHeight
   const handleValuePropName: typeof import('../src/components/common/Form/utils/helper').handleValuePropName
   const initCompProps: typeof import('../src/components/common/Form/utils/helper').initCompProps
+  const initMonacoWorkers: typeof import('../src/components/common/Editor/src/monaco-loader').initMonacoWorkers
+  const isDarkMode: typeof import('../src/components/common/Editor/src/utils').isDarkMode
   const lazy: typeof import('react').lazy
   const memo: typeof import('react').memo
+  const monacoLoader: typeof import('../src/components/common/Editor/src/monaco-loader').default
   const reducer: typeof import('../src/components/Table/utils/reducer').reducer
   const startTransition: typeof import('react').startTransition
   const string2Dayjs: typeof import('../src/components/common/Dates/utils/helper').string2Dayjs
@@ -148,6 +158,6 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { TabItem, ThemeLoadingProps, TokenPayload, AuthState, UserState, AuthLayoutProps, BusinessComponents, RangeValue, SearchModalProps, Langs, ApiFn, ApiSelectProps, ApiTreeSelectProps, ApiPageSelectProps, CheckboxList, InitTableState, TableAction, ECOption, FC } from './autoImports.d'
+  export type { TiptapEditorProps, MarkdownEditorProps, CodeEditorProps, JsonEditorProps, PlainTextEditorProps, EditorProps, TabItem, ThemeLoadingProps, TokenPayload, AuthState, UserState, AuthLayoutProps, BusinessComponents, RangeValue, SearchModalProps, Langs, ApiFn, ApiSelectProps, ApiTreeSelectProps, ApiPageSelectProps, CheckboxList, InitTableState, TableAction, ECOption, FC } from './autoImports.d'
   import('./autoImports.d')
 }

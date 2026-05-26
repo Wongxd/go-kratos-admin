@@ -3,7 +3,6 @@ import type { ProFormInstance } from '@ant-design/pro-components';
 import {
   DrawerForm,
   ProFormText,
-  ProFormTextArea,
   ProFormSelect,
 } from '@ant-design/pro-components';
 import { App, TreeSelect, Form } from 'antd';
@@ -11,8 +10,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { internal_messageservicev1_InternalMessage as InternalMessage } from '@/api/generated/admin/service/v1';
 import { PaginationQuery } from '@/core';
-import { useUpdateInternalMessage, useSendMessage } from '@/api/hooks/internal-message';
-import { fetchListMessageCategories } from '@/api/hooks/internal-message';
+import { useUpdateInternalMessage, useSendMessage, fetchListMessageCategories } from '@/api/hooks/internal-message';
+import { Editor, EditorType } from '@/components/common/Editor';
 import { getStatusOptions, getTypeOptions } from '../constants';
 
 interface MessageDrawerProps {
@@ -188,12 +187,18 @@ const MessageDrawer: React.FC<MessageDrawerProps> = ({ open, mode, data, onClose
         fieldProps={{ allowClear: true }}
       />
 
-      <ProFormTextArea
+      {/* 消息内容 - Tiptap 富文本编辑器 */}
+      <Form.Item
         name="content"
         label={t('content')}
-        placeholder={t('contentPlaceholder')}
-        fieldProps={{ allowClear: true, rows: 8 }}
-      />
+        rules={[{ required: true, message: t('requiredContent', '请输入消息内容') }]}
+      >
+        <Editor
+          editorType={EditorType.RICH_TEXT}
+          height={400}
+          placeholder={t('contentPlaceholder')}
+        />
+      </Form.Item>
     </DrawerForm>
   );
 };
