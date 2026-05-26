@@ -79,11 +79,7 @@ const LanguageManagement = () => {
       hideInSearch: true,
       render: (_, record) => {
         const enabled = record.isEnabled as boolean;
-        return (
-          <Tag color={enableBoolToColor(enabled)}>
-            {enabled ? t('yes') : t('no')}
-          </Tag>
-        );
+        return <Tag color={enableBoolToColor(enabled)}>{enabled ? t('yes') : t('no')}</Tag>;
       },
     },
     {
@@ -93,11 +89,7 @@ const LanguageManagement = () => {
       hideInSearch: true,
       render: (_, record) => {
         const isDefault = record.isDefault as boolean;
-        return (
-          <Tag color={enableBoolToColor(isDefault)}>
-            {isDefault ? t('yes') : t('no')}
-          </Tag>
-        );
+        return <Tag color={enableBoolToColor(isDefault)}>{isDefault ? t('yes') : t('no')}</Tag>;
       },
     },
     {
@@ -128,7 +120,7 @@ const LanguageManagement = () => {
             setDrawerOpen(true);
           }}
         >
-          <EditOutlined /> {t('common:button.edit')}
+          <EditOutlined />
         </a>,
         <Popconfirm
           key="delete"
@@ -140,9 +132,7 @@ const LanguageManagement = () => {
           okText={t('common:button.ok')}
           cancelText={t('common:button.cancel')}
         >
-          <a style={{ color: '#ff4d4f' }}>
-            <DeleteOutlined /> {t('common:button.delete')}
-          </a>
+          <a style={{ color: '#ff4d4f' }}><DeleteOutlined /></a>
         </Popconfirm>,
       ],
     },
@@ -200,7 +190,6 @@ const LanguageManagement = () => {
               defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
               showSizeChanger: true,
               showQuickJumper: true,
-              position: ['bottomRight'],
             }}
             toolBarRender={() => [
               <Button

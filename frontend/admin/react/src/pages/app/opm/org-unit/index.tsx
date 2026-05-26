@@ -56,27 +56,17 @@ const OrgUnitManagement = () => {
     },
   });
 
-  // 构建组织树
-  const buildOrgTree = (items: OrgUnit[]): OrgUnit[] => {
-    const map = new Map<number, OrgUnit & { children?: OrgUnit[] }>();
-    const roots: (OrgUnit & { children?: OrgUnit[] })[] = [];
-
-    items.forEach((item) => {
-      map.set(item.id as number, { ...item, children: [] });
-    });
-
-    map.forEach((node) => {
-      const parentId = (node as any).parentId;
-      if (parentId && map.has(Number(parentId))) {
-        const parent = map.get(Number(parentId))!;
-        if (!parent.children) parent.children = [];
-        parent.children.push(node);
-      } else {
-        roots.push(node);
+  // 清理 API 返回树形数据中的空 children 数组
+  const cleanEmptyChildren = (nodes: any[]): void => {
+    nodes.forEach((n) => {
+      if (n.children) {
+        if (n.children.length === 0) {
+          delete n.children;
+        } else {
+          cleanEmptyChildren(n.children);
+        }
       }
     });
-
-    return roots;
   };
 
   // 展开全部/折叠全部
@@ -196,9 +186,7 @@ const OrgUnitManagement = () => {
           okText={t('common:button.ok')}
           cancelText={t('common:button.cancel')}
         >
-          <a style={{ color: '#ff4d4f' }}>
-            <DeleteOutlined />
-          </a>
+          <a style={{ color: '#ff4d4f' }}><DeleteOutlined /></a>
         </Popconfirm>,
       ],
     },
@@ -222,13 +210,14 @@ const OrgUnitManagement = () => {
                 });
 
                 const response = await fetchListOrgUnits(query);
-                const items = response.items || [];
-                const treeData = buildOrgTree(items as OrgUnit[]);
-                setTreeData(treeData);
+                const items = (response.items || []) as OrgUnit[];
+                // API 已返回树形结构，只需清理空 children
+                cleanEmptyChildren(items as any[]);
+                setTreeData(items);
 
                 return {
-                  data: treeData,
-                  total: items.length,
+                  data: items,
+                  total: (response as any).total ?? items.length,
                   success: true,
                 };
               } catch (error: any) {

@@ -84,6 +84,18 @@ const MenuManagement = () => {
       }
     });
 
+    // 清理叶子节点的空 children，避免 ProTable 显示无效展开箭头
+    const cleanEmpty = (nodes: (Menu & { children?: Menu[] })[]) => {
+      nodes.forEach((n) => {
+        if (n.children && n.children.length === 0) {
+          delete n.children;
+        } else if (n.children) {
+          cleanEmpty(n.children);
+        }
+      });
+    };
+    cleanEmpty(roots);
+
     return roots;
   };
 
@@ -222,7 +234,7 @@ const MenuManagement = () => {
             setDrawerOpen(true);
           }}
         >
-          <EditOutlined /> {t('common:button.edit')}
+          <EditOutlined />
         </a>,
         <Popconfirm
           key="delete"
@@ -234,9 +246,7 @@ const MenuManagement = () => {
           okText={t('common:button.ok')}
           cancelText={t('common:button.cancel')}
         >
-          <a style={{ color: '#ff4d4f' }}>
-            <DeleteOutlined /> {t('common:button.delete')}
-          </a>
+          <a style={{ color: '#ff4d4f' }}><DeleteOutlined /></a>
         </Popconfirm>,
       ],
     },

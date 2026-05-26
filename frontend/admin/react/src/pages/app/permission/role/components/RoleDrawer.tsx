@@ -61,13 +61,15 @@ const RoleDrawer: React.FC<RoleDrawerProps> = ({ open, mode, data, onClose, onSu
   // 编辑模式填充表单
   useEffect(() => {
     if (open && mode === 'edit' && data) {
-      formRef.current?.setFieldsValue({
-        name: data.name || '',
-        code: data.code || '',
-        sortOrder: (data as any).sortOrder ?? 1,
-        status: data.status || 'ON',
-        description: (data as any).description || '',
-      });
+      setTimeout(() => {
+        formRef.current?.setFieldsValue({
+          name: data.name || '',
+          code: data.code || '',
+          sortOrder: (data as any).sortOrder ?? 1,
+          status: data.status || 'ON',
+          description: (data as any).description || '',
+        });
+      }, 0);
       // 设置已勾选的权限
       const perms = (data as any).permissions;
       if (Array.isArray(perms)) {
@@ -130,7 +132,6 @@ const RoleDrawer: React.FC<RoleDrawerProps> = ({ open, mode, data, onClose, onSu
           onClose();
         }
       }}
-      width={600}
       initialValues={{
         sortOrder: 1,
         status: 'ON',
@@ -146,7 +147,7 @@ const RoleDrawer: React.FC<RoleDrawerProps> = ({ open, mode, data, onClose, onSu
         },
         resetButtonProps: { onClick: onClose },
       }}
-      drawerProps={{ destroyOnClose: true, onClose }}
+      drawerProps={{ destroyOnClose: true, onClose, styles: { wrapper: { width: 600 } } }}
     >
       <ProFormText
         name="name"

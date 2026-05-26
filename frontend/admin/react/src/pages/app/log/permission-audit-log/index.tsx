@@ -146,7 +146,6 @@ const PermissionAuditLogPage = () => {
             defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
             showSizeChanger: true,
             showQuickJumper: true,
-            position: ['bottomRight'],
           }}
           options={{
             density: true,

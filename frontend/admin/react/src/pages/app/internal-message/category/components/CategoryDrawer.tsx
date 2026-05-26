@@ -35,13 +35,15 @@ const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ open, mode, data, onClo
   // 编辑模式填充表单
   useEffect(() => {
     if (open && mode === 'edit' && data) {
-      formRef.current?.setFieldsValue({
-        name: data.name || '',
-        code: data.code || '',
-        sortOrder: (data as any).sortOrder ?? 1,
-        isEnabled: data.isEnabled ?? true,
-        remark: (data as any).remark || '',
-      });
+      setTimeout(() => {
+        formRef.current?.setFieldsValue({
+          name: data.name || '',
+          code: data.code || '',
+          sortOrder: (data as any).sortOrder ?? 1,
+          isEnabled: data.isEnabled ?? true,
+          remark: (data as any).remark || '',
+        });
+      }, 0);
     }
   }, [open, mode, data]);
 
@@ -93,7 +95,6 @@ const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ open, mode, data, onClo
           onClose();
         }
       }}
-      width={500}
       initialValues={{
         sortOrder: 1,
         isEnabled: true,
@@ -109,7 +110,7 @@ const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ open, mode, data, onClo
         },
         resetButtonProps: { onClick: onClose },
       }}
-      drawerProps={{ destroyOnClose: true, onClose }}
+      drawerProps={{ destroyOnClose: true, onClose, styles: { wrapper: { width: 500 } } }}
     >
       <ProFormText
         name="name"

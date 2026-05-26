@@ -47,7 +47,7 @@ const OrgDrawer: React.FC<OrgDrawerProps> = ({ open, mode, data, onClose, onSucc
         .then((res) => {
           const items = res?.items || [];
           // 构建树形选择数据
-          const treeData = buildOrgTree(items as OrgUnit[], data?.id);
+          const treeData = buildOrgTreeSelect(items as any[], data?.id);
           setParentTreeData(treeData);
         })
         .catch(() => setParentTreeData([]));
@@ -70,21 +70,24 @@ const OrgDrawer: React.FC<OrgDrawerProps> = ({ open, mode, data, onClose, onSucc
   // 编辑模式填充表单
   useEffect(() => {
     if (open && mode === 'edit' && data) {
-      formRef.current?.setFieldsValue({
-        name: data.name || '',
-        code: data.code || '',
-        parentId: (data as any).parentId || undefined,
-        leaderId: (data as any).leaderId || undefined,
-        type: data.type || undefined,
-        sortOrder: (data as any).sortOrder ?? 1,
-        status: data.status || 'ON',
-        isLegalEntity: (data as any).isLegalEntity ?? false,
-        registrationNumber: (data as any).registrationNumber || '',
-        taxId: (data as any).taxId || '',
-        address: (data as any).address || '',
-        description: (data as any).description || '',
-        remark: (data as any).remark || '',
-      });
+      // 使用 setTimeout 确保 DrawerForm 内部初始化完成后再设值
+      setTimeout(() => {
+        formRef.current?.setFieldsValue({
+          name: data.name || '',
+          code: data.code || '',
+          parentId: (data as any).parentId || undefined,
+          leaderId: (data as any).leaderId || undefined,
+          type: data.type || undefined,
+          sortOrder: (data as any).sortOrder ?? 1,
+          status: data.status || 'ON',
+          isLegalEntity: (data as any).isLegalEntity ?? false,
+          registrationNumber: (data as any).registrationNumber || '',
+          taxId: (data as any).taxId || '',
+          address: (data as any).address || '',
+          description: (data as any).description || '',
+          remark: (data as any).remark || '',
+        });
+      }, 0);
     }
   }, [open, mode, data]);
 
@@ -136,7 +139,6 @@ const OrgDrawer: React.FC<OrgDrawerProps> = ({ open, mode, data, onClose, onSucc
           onClose();
         }
       }}
-      width={600}
       initialValues={{
         sortOrder: 1,
         status: 'ON',
@@ -153,7 +155,7 @@ const OrgDrawer: React.FC<OrgDrawerProps> = ({ open, mode, data, onClose, onSucc
         },
         resetButtonProps: { onClick: onClose },
       }}
-      drawerProps={{ destroyOnClose: true, onClose }}
+      drawerProps={{ destroyOnClose: true, onClose, styles: { wrapper: { width: 600 } } }}
     >
       <ProFormText
         name="name"
@@ -268,49 +270,35 @@ const OrgDrawer: React.FC<OrgDrawerProps> = ({ open, mode, data, onClose, onSucc
 };
 
 /**
- * 构建组织树形选择数据（排除当前编辑节点及其子节点，防止循环引用）
+ * 将 API 返回的树形组织数据转为 TreeSelect 格式，
+ * 并排除当前编辑节点及其子节点，防止循环引用
  */
-function buildOrgTree(items: OrgUnit[], excludeId?: number | string): any[] {
-  const map = new Map<number, any>();
-  const roots: any[] = [];
+function buildOrgTreeSelect(items: any[], excludeId?: number | string): any[] {
+  const result: any[] = [];
 
-  items.forEach((item) => {
-    map.set(item.id as number, {
+  for (const item of items) {
+    // 排除当前编辑节点
+    if (excludeId && item.id === Number(excludeId)) continue;
+
+    const node: any = {
       id: item.id,
       key: item.id,
       value: item.id,
       title: item.name || String(item.id),
       label: item.name || String(item.id),
-      children: [],
-      _parentId: (item as any).parentId,
-    });
-  });
+    };
 
-  map.forEach((node) => {
-    if (excludeId && (node.id === Number(excludeId) || node.id === excludeId)) return;
-    if (node._parentId && map.has(Number(node._parentId))) {
-      const parent = map.get(Number(node._parentId));
-      if (parent.id !== Number(excludeId) && parent.id !== excludeId) {
-        parent.children.push(node);
+    if (item.children && item.children.length > 0) {
+      const children = buildOrgTreeSelect(item.children, excludeId);
+      if (children.length > 0) {
+        node.children = children;
       }
-    } else {
-      roots.push(node);
     }
-  });
 
-  // 清理空 children
-  const cleanEmpty = (nodes: any[]) => {
-    nodes.forEach((n) => {
-      if (n.children.length === 0) {
-        delete n.children;
-      } else {
-        cleanEmpty(n.children);
-      }
-    });
-  };
-  cleanEmpty(roots);
+    result.push(node);
+  }
 
-  return roots;
+  return result;
 }
 
 export default OrgDrawer;

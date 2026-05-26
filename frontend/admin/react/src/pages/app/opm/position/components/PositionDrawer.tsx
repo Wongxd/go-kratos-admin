@@ -58,17 +58,20 @@ const PositionDrawer: React.FC<PositionDrawerProps> = ({
   // 编辑模式填充表单
   useEffect(() => {
     if (open && mode === 'edit' && data) {
-      formRef.current?.setFieldsValue({
-        name: data.name || '',
-        code: data.code || '',
-        type: data.type || 'REGULAR',
-        orgUnitId: (data as any).orgUnitId || undefined,
-        headcount: (data as any).headcount ?? 1,
-        sortOrder: (data as any).sortOrder ?? 1,
-        status: data.status || 'ON',
-        description: (data as any).description || '',
-        remark: (data as any).remark || '',
-      });
+      // 使用 setTimeout 确保 DrawerForm 内部初始化完成后再设值
+      setTimeout(() => {
+        formRef.current?.setFieldsValue({
+          name: data.name || '',
+          code: data.code || '',
+          type: data.type || 'REGULAR',
+          orgUnitId: (data as any).orgUnitId || undefined,
+          headcount: (data as any).headcount ?? 1,
+          sortOrder: (data as any).sortOrder ?? 1,
+          status: data.status || 'ON',
+          description: (data as any).description || '',
+          remark: (data as any).remark || '',
+        });
+      }, 0);
     }
   }, [open, mode, data]);
 
@@ -120,7 +123,6 @@ const PositionDrawer: React.FC<PositionDrawerProps> = ({
           onClose();
         }
       }}
-      width={600}
       initialValues={{
         type: 'REGULAR',
         headcount: 1,
@@ -138,7 +140,7 @@ const PositionDrawer: React.FC<PositionDrawerProps> = ({
         },
         resetButtonProps: { onClick: onClose },
       }}
-      drawerProps={{ destroyOnClose: true, onClose }}
+      drawerProps={{ destroyOnClose: true, onClose, styles: { wrapper: { width: 600 } } }}
     >
       <ProFormText
         name="name"

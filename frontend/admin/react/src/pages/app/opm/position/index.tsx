@@ -149,9 +149,7 @@ const PositionManagement = () => {
           okText={t('common:button.ok')}
           cancelText={t('common:button.cancel')}
         >
-          <a style={{ color: '#ff4d4f' }}>
-            <DeleteOutlined />
-          </a>
+          <a style={{ color: '#ff4d4f' }}><DeleteOutlined /></a>
         </Popconfirm>,
       ],
     },

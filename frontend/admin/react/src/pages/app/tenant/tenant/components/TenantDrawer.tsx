@@ -45,24 +45,26 @@ const TenantDrawer: React.FC<TenantDrawerProps> = ({
 
   // 当 Drawer 打开时，设置表单初始值
   useEffect(() => {
-    if (open && formRef.current) {
-      if (mode === 'edit' && data) {
-        formRef.current.setFieldsValue({
-          name: data.name,
-          code: data.code,
-          tenantType: data.type,
-          auditStatus: data.auditStatus,
-          status: data.status,
-          remark: data.remark,
-        });
-      } else {
-        // 创建模式下的默认值
-        formRef.current.setFieldsValue({
-          tenantType: 'PAID',
-          auditStatus: 'APPROVED',
-          status: 'ON',
-        });
-      }
+    if (open) {
+      setTimeout(() => {
+        if (mode === 'edit' && data && formRef.current) {
+          formRef.current.setFieldsValue({
+            name: data.name,
+            code: data.code,
+            tenantType: data.type,
+            auditStatus: data.auditStatus,
+            status: data.status,
+            remark: data.remark,
+          });
+        } else if (formRef.current) {
+          // 创建模式下的默认值
+          formRef.current.setFieldsValue({
+            tenantType: 'PAID',
+            auditStatus: 'APPROVED',
+            status: 'ON',
+          });
+        }
+      }, 0);
     }
   }, [open, mode, data]);
 
@@ -146,7 +148,6 @@ const TenantDrawer: React.FC<TenantDrawerProps> = ({
           onClose();
         }
       }}
-      width={600}
       initialValues={{
         tenantType: 'PAID',
         auditStatus: 'APPROVED',
@@ -160,6 +161,11 @@ const TenantDrawer: React.FC<TenantDrawerProps> = ({
           </Button>,
           ...dom,
         ],
+      }}
+      drawerProps={{
+        destroyOnClose: true,
+        onClose,
+        styles: { wrapper: { width: 600 } },
       }}
     >
       <ProFormText

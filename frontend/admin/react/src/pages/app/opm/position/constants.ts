@@ -58,45 +58,29 @@ export function getPositionTypeOptions(t: TFn) {
 // ========== 组织树构建 ==========
 
 /**
- * 从平级组织列表构建树形结构（供 TreeSelect 使用）
+ * 将 API 返回的树形组织数据转为 TreeSelect 格式
  */
-export function buildOrgTreeData(
-  items: Array<{ id?: number | string; name?: string; parentId?: number | string }>,
-): any[] {
-  const map = new Map<number, any>();
-  const roots: any[] = [];
+export function buildOrgTreeData(items: any[]): any[] {
+  const result: any[] = [];
 
-  items.forEach((item) => {
-    map.set(Number(item.id), {
+  for (const item of items) {
+    const node: any = {
       id: item.id,
       key: item.id,
       value: item.id,
       title: item.name || String(item.id),
       label: item.name || String(item.id),
-      children: [],
-      _parentId: item.parentId,
-    });
-  });
+    };
 
-  map.forEach((node) => {
-    if (node._parentId && map.has(Number(node._parentId))) {
-      map.get(Number(node._parentId)).children.push(node);
-    } else {
-      roots.push(node);
-    }
-  });
-
-  // 清理空 children
-  const cleanEmpty = (nodes: any[]) => {
-    nodes.forEach((n) => {
-      if (n.children.length === 0) {
-        delete n.children;
-      } else {
-        cleanEmpty(n.children);
+    if (item.children && item.children.length > 0) {
+      const children = buildOrgTreeData(item.children);
+      if (children.length > 0) {
+        node.children = children;
       }
-    });
-  };
-  cleanEmpty(roots);
+    }
 
-  return roots;
+    result.push(node);
+  }
+
+  return result;
 }

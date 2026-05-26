@@ -93,7 +93,9 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, mode, data, onClose, onSu
         'meta.hideInBreadcrumb': meta.hideInBreadcrumb || false,
         'meta.hideInTab': meta.hideInTab || false,
       };
-      formRef.current?.setFieldsValue(formValues);
+      setTimeout(() => {
+        formRef.current?.setFieldsValue(formValues);
+      }, 0);
     }
   }, [open, mode, data]);
 
@@ -172,7 +174,11 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, mode, data, onClose, onSu
           onClose();
         }
       }}
-      width={720}
+      drawerProps={{
+        destroyOnClose: true,
+        onClose,
+        styles: { wrapper: { width: 720 } },
+      }}
       initialValues={{
         type: 'MENU',
         status: 'ON',
@@ -190,10 +196,6 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, mode, data, onClose, onSu
         resetButtonProps: {
           onClick: onClose,
         },
-      }}
-      drawerProps={{
-        destroyOnClose: true,
-        onClose,
       }}
     >
       {/* 菜单类型 */}
@@ -331,7 +333,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, mode, data, onClose, onSu
       <ProFormDependency name={['type']}>
         {({ type }) => {
           if (isButton(type) || type === 'LINK') return null;
-          return <Divider orientation={'left' as any}>{t('advancedSettings')}</Divider>;
+          return <Divider titlePlacement="left">{t('advancedSettings')}</Divider>;
         }}
       </ProFormDependency>
 

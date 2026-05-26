@@ -88,7 +88,6 @@ const FileDrawer: React.FC<FileDrawerProps> = ({
           onClose();
         }
       }}
-      width={480}
       initialValues={mode === 'edit' ? { ...data } : undefined}
       onFinish={handleSubmit}
       submitter={{
@@ -106,6 +105,7 @@ const FileDrawer: React.FC<FileDrawerProps> = ({
       drawerProps={{
         destroyOnClose: true,
         onClose,
+        styles: { wrapper: { width: 480 } },
       }}
     >
       <ProFormText

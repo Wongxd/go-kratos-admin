@@ -134,7 +134,7 @@ const ApiManagement = () => {
             setDrawerOpen(true);
           }}
         >
-          <EditOutlined /> {t('common:button.edit')}
+          <EditOutlined />
         </a>,
         <Popconfirm
           key="delete"
@@ -144,9 +144,7 @@ const ApiManagement = () => {
           okText={t('common:button.ok')}
           cancelText={t('common:button.cancel')}
         >
-          <a style={{ color: '#ff4d4f' }}>
-            <DeleteOutlined /> {t('common:button.delete')}
-          </a>
+          <a style={{ color: '#ff4d4f' }}><DeleteOutlined /></a>
         </Popconfirm>,
       ],
     },
@@ -205,7 +203,6 @@ const ApiManagement = () => {
               defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
               showSizeChanger: true,
               showQuickJumper: true,
-              position: ['bottomRight'],
             }}
             toolBarRender={() => [
               <Button

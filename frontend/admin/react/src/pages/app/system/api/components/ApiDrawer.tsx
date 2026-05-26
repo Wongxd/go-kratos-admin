@@ -74,7 +74,6 @@ const ApiDrawer: React.FC<ApiDrawerProps> = ({ open, mode, data, onClose, onSucc
       formRef={formRef}
       open={open}
       title={mode === 'create' ? t('create') : t('edit')}
-      width={600}
       initialValues={mode === 'edit' ? data : undefined}
       onFinish={handleSubmit}
       submitter={{
@@ -92,6 +91,7 @@ const ApiDrawer: React.FC<ApiDrawerProps> = ({ open, mode, data, onClose, onSucc
       drawerProps={{
         destroyOnClose: true,
         onClose,
+        styles: { wrapper: { width: 600 } },
       }}
     >
       <ProFormText

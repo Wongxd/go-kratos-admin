@@ -221,9 +221,7 @@ const TaskManagement = () => {
           okText={t('common:button.ok')}
           cancelText={t('common:button.cancel')}
         >
-          <a style={{ color: '#52c41a' }} title={t('start')}>
-            <CaretRightOutlined />
-          </a>
+          <a style={{ color: '#52c41a' }}><CaretRightOutlined /></a>
         </Popconfirm>,
         <Popconfirm
           key="stop"
@@ -235,9 +233,7 @@ const TaskManagement = () => {
           okText={t('common:button.ok')}
           cancelText={t('common:button.cancel')}
         >
-          <a style={{ color: '#ff4d4f' }} title={t('stop')}>
-            <PauseOutlined />
-          </a>
+          <a style={{ color: '#ff4d4f' }}><PauseOutlined /></a>
         </Popconfirm>,
         <Popconfirm
           key="restart"
@@ -249,9 +245,7 @@ const TaskManagement = () => {
           okText={t('common:button.ok')}
           cancelText={t('common:button.cancel')}
         >
-          <a title={t('restart')}>
-            <ReloadOutlined />
-          </a>
+          <a><ReloadOutlined /></a>
         </Popconfirm>,
         <Popconfirm
           key="delete"
@@ -261,9 +255,7 @@ const TaskManagement = () => {
           okText={t('common:button.ok')}
           cancelText={t('common:button.cancel')}
         >
-          <a style={{ color: '#ff4d4f' }}>
-            <DeleteOutlined />
-          </a>
+          <a style={{ color: '#ff4d4f' }}><DeleteOutlined /></a>
         </Popconfirm>,
       ],
     },

@@ -90,7 +90,6 @@ const LoginPolicyDrawer: React.FC<LoginPolicyDrawerProps> = ({
           onClose();
         }
       }}
-      width={520}
       initialValues={mode === 'edit' ? { ...data } : undefined}
       onFinish={handleSubmit}
       submitter={{
@@ -108,6 +107,7 @@ const LoginPolicyDrawer: React.FC<LoginPolicyDrawerProps> = ({
       drawerProps={{
         destroyOnClose: true,
         onClose,
+        styles: { wrapper: { width: 520 } },
       }}
     >
       <ProFormText

@@ -59,13 +59,15 @@ const MessageDrawer: React.FC<MessageDrawerProps> = ({ open, mode, data, onClose
   // 编辑模式填充表单
   useEffect(() => {
     if (open && mode === 'edit' && data) {
-      formRef.current?.setFieldsValue({
-        status: data.status || 'DRAFT',
-        type: (data as any).type || 'NOTIFICATION',
-        categoryId: (data as any).categoryId || undefined,
-        title: data.title || '',
-        content: (data as any).content || '',
-      });
+      setTimeout(() => {
+        formRef.current?.setFieldsValue({
+          status: data.status || 'DRAFT',
+          type: (data as any).type || 'NOTIFICATION',
+          categoryId: (data as any).categoryId || undefined,
+          title: data.title || '',
+          content: (data as any).content || '',
+        });
+      }, 0);
     }
   }, [open, mode, data]);
 
@@ -120,7 +122,6 @@ const MessageDrawer: React.FC<MessageDrawerProps> = ({ open, mode, data, onClose
           onClose();
         }
       }}
-      width={800}
       initialValues={{
         status: 'DRAFT',
         type: 'NOTIFICATION',
@@ -136,7 +137,7 @@ const MessageDrawer: React.FC<MessageDrawerProps> = ({ open, mode, data, onClose
         },
         resetButtonProps: { onClick: onClose },
       }}
-      drawerProps={{ destroyOnClose: true, onClose }}
+      drawerProps={{ destroyOnClose: true, onClose, styles: { wrapper: { width: 800 } } }}
     >
       <ProFormSelect
         name="status"

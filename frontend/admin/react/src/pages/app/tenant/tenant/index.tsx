@@ -84,14 +84,14 @@ const TenantList = () => {
       width: 150,
     },
     {
-      title: t('adminUsername'),
-      dataIndex: 'adminUsername',
+      title: t('adminUserName'),
+      dataIndex: 'adminUserName',
       width: 150,
       hideInSearch: true,
     },
     {
       title: t('tenantType'),
-      dataIndex: 'tenantType',
+      dataIndex: 'type',
       width: 100,
       valueType: 'select',
       valueEnum: Object.fromEntries(
@@ -177,7 +177,7 @@ const TenantList = () => {
             setDrawerOpen(true);
           }}
         >
-          <EditOutlined /> {t('common:button.edit')}
+          <EditOutlined />
         </a>,
         <Popconfirm
           key="delete"
@@ -188,7 +188,7 @@ const TenantList = () => {
           cancelText={t('common:button.cancel')}
         >
           <a style={{ color: '#ff4d4f' }}>
-            <DeleteOutlined /> {t('common:button.delete')}
+            <DeleteOutlined />
           </a>
         </Popconfirm>,
       ],
@@ -250,7 +250,6 @@ const TenantList = () => {
               defaultPageSize: TABLE.DEFAULT_PAGE_SIZE,
               showSizeChanger: true,
               showQuickJumper: true,
-              position: ['bottomRight'],
             }}
             toolBarRender={() => [
               <Button

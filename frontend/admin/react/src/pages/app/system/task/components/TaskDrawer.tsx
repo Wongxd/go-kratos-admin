@@ -53,19 +53,21 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ open, mode, data, onClose, onSu
   useEffect(() => {
     if (open && mode === 'edit' && data) {
       const taskOptions = (data as any).taskOptions || {};
-      formRef.current?.setFieldsValue({
-        type: data.type || 'PERIODIC',
-        typeName: data.typeName || '',
-        taskPayload: data.taskPayload || '',
-        cronSpec: data.cronSpec || '',
-        enable: data.enable ?? true,
-        remark: data.remark || '',
-        'taskOptions.maxRetry': taskOptions.maxRetry ?? 3,
-        'taskOptions.timeout': taskOptions.timeout,
-        'taskOptions.deadline': taskOptions.deadline,
-        'taskOptions.processIn': taskOptions.processIn,
-        'taskOptions.processAt': taskOptions.processAt,
-      });
+      setTimeout(() => {
+        formRef.current?.setFieldsValue({
+          type: data.type || 'PERIODIC',
+          typeName: data.typeName || '',
+          taskPayload: data.taskPayload || '',
+          cronSpec: data.cronSpec || '',
+          enable: data.enable ?? true,
+          remark: data.remark || '',
+          'taskOptions.maxRetry': taskOptions.maxRetry ?? 3,
+          'taskOptions.timeout': taskOptions.timeout,
+          'taskOptions.deadline': taskOptions.deadline,
+          'taskOptions.processIn': taskOptions.processIn,
+          'taskOptions.processAt': taskOptions.processAt,
+        });
+      }, 0);
     }
   }, [open, mode, data]);
 
@@ -134,7 +136,6 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ open, mode, data, onClose, onSu
           onClose();
         }
       }}
-      width={600}
       initialValues={{
         type: 'PERIODIC',
         enable: true,
@@ -151,7 +152,7 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ open, mode, data, onClose, onSu
         },
         resetButtonProps: { onClick: onClose },
       }}
-      drawerProps={{ destroyOnClose: true, onClose }}
+      drawerProps={{ destroyOnClose: true, onClose, styles: { wrapper: { width: 600 } } }}
     >
       <ProFormSelect
         name="type"
