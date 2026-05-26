@@ -6,8 +6,8 @@ import ProPage from "../ProPage/index.vue";
 /**
  * useProPage —— Level 2：命令式 Api 控制模式
  *
- * 参考 plugins/vxe-table/use-vxe-grid.ts 的 useVxeGrid 设计。
  * 返回 [ProPageComponent, api]，通过 api 命令式控制 ProPage 实例。
+ * api.setState() 支持 mount 前预设配置、mount 后响应式更新。
  *
  * @example
  * ```ts
@@ -17,6 +17,7 @@ import ProPage from "../ProPage/index.vue";
  * pageApi.refresh();
  * pageApi.openAdd();
  * pageApi.reload({ status: 1 });
+ * pageApi.setState({ loading: true }); // 响应式状态更新
  * ```
  *
  * @param config - ProPage 配置对象
@@ -32,8 +33,8 @@ export function useProPage<T = any, Q = any>(config: ProPageConfig<T, Q>) {
         api.unmount();
       });
 
-      // 支持运行时覆盖配置
-      const mergedConfig = props.config ?? config;
+      // 支持运行时覆盖配置（通过 props 或 setState）
+      const mergedConfig = props.config ?? api.state.config ?? config;
 
       return () =>
         h(

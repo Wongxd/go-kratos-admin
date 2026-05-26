@@ -1,4 +1,6 @@
 import type { Ref } from "vue";
+import { Store, useSelector } from "@tanstack/vue-store";
+import { bindMethods, isFunction, mergeWithArrayOverride, StateHandler } from "@/utils";
 import type { ProPageConfig } from "../ProPage/types";
 
 /**
@@ -37,28 +39,99 @@ export interface ProPageExpose {
 export interface ProPageState<T = any, Q = any> {
   /** 页面配置 */
   config?: ProPageConfig<T, Q>;
-  /** 搜索参数（只读快照） */
+  /** 搜索参数 */
   searchParams?: Record<string, any>;
+  /** 表格 loading */
+  loading?: boolean;
+  /** 弹窗可见 */
+  modalVisible?: boolean;
+  /** 弹窗模式 */
+  modalMode?: "add" | "edit" | "view";
+}
+
+function getDefaultState(): ProPageState {
+  return {
+    config: undefined,
+    searchParams: {},
+    loading: false,
+    modalVisible: false,
+    modalMode: "add",
+  };
 }
 
 /**
  * ProPage Api —— 命令式控制 ProPage 实例
  *
- * 参考 plugins/vxe-table/api.ts 的 VxeGridApi 设计，
- * 提供外部命令式控制能力，用于 Level 2 使用模式。
+ * 提供 setState 方法，支持 mount 前预设配置，mount 后响应式更新。
+ * 通过 Store + expose 双层架构实现状态管理。
  */
 export class ProPageApi {
   private isMounted = false;
   private pageExpose: ProPageExpose | null = null;
+  private stateHandler: StateHandler;
 
-  /** 获取当前配置引用 */
-  get config(): ProPageConfig | undefined {
-    return this._config;
-  }
-  private _config: ProPageConfig | undefined;
+  /** Store 响应式状态 */
+  public store: Store<ProPageState>;
+
+  /** 当前状态快照 */
+  public state: ProPageState;
 
   constructor(config?: ProPageConfig) {
-    this._config = config;
+    const defaultState = getDefaultState();
+    this.store = new Store<ProPageState>(
+      mergeWithArrayOverride({ config }, defaultState),
+    );
+
+    this.store.subscribe(() => {
+      this.state = this.store.state;
+    });
+
+    this.state = this.store.state;
+    this.stateHandler = new StateHandler();
+    bindMethods(this);
+  }
+
+  /**
+   * 响应式更新状态（mount 前后均可调用）
+   *
+   * @example
+   * ```ts
+   * // mount 前预设配置
+   * pageApi.setState({ config: myConfig });
+   *
+   * // mount 后动态更新 loading
+   * pageApi.setState({ loading: true });
+   *
+   * // 函数式更新
+   * pageApi.setState(prev => ({ searchParams: { ...prev.searchParams, extra: 1 } }));
+   * ```
+   */
+  setState(
+    stateOrFn:
+      | ((prev: ProPageState) => Partial<ProPageState>)
+      | Partial<ProPageState>,
+  ) {
+    if (isFunction(stateOrFn)) {
+      this.store.setState((prev: ProPageState) =>
+        mergeWithArrayOverride(stateOrFn(prev), prev) as ProPageState,
+      );
+    } else {
+      this.store.setState((prev: ProPageState) =>
+        mergeWithArrayOverride(stateOrFn, prev) as ProPageState,
+      );
+    }
+  }
+
+  /** 批量更新状态（减少中间渲染） */
+  batchState(cb: () => void) {
+    cb();
+  }
+
+  /** 获取 Store 状态的响应式引用 */
+  useStore<T = ProPageState>(
+    selector?: (state: NoInfer<ProPageState>) => T,
+  ): Readonly<Ref<T>> {
+    return useSelector(this.store, selector ?? ((s: any) => s));
   }
 
   /**
@@ -67,6 +140,7 @@ export class ProPageApi {
   mount(expose: ProPageExpose) {
     if (!this.isMounted && expose) {
       this.pageExpose = expose;
+      this.stateHandler.setConditionTrue();
       this.isMounted = true;
     }
   }
@@ -77,6 +151,7 @@ export class ProPageApi {
   unmount() {
     this.isMounted = false;
     this.pageExpose = null;
+    this.stateHandler.reset();
   }
 
   // ==================== 数据操作 ====================
@@ -175,10 +250,14 @@ export class ProPageApi {
     return { ...(this.pageExpose?.searchParams ?? {}) };
   }
 
-  // ==================== 内部方法 ====================
-
-  /** 更新配置（响应式更新） */
+  /** 更新配置（响应式更新，委托给 setState） */
   setConfig(config: ProPageConfig) {
-    this._config = config;
+    this.setState({ config });
+  }
+
+  /** 等待组件挂载完成 */
+  async waitForMounted() {
+    if (this.isMounted) return;
+    await this.stateHandler.waitForCondition();
   }
 }

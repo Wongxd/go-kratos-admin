@@ -27,5 +27,11 @@ export type { ProPageExpose, ProPageState } from "./composables/ProPageApi";
 export { useProPage } from "./composables/useProPage";
 export type { UseProPage } from "./composables/useProPage";
 
+// Level 2.5: 弹窗抽离（connectedComponent）
+export { ProModalApi } from "./composables/useProModal";
+export type { ProModalState, UseProModalOptions } from "./composables/useProModal";
+export { useProModal, injectProModalApi } from "./composables/useProModal";
+export type { UseProModal } from "./composables/useProModal";
+
 // 常量
 export { DEFAULT_CURRENT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_PAGE_SIZES } from "./constants";

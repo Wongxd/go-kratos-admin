@@ -19,6 +19,7 @@ Pro/
 │   ├── useTableState.ts
 │   ├── useModalState.ts
 │   ├── useProPage.ts   # Level 2: 命令式 Api 控制
+│   ├── useProModal.ts  # Level 3: 弹窗抽离（connectedComponent）
 │   └── ProPageApi.ts   # ProPage Api 类
 ├── constants/        # 默认值常量
 ├── index.ts          # 统一导出
@@ -302,12 +303,40 @@ function handleNodeClick(node: any) {
 | `openView(row)` | 打开查看弹窗 |
 | `closeModal()` | 关闭弹窗 |
 | `getSearchParams()` | 获取当前搜索参数快照 |
+| `setState(stateOrFn)` | 响应式更新状态（mount 前后均可调用） |
+| `useStore(selector?)` | 获取 Store 状态的响应式引用 |
+| `waitForMounted()` | 等待组件挂载完成（异步） |
+| `setConfig(config)` | 响应式更新配置 |
 
 **要点**：
 - `useProPage` 和 `<ProPage :config>` **完全等价**，只是控制方式不同
 - 适合需要在外部联动控制表格的场景（树点击、Tab 切换、watch 联动等）
 - 无需 `ref` + `value`，api 直接调用方法
+- `setState()` 支持 mount 前预设配置、mount 后响应式更新
 - 插槽、事件、配置均与 Level 1 完全相同
+
+#### setState 响应式状态更新
+
+`ProPageApi` 内部使用 `@tanstack/vue-store` 管理响应式状态，`setState` 支持 mount 前后任意时刻调用：
+
+```typescript
+const [Page, pageApi] = useProPage(config);
+
+// 对象式更新
+pageApi.setState({ loading: true });
+
+// 函数式更新（基于前一个状态计算）
+pageApi.setState(prev => ({
+  searchParams: { ...prev.searchParams, extraParam: 1 },
+}));
+
+// mount 前预设配置
+pageApi.setState({ config: overrideConfig });
+
+// 获取响应式引用（在 setup 中使用）
+const loading = pageApi.useStore(s => s.loading);
+// loading 是 Readonly<Ref<boolean>>
+```
 
 ---
 
@@ -383,7 +412,7 @@ function handleBatchExport() { /* 批量导出逻辑 */ }
 </script>
 ```
 
-#### 外部接管弹窗
+#### 外部接管弹窗（ref 方式）
 
 当内置 ProModal 不满足需求时，可以不配置 `modal`，完全自行控制弹窗：
 
@@ -430,6 +459,107 @@ function handleSuccess() {
 - 不需要的功能不配置即可（如不配 `modal` 就不渲染弹窗）
 - ProPage 的事件（`@add`、`@edit`）让你完全控制后续流程
 - 通过 `pageRef.value?.refresh()` 可随时刷新数据
+
+#### 外部接管弹窗（connectedComponent 方式）
+
+使用 `useProModal` + `connectedComponent` 将弹窗抽离为独立的 `.vue` 文件，通过 provide/inject 自动连接，无需手动管理 ref：
+
+**列表页（user-list.vue）：**
+
+```vue
+<template>
+  <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit">
+    <!-- 列插槽 ... -->
+  </ProPage>
+
+  <!-- 弹窗组件自动连接 -->
+  <UserDrawer />
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { ProPage, useProModal, type ProPageConfig } from "@/components/Pro";
+import UserDrawer from "./user-drawer.vue";
+
+const pageRef = ref();
+
+const pageConfig: ProPageConfig = {
+  table: {
+    listAction: async () => { /* ... */ return { items: [], total: 0 }; },
+    columns: [ /* ... */ ],
+  },
+  // 不配置 modal → ProPage 不会渲染内置弹窗
+};
+
+// useProModal 连接 UserDrawer 组件
+const [UserDrawer, modalApi] = useProModal({
+  connectedComponent: UserDrawer,
+  onOpenChange(isOpen) {
+    if (!isOpen) pageRef.value?.refresh(); // 关闭时刷新
+  },
+});
+
+function handleAdd() {
+  modalApi.open({ create: true }); // 传递数据给弹窗
+}
+function handleEdit(row: any) {
+  modalApi.open({ create: false, row });
+}
+</script>
+```
+
+**弹窗组件（user-drawer.vue）：**
+
+```vue
+<template>
+  <ElDrawer v-model="visible" :title="title" size="500px" destroy-on-close append-to-body>
+    <ElForm ref="formRef" :model="form" label-width="auto">
+      <ElFormItem label="名称" prop="name" :rules="[{ required: true, message: '必填' }]">
+        <ElInput v-model="form.name" />
+      </ElFormItem>
+    </ElForm>
+    <template #footer>
+      <ElButton @click="handleCancel">取消</ElButton>
+      <ElButton type="primary" :loading="submitting" @click="handleSubmit">确定</ElButton>
+    </template>
+  </ElDrawer>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive, computed } from "vue";
+import { injectProModalApi } from "@/components/Pro";
+
+// 通过 inject 获取列表页传入的 modalApi
+const modalApi = injectProModalApi();
+
+const data = computed(() => modalApi.getData());
+const title = computed(() => data.value.create ? '新增' : '编辑');
+const visible = computed({
+  get: () => modalApi.store.state.isOpen,
+  set: (v) => { if (!v) modalApi.close(); },
+});
+
+const form = reactive({ name: '' });
+const submitting = ref(false);
+
+function handleCancel() { modalApi.close(); }
+async function handleSubmit() {
+  submitting.value = true;
+  try {
+    // 提交逻辑...
+    modalApi.close();
+  } finally {
+    submitting.value = false;
+  }
+}
+</script>
+```
+
+**要点**：
+- 列表页无需 `ref` 管理弹窗，`useProModal` 自动通过 provide/inject 桥接
+- 弹窗组件通过 `injectProModalApi()` 获取 api，访问共享数据
+- 弹窗组件完全自包含，可复用、可测试
+- `modalApi.open(data)` 可传递任意数据，弹窗内 `modalApi.getData()` 获取
 
 ---
 
@@ -590,7 +720,7 @@ function handleNodeClick(node: any) {
 | **控制方式** | 声明式（ref） | 命令式（api） | 声明式 + 事件 | 完全自行控制 |
 | **适用场景** | 标准 CRUD | 外部联动控制 | 带特殊列/交互的 CRUD | 非标准布局/复杂交互 |
 | **外部操作** | `pageRef.value?.refresh()` | `pageApi.refresh()` | 同 Level 1 | 完全自行控制 |
-| **弹窗控制** | 内置 ProModal | 内置 + api 命令式 | 外部接管弹窗 | 完全自行控制 |
+| **弹窗控制** | 内置 ProModal | 内置 + api 命令式 | 外部接管 / connectedComponent | 完全自行控制 |
 | **学习成本** | 最低 | 低 | 低 | 中 |
 
 > **建议**：70% 的页面用 Level 1，15% 用 Level 2（外部联动），10% 用 Level 3，5% 用 Level 4。
@@ -1013,6 +1143,43 @@ pageApi.openEdit(row)          // 打开编辑弹窗
 pageApi.openView(row)          // 打开查看弹窗
 pageApi.closeModal()           // 关闭弹窗
 pageApi.getSearchParams()      // 获取搜索参数
+
+// setState 响应式状态更新
+pageApi.setState({ loading: true })            // 对象式
+pageApi.setState(prev => ({                     // 函数式
+  searchParams: { ...prev.searchParams, extra: 1 },
+}))
+pageApi.useStore(s => s.loading)                // 响应式引用
+pageApi.waitForMounted()                        // 等待组件挂载
+```
+
+### useProModal
+
+弹窗抽离，通过 `connectedComponent` + provide/inject 将弹窗组件自包含。
+
+```typescript
+import { useProModal, injectProModalApi } from "@/components/Pro";
+
+// === 列表页 ===
+const [Modal, modalApi] = useProModal({
+  connectedComponent: UserDrawer,  // 弹窗组件
+  onOpenChange(isOpen) {
+    if (!isOpen) pageRef.value?.refresh();
+  },
+});
+
+modalApi.open({ create: true })  // 打开弹窗，传递数据
+modalApi.open({ create: false, row })
+modalApi.close()                 // 关闭弹窗
+modalApi.getData()               // 获取共享数据
+modalApi.setData({ key: value }) // 设置共享数据
+modalApi.setLoading(true)        // 设置确认按钮 loading
+modalApi.store.state.isOpen      // 直接访问 Store 状态
+
+// === 弹窗组件内部 ===
+const modalApi = injectProModalApi();
+const data = modalApi.getData();
+// ... 自定义渲染和提交逻辑
 ```
 
 ---
