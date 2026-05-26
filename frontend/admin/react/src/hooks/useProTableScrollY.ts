@@ -43,8 +43,6 @@ export function useProTableScrollY(
             pagination.offsetHeight +
             (parseFloat(pagStyle.marginTop) || 0) +
             (parseFloat(pagStyle.marginBottom) || 0);
-        } else {
-          belowSpace = 56; // 默认分页器高度
         }
 
         // 安全边距
