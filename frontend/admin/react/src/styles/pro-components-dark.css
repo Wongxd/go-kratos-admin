@@ -47,6 +47,35 @@
   border-color: var(--ant-color-border) !important;
 }
 
+/* ========== ProTable 圆角一致性 ========== */
+/* 顶部搜索表单圆角 */
+.ant-pro-table .ant-pro-table-search {
+  border-radius: 8px;
+}
+/* 工具栏容器圆角 */
+.ant-pro-table .ant-pro-table-list-toolbar-container {
+  border-radius: 8px 8px 0 0;
+}
+/* 表格整体底部圆角（与顶部对称） */
+.ant-pro-table .ant-table-container {
+  border-radius: 0 0 8px 8px;
+}
+.ant-pro-table .ant-table-container .ant-table-content,
+.ant-pro-table .ant-table-container table {
+  border-radius: 0 0 8px 8px;
+}
+/* bordered 模式下最后一行左右端圆角 */
+.ant-pro-table .ant-table-tbody > tr:last-child > td:first-child {
+  border-bottom-left-radius: 8px;
+}
+.ant-pro-table .ant-table-tbody > tr:last-child > td:last-child {
+  border-bottom-right-radius: 8px;
+}
+/* 搜索+表格整体分离时各自圆角 */
+.ant-pro-table .ant-card {
+  border-radius: 8px;
+}
+
 /* ========== 暗黑模式专属修正 ========== */
 [data-theme='dark'] .ant-pro-table .ant-table-placeholder {
   background-color: var(--ant-color-bg-container) !important;
