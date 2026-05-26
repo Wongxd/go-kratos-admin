@@ -559,7 +559,7 @@ function checkPermission(permission: string): boolean {
 ## 🔗 相关文档
 
 - [路由守卫](../router/guard.ts)
-- [权限 Store](../../stores/modules/core/access.store.ts)
+- [权限 Store](../../stores/modules/access.store.ts)
 - [权限工具函数](../../utils/auth.ts)
 - [CURD 组件权限配置](../../components/CURD/PageContent.vue)
 
