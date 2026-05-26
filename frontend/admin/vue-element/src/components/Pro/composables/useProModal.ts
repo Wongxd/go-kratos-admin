@@ -1,9 +1,8 @@
 import type { Component } from "vue";
-import { defineComponent, h, inject, onBeforeUnmount, provide, reactive } from "vue";
+import { defineComponent, h, inject, provide, reactive } from "vue";
 import type { Ref } from "vue";
 import { Store, useSelector } from "@tanstack/vue-store";
 import { bindMethods, isFunction, mergeWithArrayOverride } from "@/utils";
-import type { ProModalConfig, ModalMode } from "../ProModal/types";
 
 // ==================== ModalApi ====================
 
@@ -110,18 +109,14 @@ export class ProModalApi {
   }
 
   /** 响应式更新状态 */
-  setState(
-    stateOrFn:
-      | ((prev: ProModalState) => Partial<ProModalState>)
-      | Partial<ProModalState>,
-  ) {
+  setState(stateOrFn: ((prev: ProModalState) => Partial<ProModalState>) | Partial<ProModalState>) {
     if (isFunction(stateOrFn)) {
-      this.store.setState((prev: ProModalState) =>
-        mergeWithArrayOverride(stateOrFn(prev), prev) as ProModalState,
+      this.store.setState(
+        (prev: ProModalState) => mergeWithArrayOverride(stateOrFn(prev), prev) as ProModalState
       );
     } else {
-      this.store.setState((prev: ProModalState) =>
-        mergeWithArrayOverride(stateOrFn, prev) as ProModalState,
+      this.store.setState(
+        (prev: ProModalState) => mergeWithArrayOverride(stateOrFn, prev) as ProModalState
       );
     }
   }
@@ -160,9 +155,7 @@ export class ProModalApi {
   }
 
   /** 获取 Store 状态的响应式引用 */
-  useStore<T = ProModalState>(
-    selector?: (state: NoInfer<ProModalState>) => T,
-  ): Readonly<Ref<T>> {
+  useStore<T = ProModalState>(selector?: (state: NoInfer<ProModalState>) => T): Readonly<Ref<T>> {
     return useSelector(this.store, selector ?? ((s: any) => s));
   }
 
@@ -245,7 +238,7 @@ export function useProModal(options: UseProModalOptions = {}) {
         });
         return () => h(connectedComponent, { ...props, ...attrs }, slots);
       },
-      { name: "ProModalWrapper", inheritAttrs: false },
+      { name: "ProModalWrapper", inheritAttrs: false }
     );
 
     return [Modal, extendedApi] as const;
