@@ -1,5 +1,5 @@
 import type { Ref } from "vue";
-import { Store, useSelector } from "@tanstack/vue-store";
+import { computed, reactive, toRaw } from "vue";
 import { bindMethods, isFunction, mergeWithArrayOverride, StateHandler } from "@/utils";
 import type { ProPageConfig } from "../ProPage/types";
 
@@ -63,30 +63,22 @@ function getDefaultState(): ProPageState {
  * ProPage Api —— 命令式控制 ProPage 实例
  *
  * 提供 setState 方法，支持 mount 前预设配置，mount 后响应式更新。
- * 通过 Store + expose 双层架构实现状态管理。
+ * 通过 reactive + expose 双层架构实现状态管理。
  */
 export class ProPageApi {
   private isMounted = false;
   private pageExpose: ProPageExpose | null = null;
   private stateHandler: StateHandler;
 
-  /** Store 响应式状态 */
-  public store: Store<ProPageState>;
-
-  /** 当前状态快照 */
-  public state: ProPageState;
+  /** 响应式状态 */
+  public store: ProPageState;
 
   constructor(config?: ProPageConfig) {
     const defaultState = getDefaultState();
-    this.store = new Store<ProPageState>(
-      mergeWithArrayOverride({ config }, defaultState),
+    this.store = reactive(
+      mergeWithArrayOverride({ config }, defaultState) as ProPageState,
     );
 
-    this.store.subscribe(() => {
-      this.state = this.store.state;
-    });
-
-    this.state = this.store.state;
     this.stateHandler = new StateHandler();
     bindMethods(this);
   }
@@ -111,15 +103,12 @@ export class ProPageApi {
       | ((prev: ProPageState) => Partial<ProPageState>)
       | Partial<ProPageState>,
   ) {
-    if (isFunction(stateOrFn)) {
-      this.store.setState((prev: ProPageState) =>
-        mergeWithArrayOverride(stateOrFn(prev), prev) as ProPageState,
-      );
-    } else {
-      this.store.setState((prev: ProPageState) =>
-        mergeWithArrayOverride(stateOrFn, prev) as ProPageState,
-      );
-    }
+    const prev = toRaw(this.store) as ProPageState;
+    const update = isFunction(stateOrFn)
+      ? stateOrFn(prev)
+      : stateOrFn;
+    const merged = mergeWithArrayOverride(update, prev) as ProPageState;
+    Object.assign(this.store, merged);
   }
 
   /** 批量更新状态 */
@@ -129,14 +118,15 @@ export class ProPageApi {
 
   /** 获取当前状态快照 */
   getState(): ProPageState {
-    return this.state;
+    return toRaw(this.store) as ProPageState;
   }
 
-  /** 获取 Store 状态的响应式引用 */
+  /** 获取状态的响应式引用 */
   useStore<T = ProPageState>(
     selector?: (state: NoInfer<ProPageState>) => T,
   ): Readonly<Ref<T>> {
-    return useSelector(this.store, selector ?? ((s: any) => s));
+    const sel = selector ?? ((s: any) => s);
+    return computed(() => sel(this.store)) as Readonly<Ref<T>>;
   }
 
   /**

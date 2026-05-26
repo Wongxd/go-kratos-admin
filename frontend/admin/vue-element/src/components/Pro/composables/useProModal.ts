@@ -1,7 +1,6 @@
 import type { Component } from "vue";
-import { defineComponent, h, inject, provide, reactive } from "vue";
+import { computed, defineComponent, h, inject, provide, reactive, toRaw, watch } from "vue";
 import type { Ref } from "vue";
-import { Store, useSelector } from "@tanstack/vue-store";
 import { bindMethods, isFunction, mergeWithArrayOverride } from "@/utils";
 
 // ==================== ModalApi ====================
@@ -24,7 +23,6 @@ function getDefaultModalState(): ProModalState {
 }
 
 export class ProModalApi {
-  private state!: ProModalState;
   private onBeforeCloseCallback?: () => boolean | void;
   private onCloseCallback?: () => void;
   private onConfirmCallback?: () => Promise<void>;
@@ -32,7 +30,8 @@ export class ProModalApi {
   private onOpenedCallback?: () => void;
   private onClosedCallback?: () => void;
 
-  public store: Store<ProModalState>;
+  /** 响应式状态 */
+  public store: ProModalState;
 
   constructor(options?: {
     onBeforeClose?: () => boolean | void;
@@ -49,31 +48,31 @@ export class ProModalApi {
     this.onOpenedCallback = options?.onOpened;
     this.onClosedCallback = options?.onClosed;
 
-    this.store = new Store<ProModalState>(getDefaultModalState());
+    this.store = reactive(getDefaultModalState()) as ProModalState;
 
-    this.store.subscribe(() => {
-      const prevIsOpen = this.state?.isOpen;
-      this.state = this.store.state;
-      // isOpen 变化时触发 onOpenChange
-      if (this.state.isOpen !== prevIsOpen) {
-        this.onOpenChangeCallback?.(this.state.isOpen);
-      }
-    });
+    // 监听 isOpen 变化触发 onOpenChange
+    watch(
+      () => this.store.isOpen,
+      (newVal, oldVal) => {
+        if (newVal !== oldVal) {
+          this.onOpenChangeCallback?.(newVal);
+        }
+      },
+    );
 
-    this.state = this.store.state;
     bindMethods(this);
   }
 
   /** 打开弹窗，可传递共享数据 */
   open(data?: Record<string, any>) {
     if (data) {
-      this.store.setState((prev) => ({
+      this.setState((prev) => ({
         ...prev,
         sharedData: { ...prev.sharedData, ...data },
         isOpen: true,
       }));
     } else {
-      this.store.setState((prev) => ({ ...prev, isOpen: true }));
+      this.store.isOpen = true;
     }
   }
 
@@ -81,44 +80,38 @@ export class ProModalApi {
   close() {
     const allowClose = this.onBeforeCloseCallback?.() ?? true;
     if (allowClose) {
-      this.store.setState((prev) => ({ ...prev, isOpen: false }));
+      this.store.isOpen = false;
     }
   }
 
   /** 获取共享数据 */
   getData<T extends Record<string, any> = Record<string, any>>(): T {
-    return (this.state?.sharedData ?? {}) as T;
+    return (toRaw(this.store).sharedData ?? {}) as T;
   }
 
   /** 设置共享数据 */
   setData(data: Record<string, any>) {
-    this.store.setState((prev) => ({
-      ...prev,
-      sharedData: { ...prev.sharedData, ...data },
-    }));
+    Object.assign(this.store.sharedData, data);
   }
 
   /** 设置确认按钮加载状态 */
   setLoading(loading: boolean) {
-    this.store.setState((prev) => ({ ...prev, confirmLoading: loading }));
+    this.store.confirmLoading = loading;
   }
 
   /** 设置标题 */
   setTitle(title: string) {
-    this.store.setState((prev) => ({ ...prev, title }));
+    this.store.title = title;
   }
 
   /** 响应式更新状态 */
   setState(stateOrFn: ((prev: ProModalState) => Partial<ProModalState>) | Partial<ProModalState>) {
-    if (isFunction(stateOrFn)) {
-      this.store.setState(
-        (prev: ProModalState) => mergeWithArrayOverride(stateOrFn(prev), prev) as ProModalState
-      );
-    } else {
-      this.store.setState(
-        (prev: ProModalState) => mergeWithArrayOverride(stateOrFn, prev) as ProModalState
-      );
-    }
+    const prev = toRaw(this.store) as ProModalState;
+    const update = isFunction(stateOrFn)
+      ? stateOrFn(prev)
+      : stateOrFn;
+    const merged = mergeWithArrayOverride(update, prev) as ProModalState;
+    Object.assign(this.store, merged);
   }
 
   /** 确认操作 */
@@ -137,14 +130,14 @@ export class ProModalApi {
 
   /** 弹窗打开动画完毕后的回调 */
   onOpened() {
-    if (this.state.isOpen) {
+    if (this.store.isOpen) {
       this.onOpenedCallback?.();
     }
   }
 
   /** 弹窗关闭动画完毕后的回调 */
   onClosed() {
-    if (!this.state.isOpen) {
+    if (!this.store.isOpen) {
       this.onClosedCallback?.();
     }
   }
@@ -154,14 +147,15 @@ export class ProModalApi {
     cb();
   }
 
-  /** 获取 Store 状态的响应式引用 */
+  /** 获取状态的响应式引用 */
   useStore<T = ProModalState>(selector?: (state: NoInfer<ProModalState>) => T): Readonly<Ref<T>> {
-    return useSelector(this.store, selector ?? ((s: any) => s));
+    const sel = selector ?? ((s: any) => s);
+    return computed(() => sel(this.store)) as Readonly<Ref<T>>;
   }
 
   /** 重置共享数据 */
   resetData() {
-    this.store.setState((prev) => ({ ...prev, sharedData: {} }));
+    this.store.sharedData = {};
   }
 }
 

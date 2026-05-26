@@ -34,7 +34,7 @@ export function useProPage<T = any, Q = any>(config: ProPageConfig<T, Q>) {
       });
 
       // 支持运行时覆盖配置（通过 props 或 setState）
-      const mergedConfig = props.config ?? api.state.config ?? config;
+      const mergedConfig = props.config ?? api.store.config ?? config;
 
       return () =>
         h(
