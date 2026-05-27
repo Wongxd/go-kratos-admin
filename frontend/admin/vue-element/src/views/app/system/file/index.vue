@@ -77,7 +77,7 @@ const pageConfig: ProPageConfig = {
     toolbarRight: [
       {
         name: "upload",
-        text: $t("pages.file.button.upload"),
+        label: $t("pages.file.button.upload"),
         attrs: { type: "primary", icon: "upload" },
       } as ToolsButton,
     ],
@@ -110,8 +110,8 @@ const pageConfig: ProPageConfig = {
         width: 150,
         cellType: "tool",
         buttons: [
-          { name: "download", text: $t("common.button.download") },
-          { name: "delete", text: $t("common.button.delete"), attrs: { type: "danger" } },
+          { name: "download", label: $t("common.button.download") },
+          { name: "delete", label: $t("common.button.delete"), attrs: { type: "danger" } },
         ],
       },
     ],
