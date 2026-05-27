@@ -7,9 +7,9 @@ import { preferences } from "@/core/preferences";
 import { accessRoutes, coreRouteNames } from "@/router/routes";
 import { useAccessStore, useAppUserStore } from "@/stores";
 import { useAuth } from "@/composables/use-auth";
-import { fetchAllDictEntries } from "@/api/composables/use-dict-cache";
 
 import { generateAccess } from "./access";
+import { fetchAllDictEntries } from "@/composables/use-dict-cache";
 
 /**
  * 通用守卫配置
