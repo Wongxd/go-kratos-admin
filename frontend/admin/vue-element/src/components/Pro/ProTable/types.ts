@@ -76,10 +76,8 @@ export interface ProTableColumn<T = any> {
   buttons?: Array<{
     /** 按钮标识，用于 operate 事件回调 */
     name: string;
-    /** 按钮显示文本，不设则用 name */
-    text?: string;
-    /** 按钮文本国际化 key */
-    textKey?: string;
+    /** 按钮显示文本（支持 i18n key，组件会自动通过 t() 解析，解析失败则原样显示） */
+    label?: string;
     /** 权限标识（角色码或权限码），配合 AccessControl 组件控制按钮显隐 */
     auth?: string | string[];
     /** ElButton 属性 */

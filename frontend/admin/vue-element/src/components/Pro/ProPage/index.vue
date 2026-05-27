@@ -195,19 +195,17 @@ const modalSlots = computed(() => {
 });
 
 // === 工具栏按钮转换 ===
-const builtinButtons: Record<
-  string,
-  { textKey: string; icon: string; attrs: Record<string, any> }
-> = {
-  add: { textKey: "common.button.add", icon: "plus", attrs: { type: "success" } },
-  delete: {
-    textKey: "common.button.delete",
-    icon: "delete",
-    attrs: { type: "danger" },
-  },
-  import: { textKey: "common.button.import", icon: "upload", attrs: {} },
-  export: { textKey: "common.button.export", icon: "download", attrs: {} },
-};
+const builtinButtons: Record<string, { label: string; icon: string; attrs: Record<string, any> }> =
+  {
+    add: { label: "common.button.add", icon: "plus", attrs: { type: "success" } },
+    delete: {
+      label: "common.button.delete",
+      icon: "delete",
+      attrs: { type: "danger" },
+    },
+    import: { label: "common.button.import", icon: "upload", attrs: {} },
+    export: { label: "common.button.export", icon: "download", attrs: {} },
+  };
 
 function toToolbarButtons(
   items: Array<string | ToolsButton> | undefined,
@@ -219,7 +217,7 @@ function toToolbarButtons(
       const cfg = builtinButtons[item];
       return {
         name: item,
-        text: cfg ? t(cfg.textKey) : item,
+        text: cfg ? t(cfg.label) : item,
         type: item as ToolbarButton["type"],
         icon: cfg?.icon,
         attrs: { ...defaultAttrs, ...cfg?.attrs },
@@ -227,7 +225,7 @@ function toToolbarButtons(
     }
     return {
       name: item.name,
-      text: item.text ?? (item.textKey ? t(item.textKey) : item.name),
+      text: item.label ? t(item.label) : item.name,
       attrs: { ...defaultAttrs, ...item.attrs },
       auth: item.auth,
       visible: item.visible,

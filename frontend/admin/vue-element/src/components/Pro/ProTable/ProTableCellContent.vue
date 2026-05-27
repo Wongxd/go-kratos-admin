@@ -74,13 +74,15 @@
   <!-- 操作列模板 -->
   <template v-else-if="col.cellType === 'tool'">
     <template v-for="(btn, idx) in col.buttons" :key="idx">
-      <AccessControl :codes="btn.auth ? (Array.isArray(btn.auth) ? btn.auth : [btn.auth]) : undefined">
+      <AccessControl
+        :codes="btn.auth ? (Array.isArray(btn.auth) ? btn.auth : [btn.auth]) : undefined"
+      >
         <ElButton
           v-if="btn.visible === undefined || btn.visible(row)"
           v-bind="{ link: true, size: 'small', ...btn.attrs }"
           @click="emit('operate', { name: btn.name, row, $index: rowIndex })"
         >
-          {{ btn.text ?? btn.name }}
+          {{ btn.label ?? btn.name }}
         </ElButton>
       </AccessControl>
     </template>
