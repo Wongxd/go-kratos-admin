@@ -1,115 +1,111 @@
 <template>
-  <div v-show="visible">
-    <ElCard v-bind="cardAttrs">
-      <ElForm
-        ref="formRef"
-        :model="queryParams"
-        :inline="inline"
-        v-bind="formAttrs"
-        :class="formClass"
-      >
-        <template v-for="field in visibleFields" :key="field.field">
-          <ElFormItem
-            :label="field.label"
-            :prop="String(field.field)"
-            :class="{ 'form-item-stretch': grid }"
+  <div v-show="visible" class="pro-search">
+    <ElForm
+      ref="formRef"
+      :model="queryParams"
+      :inline="inline"
+      v-bind="formAttrs"
+      :class="formClass"
+    >
+      <template v-for="(field, index) in fields" :key="field.field">
+        <ElFormItem
+          v-show="!isFieldHidden(index)"
+          :label="field.label"
+          :prop="String(field.field)"
+        >
+          <template #label>
+            <span class="flex items-center gap-1">
+              {{ field.label }}
+              <ElTooltip
+                v-if="field.tips"
+                :content="typeof field.tips === 'string' ? field.tips : ''"
+                placement="top"
+              >
+                <ElIcon class="text-gray-400"><QuestionFilled /></ElIcon>
+              </ElTooltip>
+              <span v-if="colon" class="ml-0.5">:</span>
+            </span>
+          </template>
+
+          <!-- 自定义插槽 -->
+          <slot
+            v-if="field.slotName || field.type === 'custom'"
+            :name="field.slotName ?? field.field"
+            :model="queryParams"
+            :field="field.field"
+            :attrs="{ style: { width: '100%' }, ...field.attrs }"
+          />
+
+          <!-- api-tree-select -->
+          <ElTreeSelect
+            v-else-if="field.type === 'api-tree-select'"
+            v-model="queryParams[field.field]"
+            v-bind="{ style: { width: '100%' }, clearable: true, ...field.attrs }"
+          />
+
+          <!-- 动态组件 -->
+          <component
+            :is="getComponent(field.type)"
+            v-else
+            v-model="queryParams[field.field]"
+            v-bind="{ style: { width: '100%' }, clearable: true, ...field.attrs }"
+            @keyup.enter="handleSearch"
           >
-            <template #label>
-              <span class="flex items-center gap-1">
-                {{ field.label }}
-                <ElTooltip
-                  v-if="field.tips"
-                  :content="typeof field.tips === 'string' ? field.tips : ''"
-                  placement="top"
-                >
-                  <ElIcon class="text-gray-400"><QuestionFilled /></ElIcon>
-                </ElTooltip>
-                <span v-if="colon" class="ml-0.5">:</span>
-              </span>
+            <template v-if="['select', 'radio', 'checkbox'].includes(field.type ?? '')">
+              <component
+                :is="
+                  field.type === 'select'
+                    ? ElOption
+                    : field.type === 'radio'
+                      ? ElRadio
+                      : ElCheckbox
+                "
+                v-for="opt in field.options"
+                :key="opt.value"
+                :label="opt.label"
+                :value="opt.value"
+                :disabled="opt.disabled"
+              />
             </template>
-
-            <!-- 自定义插槽 -->
-            <slot
-              v-if="field.slotName || field.type === 'custom'"
-              :name="field.slotName ?? field.field"
-              :model="queryParams"
-              :field="field.field"
-              :attrs="{ style: { width: '100%' }, ...field.attrs }"
-            />
-
-            <!-- api-tree-select -->
-            <ElTreeSelect
-              v-else-if="field.type === 'api-tree-select'"
-              v-model="queryParams[field.field]"
-              v-bind="{ style: { width: '100%' }, clearable: true, ...field.attrs }"
-            />
-
-            <!-- 动态组件 -->
-            <component
-              :is="resolveComponent(field.type)"
-              v-else
-              v-model="queryParams[field.field]"
-              v-bind="{ style: { width: '100%' }, clearable: true, ...field.attrs }"
-              @keyup.enter="handleSearch"
-            >
-              <template v-if="['select', 'radio', 'checkbox'].includes(field.type ?? '')">
-                <component
-                  :is="
-                    field.type === 'select'
-                      ? ElOption
-                      : field.type === 'radio'
-                        ? ElRadio
-                        : ElCheckbox
-                  "
-                  v-for="opt in field.options"
-                  :key="opt.value"
-                  :label="opt.label"
-                  :value="opt.value"
-                  :disabled="opt.disabled"
-                />
-              </template>
-            </component>
-          </ElFormItem>
-        </template>
-
-        <!-- 按钮区域 -->
-        <ElFormItem :class="buttonClass">
-          <ElButton
-            v-if="showSearchButton"
-            type="primary"
-            :icon="Search"
-            :loading="searching"
-            @click="handleSearch"
-          >
-            {{ searchButtonText }}
-          </ElButton>
-
-          <ElButton v-if="showResetButton" :icon="Refresh" @click="handleReset">
-            {{ resetButtonText }}
-          </ElButton>
-
-          <!-- 展开/收起 -->
-          <ElLink
-            v-if="isExpandable && hasHiddenFields"
-            type="primary"
-            class="ml-2"
-            @click="toggleExpand"
-          >
-            {{ expanded ? "收起" : "展开" }}
-            <ElIcon class="ml-1">
-              <component :is="expanded ? ArrowUp : ArrowDown" />
-            </ElIcon>
-          </ElLink>
+          </component>
         </ElFormItem>
-      </ElForm>
-    </ElCard>
+      </template>
+
+      <!-- 操作按钮区域 -->
+      <div :class="actionClass">
+        <ElButton
+          v-if="showSearchButton"
+          type="primary"
+          :icon="Search"
+          :loading="searching"
+          @click="handleSearch"
+        >
+          {{ searchButtonText }}
+        </ElButton>
+
+        <ElButton v-if="showResetButton" :icon="Refresh" @click="handleReset">
+          {{ resetButtonText }}
+        </ElButton>
+
+        <!-- 展开/收起 -->
+        <span
+          v-if="isExpandable && hasHiddenFields"
+          class="pro-search__collapse-btn"
+          @click="toggleExpand"
+        >
+          {{ expanded ? t("common.button.collapse") : t("common.button.expand") }}
+          <ElIcon class="ml-1">
+            <component :is="expanded ? ArrowUp : ArrowDown" />
+          </ElIcon>
+        </span>
+      </div>
+    </ElForm>
   </div>
 </template>
 
 <script setup lang="ts" generic="T extends Record<string, any>">
-import { computed, ref, reactive, onMounted, markRaw, h } from "vue";
+import { computed, ref, reactive, onMounted, nextTick, markRaw, h } from "vue";
 import {
-  ElCard,
   ElForm,
   ElFormItem,
   ElInput,
@@ -124,12 +120,12 @@ import {
   ElTimePicker,
   ElTimeSelect,
   ElButton,
-  ElLink,
   ElIcon,
   ElTooltip,
 } from "element-plus";
 import { Search, Refresh, ArrowUp, ArrowDown, QuestionFilled } from "@element-plus/icons-vue";
 import InputTag from "@/components/InputTag/index.vue";
+import { useI18n } from "@/i18n";
 import type { ProSearchConfig, ProSearchEmits } from "./types";
 
 defineOptions({ inheritAttrs: false });
@@ -146,6 +142,7 @@ const props = withDefaults(defineProps<ProSearchConfig<T>>(), {
 });
 
 const emit = defineEmits<ProSearchEmits<T>>();
+const { t } = useI18n();
 
 const formRef = ref<InstanceType<typeof ElForm>>();
 const queryParams = reactive<Record<string, any>>({});
@@ -153,22 +150,14 @@ const expanded = ref(false);
 const searching = ref(false);
 const visible = ref(true);
 
-// 计算可见字段（处理展开/收起）
-const visibleFields = computed(() => {
-  if (!props.isExpandable || !expanded.value) {
-    return props.fields.slice(0, props.showNumber);
-  }
-  return props.fields;
-});
+// 判断字段是否应隐藏（收起模式下，超出 showNumber 的字段用 CSS hidden 隐藏）
+function isFieldHidden(index: number): boolean {
+  if (!props.isExpandable || expanded.value) return false;
+  return index >= (props.showNumber ?? 3);
+}
 
-const hasHiddenFields = computed(() => props.fields.length > props.showNumber);
-
-// 卡片属性
-const cardAttrs = computed(() => ({
-  shadow: "never" as const,
-  bodyStyle: { padding: "16px" },
-  ...props.cardAttrs,
-}));
+// 是否有可展开的隐藏字段
+const hasHiddenFields = computed(() => props.fields.length > (props.showNumber ?? 3));
 
 // 表单属性
 const formAttrs = computed<Record<string, any>>(() => ({
@@ -178,21 +167,25 @@ const formAttrs = computed<Record<string, any>>(() => ({
   ...props.form,
 }));
 
-// 表单 class（对齐 CURD PageSearch）
-const formClass = computed(() =>
-  props.grid
-    ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6 gap-5"
-    : "flex flex-wrap gap-x-8 gap-y-4"
-);
+// 按钮区域 class（参考 Vben rowEnd 模式：按钮在 grid 行末对齐）
+const actionClass = computed(() => {
+  const cls = ["pro-search__actions"];
+  if (props.grid) {
+    cls.push("pro-search__actions--grid");
+  }
+  return cls;
+});
 
-// 按钮 class
-const buttonClass = computed(() => ({
-  "button-group": props.grid === true || props.grid === "right",
-  "col-[auto/-1] justify-self-end": props.grid === "right",
-}));
+// 表单 class（响应式 Grid 布局，参考 Vben）
+const formClass = computed(() => {
+  if (props.grid) {
+    return "pro-search--grid";
+  }
+  return "pro-search--inline";
+});
 
 // 动态解析组件
-const resolveComponent = (type?: string) => {
+const getComponent = (type?: string) => {
   const map: Record<string, any> = {
     input: markRaw(ElInput),
     select: markRaw(ElSelect),
@@ -211,7 +204,6 @@ const resolveComponent = (type?: string) => {
   };
   return map[type ?? "input"] || ElInput;
 };
-
 // 搜索
 async function handleSearch() {
   try {
@@ -233,6 +225,7 @@ async function handleSearch() {
 // 重置
 function handleReset() {
   formRef.value?.resetFields();
+  nextTick(() => formRef.value?.clearValidate());
   // 恢复初始值
   props.fields.forEach((field) => {
     if (field.initialValue !== undefined) {
@@ -291,49 +284,81 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-:deep(.el-input-number .el-input__inner) {
-  text-align: left;
+.pro-search {
+  padding: 12px 16px;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color);
+  border-radius: 4px;
 }
 
-.el-form-item {
+// === Grid 布局模式（参考 Vben） ===
+.pro-search--grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 16px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  // 让表单项内容拉伸
+  :deep(.el-form-item__content) {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+// === Inline 布局模式 ===
+.pro-search--inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+}
+
+// === 操作按钮区域 ===
+.pro-search__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+// Grid 模式下按钮靠右对齐
+.pro-search__actions--grid {
+  grid-column: -2 / -1;
+  justify-self: end;
+  align-self: end;
+}
+
+// === 展开/收起按钮 ===
+.pro-search__collapse-btn {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  color: var(--el-color-primary);
+  font-size: 13px;
+  user-select: none;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+// === 通用重置 ===
+:deep(.el-form-item) {
   margin-right: 0;
   margin-bottom: 0;
 }
 
-// 全局样式：按钮固定在右下角，输入框拉伸
-:deep(.el-form) {
-  // Grid 布局模式（对齐 CURD）
-  &.grid {
-    .el-form-item:not(.button-group) {
-      .el-form-item__content {
-        flex: 1 !important;
-        min-width: 0;
-        width: 100% !important;
-      }
-    }
-
-    .button-group {
-      grid-column: -1 !important;
-      justify-self: end !important;
-      align-self: end !important;
-      margin-left: auto !important;
-
-      .el-form-item__content {
-        justify-content: flex-end !important;
-        gap: 8px;
-      }
-    }
-  }
-
-  // Flex 布局模式
-  &.flex {
-    .form-item-stretch {
-      .el-form-item__content {
-        flex: 1 !important;
-        min-width: 0;
-        width: 100% !important;
-      }
-    }
-  }
+:deep(.el-input-number .el-input__inner) {
+  text-align: left;
 }
 </style>

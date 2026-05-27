@@ -19,7 +19,9 @@
     "batchExport": "Batch Export",
     "download": "Download",
     "ok": "OK",
-    "detail": "Detail"
+    "detail": "Detail",
+    "expand": "Expand",
+    "collapse": "Collapse"
   },
   "status": {
     "enabled": "Enabled",
