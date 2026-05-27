@@ -57,6 +57,7 @@
         @operate="handleOperate"
         @current-change="handlePageChange"
         @size-change="handleSizeChange"
+        @row-click="handleRowClick"
       >
         <!-- 透传自定义列插槽 -->
         <template v-for="(_, name) in $slots" :key="name" #[name]="slotProps">
@@ -130,6 +131,7 @@ const emit = defineEmits<{
   delete: [ids: string];
   operate: [data: { name: string; row: T; $index: number }];
   toolbar: [name: string];
+  "row-click": [row: T];
 }>();
 
 const { t } = useI18n();
@@ -193,7 +195,7 @@ const modalSlots = computed(() => {
   return result;
 });
 
-// === 工具栏按钮转换（参考CURD createToolbar） ===
+// === 工具栏按钮转换 ===
 const builtinButtons: Record<
   string,
   { textKey: string; icon: string; attrs: Record<string, any> }
@@ -329,7 +331,7 @@ function handleOperate(data: { name: string; row: T; $index: number }) {
   }
 }
 
-// === 删除（参考CURD PageContent） ===
+// === 删除 ===
 async function handleBatchDelete() {
   const ids = tableState.getSelectionIds().join(",");
   if (!ids) {
@@ -388,6 +390,11 @@ function handlePageChange(page: number) {
 function handleSizeChange(size: number) {
   tableState.pagination.pageSize = size;
   tableState.fetch(searchParams, true);
+}
+
+// === 行点击 ===
+function handleRowClick(row: T) {
+  emit("row-click", row);
 }
 
 // === 弹窗配置映射 ===

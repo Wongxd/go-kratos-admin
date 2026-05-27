@@ -6,6 +6,7 @@ export { default as ProSearch } from "./ProSearch/index.vue";
 export { default as ProPagination } from "./ProPagination/index.vue";
 export { default as ProToolbar } from "./ProToolbar/index.vue";
 export { default as ProPage } from "./ProPage/index.vue";
+export { default as ProFileSelect } from "./ProFileSelect/index.vue";
 
 // 类型导出
 export * from "./ProForm/types";
@@ -15,6 +16,7 @@ export * from "./ProSearch/types";
 export * from "./ProPagination/types";
 export * from "./ProToolbar/types";
 export * from "./ProPage/types";
+export * from "./ProFileSelect/types";
 
 // Composables
 export { useTableState } from "./composables/useTableState";

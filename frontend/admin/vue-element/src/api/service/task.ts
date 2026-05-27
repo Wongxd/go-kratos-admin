@@ -1,11 +1,12 @@
 import {
   createTaskServiceClient,
+  type taskservicev1_ControlTaskRequest,
   type taskservicev1_CreateTaskRequest,
   type taskservicev1_DeleteTaskRequest,
   type taskservicev1_GetTaskRequest,
   type taskservicev1_UpdateTaskRequest,
 } from "@/api/generated/admin/service/v1";
-import { type PaginationQuery, requestApi, requestClient } from "@/core/transport/rest";
+import { type PaginationQuery, requestApi } from "@/core/transport/rest";
 
 let _instance: ReturnType<typeof createTaskServiceClient> | null = null;
 
@@ -39,28 +40,28 @@ export async function deleteTask(request: taskservicev1_DeleteTaskRequest) {
 
 /** 获取任务类型名称列表 */
 export async function listTaskTypeNames() {
-  return requestClient.get<{ typeNames: string[] }>("/admin/v1/task/type-names");
+  return getTaskService().ListTaskTypeName({});
 }
 
 /** 控制单个任务（Start/Stop/Restart） */
 export async function controlTask(typeName: string, controlType: string) {
-  return requestClient.post("/admin/v1/task/control", {
+  return getTaskService().ControlTask({
     typeName,
-    controlType,
+    controlType: controlType as taskservicev1_ControlTaskRequest["controlType"],
   });
 }
 
 /** 启动所有任务 */
 export async function startAllTasks() {
-  return requestClient.post("/admin/v1/task/start-all");
+  return getTaskService().StartAllTask({});
 }
 
 /** 停止所有任务 */
 export async function stopAllTasks() {
-  return requestClient.post("/admin/v1/task/stop-all");
+  return getTaskService().StopAllTask({});
 }
 
 /** 重启所有任务 */
 export async function restartAllTasks() {
-  return requestClient.post("/admin/v1/task/restart-all");
+  return getTaskService().RestartAllTask({});
 }

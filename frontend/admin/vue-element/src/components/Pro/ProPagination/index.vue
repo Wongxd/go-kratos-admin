@@ -2,7 +2,9 @@
   <div
     v-if="showPagination"
     class="pro-pagination"
-    :class="{ 'pro-pagination--hidden': hideOnSinglePage && (total ?? 0) <= (pageSize ?? DEFAULT_PAGE_SIZE) }"
+    :class="{
+      'pro-pagination--hidden': hideOnSinglePage && (total ?? 0) <= (pageSize ?? DEFAULT_PAGE_SIZE),
+    }"
   >
     <ElPagination
       v-model:current-page="currentPage"
@@ -51,7 +53,7 @@ const emit = defineEmits<PaginationEmits>();
 const currentPage = ref(props.currentPage);
 const pageSize = ref(props.pageSize);
 
-// 自动计算 layout（对齐 CURD PageContent）
+// 自动计算 layout
 const computedLayout = computed(() => {
   if (props.layout) return props.layout;
   const left: string[] = ["total"];

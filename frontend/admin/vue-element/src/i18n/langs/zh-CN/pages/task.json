@@ -17,7 +17,10 @@
     "update": "更新",
     "startAll": "启动所有",
     "stopAll": "停止所有",
-    "restartAll": "重启所有"
+    "restartAll": "重启所有",
+    "start": "启动",
+    "stop": "停止",
+    "restart": "重启"
   },
   "text": {
     "do_you_want_start_all_task": "确定要启动所有{moduleName}吗？",

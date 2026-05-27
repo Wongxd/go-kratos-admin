@@ -182,7 +182,6 @@ VITE_APP_TENANT_ENABLED=true
 │   ├── api/              # API 接口定义
 │   ├── assets/           # 静态资源（图标、图片等）
 │   ├── components/       # 公共组件
-│   │   ├── CURD/        # CRUD 操作组件
 │   │   ├── DictSelect/  # 字典选择器
 │   │   ├── DictTag/     # 字典标签
 │   │   ├── Editor/      # 富文本编辑器

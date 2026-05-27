@@ -63,13 +63,7 @@
       </ElFormItem>
 
       <ElFormItem :label="$t('pages.internal_message.content')" prop="content">
-        <!-- TODO: 集成富文本编辑器 -->
-        <ElInput
-          v-model="formData.content"
-          type="textarea"
-          :placeholder="$t('common.placeholder.input')"
-          :rows="10"
-        />
+        <Editor v-model="formData.content" :editor-type="EditorType.RICH_TEXT" :height="350" />
       </ElFormItem>
     </ElForm>
 
@@ -87,6 +81,8 @@
 <script lang="ts" setup>
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import { ref, reactive, computed } from "vue";
+
+import { Editor, EditorType } from "@/components/Editor";
 
 import {
   internalMessageStatusList,

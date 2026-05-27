@@ -172,27 +172,9 @@ const pageConfig: ProPageConfig = {
         cellType: "tool",
         buttons: [
           { name: "edit", text: $t("common.button.edit") },
-          {
-            name: "start",
-            text: $t("pages.task.text.do_you_want_start_task", {
-              moduleName: $t("pages.task.moduleName"),
-            }),
-            attrs: { type: "success" },
-          },
-          {
-            name: "stop",
-            text: $t("pages.task.text.do_you_want_stop_task", {
-              moduleName: $t("pages.task.moduleName"),
-            }),
-            attrs: { type: "danger" },
-          },
-          {
-            name: "restart",
-            text: $t("pages.task.text.do_you_want_restart_task", {
-              moduleName: $t("pages.task.moduleName"),
-            }),
-            attrs: { type: "primary" },
-          },
+          { name: "start", text: $t("pages.task.button.start"), attrs: { type: "success" } },
+          { name: "stop", text: $t("pages.task.button.stop"), attrs: { type: "danger" } },
+          { name: "restart", text: $t("pages.task.button.restart"), attrs: { type: "primary" } },
           { name: "delete", text: $t("common.button.delete"), attrs: { type: "danger" } },
         ],
       },

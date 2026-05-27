@@ -1,6 +1,12 @@
 <template>
   <div class="app-container h-full flex flex-1 flex-col">
-    <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit">
+    <ProPage
+      ref="pageRef"
+      :config="pageConfig"
+      @add="handleAdd"
+      @edit="handleEdit"
+      @row-click="handleRowClick"
+    >
       <!-- 启用状态 -->
       <template #isEnabled="scope: any">
         <ElTag size="small" effect="dark" round :color="enableBoolToColor(scope.row.isEnabled)">
@@ -15,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { ElTag } from "element-plus";
 
 import ProPage from "@/components/Pro/ProPage/index.vue";
@@ -107,16 +113,11 @@ function handleSuccess() {
 }
 
 // 行点击联动 - 切换字典类型时刷新字典项列表
-onMounted(() => {
-  const vxeTable = pageRef.value?.tableRef?.tableRef;
-  if (vxeTable) {
-    vxeTable.on("current-change", ({ row }: any) => {
-      if (row?.id) {
-        dictViewStore.setCurrentTypeId(row.id);
-      }
-    });
+function handleRowClick(row: any) {
+  if (row?.id) {
+    dictViewStore.setCurrentTypeId(row.id);
   }
-});
+}
 </script>
 
 <style lang="scss" scoped>

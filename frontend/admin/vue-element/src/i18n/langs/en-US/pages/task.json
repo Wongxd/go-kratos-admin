@@ -17,7 +17,10 @@
     "update": "Update",
     "startAll": "Start All",
     "stopAll": "Stop All",
-    "restartAll": "Restart All"
+    "restartAll": "Restart All",
+    "start": "Start",
+    "stop": "Stop",
+    "restart": "Restart"
   },
   "text": {
     "do_you_want_start_all_task": "Are you sure you want to start all {moduleName}?",

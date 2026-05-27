@@ -12,24 +12,16 @@
     <!-- 新增/编辑抽屉 -->
     <FileDrawer ref="drawerRef" @success="handleSuccess" />
 
-    <!-- 隐藏的文件上传组件 -->
-    <ElUpload
-      ref="uploadRef"
-      :auto-upload="false"
-      :show-file-list="false"
-      :on-change="handleFileChange"
-      class="upload-trigger"
-    >
-      <el-button style="display: none">上传</el-button>
-    </ElUpload>
+    <ProFileSelect ref="fileSelectRef" @select="handleFileSelect" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { ElMessage, ElMessageBox, ElTag, type UploadFile } from "element-plus";
+import { ElMessage, ElTag } from "element-plus";
 
 import ProPage from "@/components/Pro/ProPage/index.vue";
+import ProFileSelect from "@/components/Pro/ProFileSelect/index.vue";
 import type { ProPageConfig, ToolsButton } from "@/components/Pro/ProPage/types";
 import FileDrawer from "./file-drawer.vue";
 
@@ -50,7 +42,7 @@ const { mutateAsync: downloadFileAction } = useDownloadFile();
 
 const pageRef = ref();
 const drawerRef = ref();
-const uploadRef = ref();
+const fileSelectRef = ref();
 
 const pageConfig: ProPageConfig = {
   permPrefix: "sys:file",
@@ -129,7 +121,7 @@ const pageConfig: ProPageConfig = {
 
 function handleToolbar(name: string) {
   if (name === "upload") {
-    uploadRef.value?.handleClick();
+    fileSelectRef.value?.open();
   }
 }
 
@@ -143,13 +135,18 @@ function handleSuccess() {
   pageRef.value?.refresh();
 }
 
-async function handleFileChange(file: UploadFile) {
-  if (!file.raw) return;
+function handleFileSelect(files: File[]) {
+  if (files.length > 0) {
+    handleUploadFile(files[0]);
+  }
+}
+
+async function handleUploadFile(file: File) {
   try {
     await uploadFileAction({
       bucketName: "images",
       fileDirectory: "temp",
-      file: file.raw,
+      file,
       method: "post",
     });
     ElMessage.success($t("pages.file.notification.upload_success"));
@@ -172,10 +169,5 @@ function handleDownloadFile(row: any) {
   width: 100%;
   min-width: 0;
   flex-shrink: 0;
-}
-
-// 隐藏默认的上传按钮，使用自定义工具栏按钮
-:deep(.upload-trigger) {
-  display: none;
 }
 </style>

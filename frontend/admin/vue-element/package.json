@@ -88,6 +88,7 @@
     "exceljs": "^4.4.0",
     "highlight.js": "^11.11.1",
     "json-editor-vue": "^0.18.1",
+    "jsoneditor": "^10.4.3",
     "lodash-es": "^4.17.23",
     "lodash.clonedeep": "^4.5.0",
     "lowlight": "^3.3.0",

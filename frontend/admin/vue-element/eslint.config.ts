@@ -204,16 +204,6 @@ export default [
     },
   },
 
-  // CURD 组件配置
-  {
-    files: ["**/components/CURD/**/*.{ts,vue}"],
-    rules: {
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-    },
-  },
-
   // Prettier 集成（必须放在最后）
   {
     plugins: {

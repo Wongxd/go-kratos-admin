@@ -14,6 +14,7 @@
       v-bind="tableAttrs"
       @checkbox-change="handleVxeSelectionChange"
       @checkbox-all="handleVxeSelectionChange"
+      @current-change="handleVxeCurrentChange"
     >
       <template v-for="col in resolvedColumns" :key="col.prop ?? col.type">
         <!-- 复选框列 -->
@@ -80,6 +81,7 @@
       style="width: 100%"
       v-bind="tableAttrs"
       @selection-change="handleElSelectionChange"
+      @current-change="handleElCurrentChange"
     >
       <template v-for="col in resolvedColumns" :key="col.prop ?? col.type">
         <!-- 复选框列 -->
@@ -166,6 +168,7 @@ const emit = defineEmits<{
   operate: [data: { name: string; row: T; $index: number }];
   "current-change": [currentPage: number];
   "size-change": [pageSize: number];
+  "row-click": [row: T];
 }>();
 
 const tableRef = ref<any>(null);
@@ -199,6 +202,16 @@ function handleVxeSelectionChange({ records }: { records: T[] }) {
 // === el-table 选中处理 ===
 function handleElSelectionChange(rows: T[]) {
   emit("selection-change", rows);
+}
+
+// === vxe-table 行点击（高亮行切换） ===
+function handleVxeCurrentChange({ row }: { row: T }) {
+  emit("row-click", row);
+}
+
+// === el-table 行点击 ===
+function handleElCurrentChange(row: T) {
+  emit("row-click", row);
 }
 
 // === 统一 expose API ===
@@ -235,7 +248,7 @@ defineExpose({
   overflow: auto;
 }
 
-// vxe-table 样式优化（对齐 CURD PageContent）
+// vxe-table 样式优化
 :deep(.vxe-table) {
   border-radius: 4px;
   overflow: hidden;

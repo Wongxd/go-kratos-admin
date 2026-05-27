@@ -1,6 +1,6 @@
 <template>
   <div class="app-container h-full flex flex-1 flex-col">
-    <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit">
+    <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit" @row-click="handleRowClick">
       <!-- 状态 -->
       <template #status="scope: any">
         <ElTag size="small" effect="dark" round :color="statusToColor(scope.row.status)">
@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { ElTag } from "element-plus";
 
 import ProPage from "@/components/Pro/ProPage/index.vue";
@@ -145,16 +145,11 @@ function handleSuccess() {
 }
 
 // 行点击联动 - 切换分组时刷新权限列表
-onMounted(() => {
-  const vxeTable = pageRef.value?.tableRef?.tableRef;
-  if (vxeTable) {
-    vxeTable.on("current-change", ({ row }: any) => {
-      if (row?.id) {
-        permissionViewStore.setCurrentGroupId(row.id);
-      }
-    });
+function handleRowClick(row: any) {
+  if (row?.id) {
+    permissionViewStore.setCurrentGroupId(row.id);
   }
-});
+}
 </script>
 
 <style lang="scss" scoped>
