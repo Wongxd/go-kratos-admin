@@ -210,31 +210,36 @@ function handleBuiltinThemeChange(type: BuiltinThemeType) {
   width: 100%;
   height: 64px;
   border-radius: 6px;
-  border: 1px solid var(--el-border-color);
+  border: 2px solid var(--el-border-color-lighter);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--el-text-color-secondary);
+  background: var(--el-fill-color-light);
 
   &:hover {
-    border-color: var(--el-color-primary);
+    border-color: var(--el-color-primary-light-7);
     background: var(--el-color-primary-light-9);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     color: var(--el-color-primary);
   }
 
   &.active {
     border: 2px solid var(--el-color-primary);
+    background: var(--el-fill-color-light);
+    box-shadow: 0 0 0 1px var(--el-color-primary);
     color: var(--el-color-primary);
   }
 }
 
 .theme-mode-label {
-  font-size: 11px;
-  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--el-text-color-regular);
   transition: all 0.3s;
+  text-align: center;
 }
 
 .builtin-themes-grid {
@@ -258,19 +263,22 @@ function handleBuiltinThemeChange(type: BuiltinThemeType) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--el-border-color);
+  border: 2px solid var(--el-border-color-lighter);
   border-radius: 6px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--el-fill-color-light);
 
   &:hover {
-    border-color: var(--el-color-primary);
+    border-color: var(--el-color-primary-light-7);
     background: var(--el-color-primary-light-9);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
   &.active {
     border: 2px solid var(--el-color-primary);
+    background: var(--el-fill-color-light);
+    box-shadow: 0 0 0 1px var(--el-color-primary);
   }
 }
 
@@ -285,8 +293,10 @@ function handleBuiltinThemeChange(type: BuiltinThemeType) {
 }
 
 .theme-name {
-  font-size: 11px;
-  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--el-text-color-regular);
+  text-align: center;
 }
 
 .radius-group {
