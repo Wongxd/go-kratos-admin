@@ -11,6 +11,7 @@ import {
   refreshTokenMutation,
   registerMutation,
 } from '@/api';
+import { startRefreshTimer, stopRefreshTimer, disconnectSSEServer } from '@/hooks/useTokenRefresh';
 
 /**
  * 令牌载荷
@@ -135,7 +136,10 @@ export const useAuthStore = create<AuthState>()(
           set({ userInfo });
           console.log('✅ User info fetched:', userInfo);
 
-          // 4. 执行成功回调或跳转
+          // 4. 启动定时刷新 token
+          startRefreshTimer();
+
+          // 5. 执行成功回调或跳转
           if (onSuccess) {
             onSuccess();
           } else if (userInfo?.homePath) {
@@ -174,6 +178,8 @@ export const useAuthStore = create<AuthState>()(
 
       // 登出
       logout: async (redirect = true) => {
+        stopRefreshTimer();
+        disconnectSSEServer();
         try {
           await logoutMutation.execute({}).catch(() => {}); // 忽略接口错误
         } finally {
@@ -194,7 +200,9 @@ export const useAuthStore = create<AuthState>()(
 
           // 跳转
           if (redirect && window.location.pathname !== '/auth/login') {
-            const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
+            const currentPath = encodeURIComponent(
+              window.location.pathname + window.location.search,
+            );
             window.location.href = `/auth/login?redirect=${currentPath}`;
           }
         }
@@ -242,9 +250,12 @@ export const useAuthStore = create<AuthState>()(
       // 强制登出：纯前端操作，不调后端接口
       // 用于 token 已失效（401）场景，避免调 logout API 又触发 401 死循环
       forceLogout: () => {
-        const currentPath = window.location.pathname !== '/auth/login'
-          ? `?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`
-          : '';
+        stopRefreshTimer();
+        disconnectSSEServer();
+        const currentPath =
+          window.location.pathname !== '/auth/login'
+            ? `?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`
+            : '';
         console.warn('Force logout: clearing auth state and redirecting to login');
         localStorage.removeItem('auth-storage');
         set({
