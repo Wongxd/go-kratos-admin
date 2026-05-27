@@ -53,6 +53,3 @@ export * from "./policy-evaluation-log";
 
 // 内部消息
 export * from "./internal-message";
-
-// 字典缓存
-export * from "./use-dict-cache";
