@@ -79,6 +79,7 @@ const transitionName = computed(() => {
 .app-main {
   position: relative;
   overflow-y: auto;
+  scrollbar-gutter: stable;
   background-color: var(--el-bg-color-page);
   width: 100%;
   min-width: 0;

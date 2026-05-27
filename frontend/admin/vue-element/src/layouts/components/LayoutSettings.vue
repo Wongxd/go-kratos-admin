@@ -4,6 +4,8 @@
     size="380"
     :title="t('pages.settings.project')"
     :before-close="handleCloseDrawer"
+    append-to-body
+    :lock-scroll="false"
     class="settings-drawer"
   >
     <div class="settings-content">

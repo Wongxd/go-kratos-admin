@@ -45,8 +45,7 @@
 
     <!-- 编辑密码弹窗 -->
     <EditPasswordModal
-      v-model="dialogVisible"
-      :data="dialogData"
+      ref="editPasswordModalRef"
       @success="handlePasswordSuccess"
     />
   </div>
@@ -78,15 +77,7 @@ const userId = computed(() => {
 
 const { mutateAsync: updateUser } = useUpdateUser();
 
-// 弹窗控制
-const dialogVisible = ref(false);
-const dialogData = ref({ create: false, userId: undefined });
-
-/* 打开模态窗口 */
-function openModal(create: boolean, userId?: any) {
-  dialogData.value = { create, userId };
-  dialogVisible.value = true;
-}
+const editPasswordModalRef = ref();
 
 /**
  * 返回上一级页面
@@ -123,14 +114,13 @@ async function handleBanAccount() {
  * 编辑密码
  */
 function handleEditPassword() {
-  openModal(true, userId);
+  editPasswordModalRef.value?.open({ userId: userId.value });
 }
 
 /**
  * 密码修改成功
  */
 function handlePasswordSuccess() {
-  dialogVisible.value = false;
   ElMessage.success($t("common.notification.update_success"));
 }
 </script>

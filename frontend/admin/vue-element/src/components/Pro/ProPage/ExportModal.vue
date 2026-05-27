@@ -4,6 +4,8 @@
     :title="t('pages.curd.export.title')"
     width="700px"
     align-center
+    append-to-body
+    :lock-scroll="false"
     @close="handleClose"
   >
     <ElScrollbar max-height="70vh">
