@@ -28,8 +28,8 @@
       </template>
     </ProPage>
 
-    <!-- 新增/编辑抽屉 -->
-    <TenantDrawer ref="drawerRef" @success="handleSuccess" />
+    <!-- 弹窗组件自动连接 -->
+    <ConnectedDrawer />
   </div>
 </template>
 
@@ -38,6 +38,7 @@ import { ref } from "vue";
 import { ElTag } from "element-plus";
 import ProPage from "@/components/Pro/ProPage/index.vue";
 import type { ProPageConfig } from "@/components/Pro/ProPage/types";
+import { useProModal } from "@/components/Pro";
 import TenantDrawer from "./tenant-drawer.vue";
 
 import {
@@ -59,7 +60,14 @@ import { $t } from "@/i18n";
 const { mutateAsync: deleteTenant } = useDeleteTenant();
 
 const pageRef = ref();
-const drawerRef = ref();
+
+// useProModal 连接 TenantDrawer 组件
+const [ConnectedDrawer, modalApi] = useProModal({
+  connectedComponent: TenantDrawer,
+  onOpenChange(isOpen) {
+    if (!isOpen) pageRef.value?.refresh();
+  },
+});
 
 // === 页面配置 ===
 const pageConfig: ProPageConfig = {
@@ -121,7 +129,8 @@ const pageConfig: ProPageConfig = {
       await deleteTenant({ id: ids as any });
     },
     toolbar: [],
-    defaultToolbar: ["refresh", "exports", "imports", "filter", "add"],
+    toolbarRight: ["add"],
+    defaultToolbar: ["refresh", "exports", "imports", "filter"],
     tableAttrs: { border: true, stripe: false },
     columns: [
       { type: "index", label: $t("common.table.seq"), width: 60 },
@@ -161,15 +170,11 @@ const pageConfig: ProPageConfig = {
 
 // === 事件处理 ===
 function handleAdd() {
-  drawerRef.value?.open();
+  modalApi.open({ create: true });
 }
 
 function handleEdit(row: any) {
-  drawerRef.value?.open(row);
-}
-
-function handleSuccess() {
-  pageRef.value?.refresh();
+  modalApi.open({ create: false, row });
 }
 </script>
 

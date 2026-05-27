@@ -68,6 +68,7 @@ export interface ProToolbarEmits {
   "button-click": [name: string, data?: any];
   refresh: [];
   filter: [];
+  "filter-change": [columns: any[]];
   search: [];
   export: [];
   import: [];

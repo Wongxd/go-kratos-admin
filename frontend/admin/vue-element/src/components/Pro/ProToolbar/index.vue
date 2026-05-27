@@ -50,22 +50,16 @@
             v-else-if="tool === 'filter' && hasFilterContent"
             placement="bottom"
             trigger="click"
-            :width="200"
+            :width="350"
           >
             <template #reference>
               <ElButton circle :icon="Operation" />
             </template>
-            <ElScrollbar max-height="350px">
-              <template v-if="filterableColumns.length">
-                <ElCheckbox
-                  v-for="col in filterableColumns"
-                  :key="col.prop"
-                  v-model="col.show"
-                  :label="col.label"
-                />
-              </template>
-              <slot v-else name="filter" />
-            </ElScrollbar>
+            <ColumnFilter
+              :columns="filterableColumns"
+              @confirm="handleFilterConfirm"
+              @cancel="handleFilterCancel"
+            />
           </ElPopover>
           <!-- 搜索 -->
           <ElButton
@@ -116,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { ElButton, ElCheckbox, ElIcon, ElPopover, ElScrollbar } from "element-plus";
+import { ElButton, ElIcon, ElPopover } from "element-plus";
 import {
   Refresh,
   Operation,
@@ -126,6 +120,7 @@ import {
   FullScreen,
   Aim,
 } from "@element-plus/icons-vue";
+import ColumnFilter from "./ColumnFilter.vue";
 import type {
   ProToolbarProps,
   ProToolbarEmits,
@@ -135,6 +130,7 @@ import type {
 } from "./types";
 import { useAccess } from "@/core/access";
 import { computed, ref, useSlots } from "vue";
+import { ProTableColumn } from "@/components/Pro";
 
 defineOptions({ inheritAttrs: false });
 
@@ -232,6 +228,16 @@ function handleCustomToolClick(btn: ToolbarCustomButton) {
 function handleZoom() {
   isFullscreen.value = !isFullscreen.value;
   emit("zoom", isFullscreen.value);
+}
+
+// 筛选确认
+function handleFilterConfirm(columns: ProTableColumn[]) {
+  emit("filter-change", columns);
+}
+
+// 筛选取消
+function handleFilterCancel() {
+  // 不做处理，Popover 会自动关闭
 }
 
 // 暴露方法

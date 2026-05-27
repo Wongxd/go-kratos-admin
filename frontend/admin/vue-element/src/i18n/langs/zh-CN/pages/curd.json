@@ -1,6 +1,8 @@
 {
   "toolbar": {
     "filter": "筛选列",
+    "filterAll": "全部",
+    "filterReset": "恢复默认",
     "refresh": "刷新",
     "search": "搜索",
     "batchImport": "批量导入",

@@ -27,6 +27,7 @@
         @export="openExportsModal"
         @import="openImportsModal"
         @zoom="handleZoom"
+        @filter-change="handleFilterChange"
       >
         <template #left><slot name="toolbar-left" /></template>
         <template #before-tools><slot name="toolbar-before-tools" /></template>
@@ -261,6 +262,10 @@ function toggleSearch() {
 }
 
 // === 筛选处理（filter 由 ProToolbar 内部 ElPopover + columns checkbox 处理） ===
+function handleFilterChange(columns: any[]) {
+  // 列配置已通过响应式更新，这里可以做额外处理
+  // 比如保存到 localStorage 或后端
+}
 
 // === 工具栏事件 ===
 function handleToolbarClick(name: string) {

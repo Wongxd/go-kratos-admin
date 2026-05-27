@@ -1,6 +1,8 @@
 {
   "toolbar": {
     "filter": "Filter Columns",
+    "filterAll": "All",
+    "filterReset": "Reset",
     "refresh": "Refresh",
     "search": "Search",
     "batchImport": "Batch Import",

@@ -133,7 +133,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 import { ElMessage } from "element-plus";
 
@@ -149,23 +149,27 @@ import {
 import { PaginationQuery } from "@/core/transport/rest";
 import type { identityservicev1_Tenant as Tenant } from "@/api/generated/admin/service/v1";
 import { $t } from "@/i18n";
+import { injectProModalApi } from "@/components/Pro";
 
-const emit = defineEmits<{
-  (e: "success"): void;
-}>();
+// 通过 inject 获取列表页传入的 modalApi
+const modalApi = injectProModalApi();
+
+const data = computed(() => modalApi.getData<{ create?: boolean; row?: Tenant }>());
+const isCreate = computed(() => !!data.value.create);
+
+const visible = computed({
+  get: () => modalApi.store.isOpen,
+  set: (v) => {
+    if (!v) modalApi.close();
+  },
+});
 
 const { mutateAsync: createTenantWithAdminUserMut } = useCreateTenantWithAdminUser();
 const { mutateAsync: updateTenantMut } = useUpdateTenant();
 const { mutateAsync: userExists } = useUserExists();
 
-// 弹窗可见性
-const visible = ref(false);
 // 加载状态
 const loading = ref(false);
-// 是否为创建模式
-const isCreate = ref(false);
-// 当前编辑的数据
-const currentRow = ref<Tenant | null>(null);
 
 // 表单数据
 const formData = ref({
@@ -191,36 +195,33 @@ const title = computed(() =>
     : $t("common.modal.update", { moduleName: $t("pages.tenant.moduleName") })
 );
 
-// 打开弹窗
-const open = (row?: Tenant) => {
-  visible.value = true;
-
-  if (row) {
-    // 编辑模式
-    isCreate.value = false;
-    currentRow.value = row;
-    formData.value = {
-      name: row.name || "",
-      code: row.code || "",
-      type: row.type || "PAID",
-      auditStatus: row.auditStatus || "APPROVED",
-      status: row.status || "ON",
-      remark: row.remark || "",
-      user: {
-        username: "",
-        mobile: "",
-        email: "",
-      },
-      password: "",
-      passwordConfirm: "",
-    };
-  } else {
-    // 创建模式
-    isCreate.value = true;
-    currentRow.value = null;
-    resetForm();
+// 监听弹窗打开，初始化表单数据
+watch(visible, (val) => {
+  if (val) {
+    if (!isCreate.value && data.value.row) {
+      // 编辑模式
+      const row = data.value.row;
+      formData.value = {
+        name: row.name || "",
+        code: row.code || "",
+        type: row.type || "PAID",
+        auditStatus: row.auditStatus || "APPROVED",
+        status: row.status || "ON",
+        remark: row.remark || "",
+        user: {
+          username: "",
+          mobile: "",
+          email: "",
+        },
+        password: "",
+        passwordConfirm: "",
+      };
+    } else {
+      // 创建模式
+      resetForm();
+    }
   }
-};
+});
 
 // 重置表单
 const resetForm = () => {
@@ -243,7 +244,7 @@ const resetForm = () => {
 
 // 关闭弹窗
 const handleClose = () => {
-  visible.value = false;
+  modalApi.close();
   resetForm();
 };
 
@@ -265,8 +266,7 @@ const handleSubmit = async () => {
     }
 
     // 成功回调
-    emit("success");
-    handleClose();
+    modalApi.close();
   } catch (error) {
     console.error("Submit error:", error);
   } finally {
@@ -321,13 +321,13 @@ async function createTenantWithAdminUser() {
 
 // 更新租户
 async function updateTenant() {
-  if (!currentRow.value?.id) {
+  if (!data.value.row?.id) {
     ElMessage.error($t("common.notification.update_failed"));
     return;
   }
 
   await updateTenantMut({
-    id: currentRow.value.id,
+    id: data.value.row!.id,
     values: {
       name: formData.value.name,
       code: formData.value.code,
@@ -340,11 +340,6 @@ async function updateTenant() {
 
   ElMessage.success($t("common.notification.update_success"));
 }
-
-// 暴露方法给父组件
-defineExpose({
-  open,
-});
 </script>
 
 <style scoped>
