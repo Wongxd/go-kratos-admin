@@ -47,6 +47,8 @@ export interface AuthState {
   logout: (redirect?: boolean) => Promise<void>;
   refreshToken: () => Promise<string>;
   reauthenticate: () => void;
+  /** 强制登出：纯前端清除认证状态 + 跳转登录页，不调后端接口（用于 token 已失效场景） */
+  forceLogout: () => void;
   setUserInfo: (info: UserInfo) => void;
   clearError: () => void;
   $reset: () => void;
@@ -191,8 +193,9 @@ export const useAuthStore = create<AuthState>()(
           });
 
           // 跳转
-          if (redirect && window.location.pathname !== '/login') {
-            window.location.href = '/auth/login';
+          if (redirect && window.location.pathname !== '/auth/login') {
+            const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/auth/login?redirect=${currentPath}`;
           }
         }
       },
@@ -201,7 +204,7 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: async () => {
         const { refreshTokenValue: refreshVal } = get();
         if (!refreshVal) {
-          get().reauthenticate();
+          get().forceLogout();
           return '';
         }
 
@@ -225,7 +228,7 @@ export const useAuthStore = create<AuthState>()(
           return response.access_token || '';
         } catch (err) {
           console.error('Refresh token failed:', err);
-          get().reauthenticate();
+          get().forceLogout();
           return '';
         }
       },
@@ -234,8 +237,27 @@ export const useAuthStore = create<AuthState>()(
       reauthenticate: () => {
         console.warn('Token invalid, please re-login');
         set({ error: i18next.t('auth:sessionExpired') });
-        // 可选：自动跳转登录页
-        // window.location.href = '/auth/login';
+      },
+
+      // 强制登出：纯前端操作，不调后端接口
+      // 用于 token 已失效（401）场景，避免调 logout API 又触发 401 死循环
+      forceLogout: () => {
+        const currentPath = window.location.pathname !== '/auth/login'
+          ? `?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`
+          : '';
+        console.warn('Force logout: clearing auth state and redirecting to login');
+        localStorage.removeItem('auth-storage');
+        set({
+          accessToken: null,
+          refreshTokenValue: null,
+          accessTokenExpireAt: null,
+          refreshTokenExpireAt: null,
+          userInfo: null,
+          error: null,
+          loginLoading: false,
+          registerLoading: false,
+        });
+        window.location.href = `/auth/login${currentPath}`;
       },
 
       // 设置用户信息
