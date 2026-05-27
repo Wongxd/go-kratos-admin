@@ -544,7 +544,7 @@ const refreshSelectedTag = (tag: TagView | null) => {
   closeContextMenu();
   tagsViewStore.delCachedView(tag);
   nextTick(() => {
-    router.replace("/redirect" + tag.fullPath);
+    router.replace(tag.fullPath);
   });
 };
 

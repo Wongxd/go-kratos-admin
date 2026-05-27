@@ -70,9 +70,6 @@ function handleLink(item: any) {
 watch(
   () => currentRoute.path,
   (path) => {
-    if (path.startsWith("/redirect/")) {
-      return;
-    }
     getBreadcrumb();
   }
 );

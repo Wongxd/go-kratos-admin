@@ -11,9 +11,6 @@ export const useTagsViewStore = defineStore(
      */
     function addVisitedView(view: TagView) {
       // 如果已经存在于已访问的视图列表中或者是重定向地址，则不再添加
-      if (view.path.startsWith("/redirect")) {
-        return;
-      }
       const existing = visitedViews.value.find((v: TagView) => v.path === view.path);
       if (existing) {
         // 如果已存在，回填缺失的字段（如 icon）
@@ -247,7 +244,7 @@ export const useTagsViewStore = defineStore(
         // you can adjust it according to your needs.
         if (view?.name === "Dashboard") {
           // to reload home page
-          router.replace("/redirect" + view.fullPath);
+          router.replace(view.fullPath);
         } else {
           router.push("/");
         }
