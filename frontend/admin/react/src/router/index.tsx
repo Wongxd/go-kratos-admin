@@ -1,18 +1,58 @@
 import { useState, useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
+import React, { Suspense, createElement } from 'react';
 
 import { createAccessibleRouter } from '@/core/router/factory';
 import { useAuthStore } from '@/stores';
 import { useAuth } from '@/hooks/useAuth';
 import { getAccessStatic } from '@/core/access';
 import { fetchAllDictEntries } from '@/hooks/useDictCache';
+import { usePreferencesStore } from '@/core/preferences/store';
+import { getNavigation } from '@/api/service/admin-portal';
+import Loading from '@/components/common/Loading';
 
 import { Forbidden } from '@/pages/core/error';
-import type { AppRouteObject } from '@/core/router';
+import type { AppRouteObject, ComponentRecordType } from '@/core/router';
+import MainLayout from '@/layouts/MainLayout';
 
 import { errorRoutes } from './config/error-routes';
 import { authRoutes } from './config/auth';
 import { staticRoutes } from './config/static';
+
+// 布局组件映射（后端 component 字段 → React 组件）
+const layoutMap: ComponentRecordType = {
+  BasicLayout: MainLayout,
+};
+
+// 页面组件映射：使用 Vite glob 导入所有业务页面（后端模式用）
+// 后端返回的 component 路径如 "dashboard/index"，会被标准化后匹配
+const rawPageModules = import.meta.glob(
+  '../pages/app/**/*.tsx',
+  { eager: true },
+);
+
+// 将 glob 返回的模块对象转换为 ComponentType 映射
+// glob eager 返回 { '../pages/app/dashboard/index.tsx': { default: Component } }
+// 需要转为 { '/dashboard/index': Component }
+const pageMap: ComponentRecordType = {};
+for (const [globPath, module] of Object.entries(rawPageModules)) {
+  const mod = module as any;
+  const Component = mod?.default || mod;
+  if (typeof Component === 'function') {
+    // 标准化 glob 路径为与 normalizeViewPath 兼容的格式
+    const normalized = globPath
+      .replace(/^\.\.\//, '/')         // ../  → /
+      .replace(/^\.\//, '/')           // ./   → /
+      .replace(/^pages\//, '/')        // pages/ → /
+      .replace(/\.tsx$/, '')            // 去除后缀
+      .replace(/\/index$/, '');         // 去除末尾 /index
+    pageMap[normalized] = Component;
+    // 同时注册带 /index 的路径
+    pageMap[`${normalized}/index`] = Component;
+    pageMap[`${normalized}.tsx`] = Component;
+    pageMap[`${normalized}/index.tsx`] = Component;
+  }
+}
 
 // 自动导入 modules 下的所有路由模块（仅包含业务功能路由）
 const modulesRoutes = import.meta.glob<AppRouteObject[][]>('./modules/**/*.tsx', {
@@ -47,6 +87,7 @@ export const AppRouter = () => {
   const [loading, setLoading] = useState(true);
 
   const { accessToken } = useAuthStore();
+  const accessMode = usePreferencesStore((s) => s.preferences.app.accessMode);
 
   const isAuthenticated = !!accessToken;
 
@@ -84,13 +125,22 @@ export const AppRouter = () => {
         const freshPermissions = getAccessStatic().getAllPermissions();
 
         // 无论认证是否成功，都生成路由（未认证时 permissions 为空，AuthGuard 会拦截）
-        const appRouter = await createAccessibleRouter({
-          routes: allRoutes,
-          permissions: freshPermissions,
-          forbiddenElement: <Forbidden />,
-          autoInjectRedirect: true,
-          autoSort: true,
-        });
+        const appRouter = await createAccessibleRouter(
+          accessMode,
+          {
+            routes: allRoutes,
+            permissions: freshPermissions,
+            forbiddenElement: <Forbidden />,
+            fetchMenuListAsync: async () => {
+              const data = await getNavigation();
+              return data.items ?? [];
+            },
+            layoutMap,
+            pageMap,
+            autoInjectRedirect: true,
+            autoSort: true,
+          },
+        );
 
         if (!stale) {
           setRouter(appRouter);

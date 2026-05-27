@@ -7,15 +7,45 @@ import { generateRoutesByBackend, generateRoutesByFrontend } from '@/core/router
 import type { AccessModeType } from '@/core/preferences';
 import React from 'react';
 
-export const createAccessibleRouter = async (options: GenerateMenuAndRoutesOptions) => {
+export const createAccessibleRouter = async (
+  mode: AccessModeType,
+  options: GenerateMenuAndRoutesOptions,
+) => {
   let routes: AppRouteObject[] = [...options.routes];
 
-  // 前端模式：基于权限过滤路由
-  routes = await generateRoutesByFrontend(
-    routes,
-    options.permissions ?? [],
-    options.forbiddenElement,
-  );
+  // 根据模式生成路由
+  switch (mode) {
+    case 'backend': {
+      // 后端模式：从 API 获取路由树，动态转换组件
+      if (!options.fetchMenuListAsync) {
+        console.warn('[Router] Backend mode requires fetchMenuListAsync, falling back to frontend mode');
+        routes = await generateRoutesByFrontend(
+          routes,
+          options.permissions ?? [],
+          options.forbiddenElement,
+        );
+      } else {
+        routes = await generateRoutesByBackend({
+          staticRoutes: routes,
+          mode,
+          fetchMenuListAsync: options.fetchMenuListAsync,
+          layoutMap: options.layoutMap,
+          pageMap: options.pageMap,
+        });
+      }
+      break;
+    }
+    case 'frontend':
+    default: {
+      // 前端模式：基于静态路由 + 权限过滤
+      routes = await generateRoutesByFrontend(
+        routes,
+        options.permissions ?? [],
+        options.forbiddenElement,
+      );
+      break;
+    }
+  }
 
   if (options.autoInjectRedirect !== false)
     routes = injectRedirects(routes as unknown as AppRoute[]) as unknown as AppRouteObject[];
