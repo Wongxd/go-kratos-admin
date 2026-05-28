@@ -13,7 +13,7 @@
       </div>
 
       <!-- 面包屑 -->
-      <Breadcrumb />
+      <LayoutBreadcrumb />
     </div>
 
     <!-- ==================== 右侧区域 ==================== -->
@@ -89,7 +89,7 @@ import { useAppUserStore } from "@/stores";
 import { useAuth } from "@/composables/use-auth";
 import { preferences, preferencesManager } from "@/core/preferences";
 
-import Breadcrumb from "@/components/Breadcrumb/index.vue";
+import LayoutBreadcrumb from "./LayoutBreadcrumb.vue";
 import CommandPalette from "@/components/CommandPalette/index.vue";
 import ThemeSwitch from "@/components/ThemeSwitch/index.vue";
 import LangSelect from "@/components/LangSelect/index.vue";
