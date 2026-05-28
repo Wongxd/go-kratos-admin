@@ -132,7 +132,9 @@ function handleRefresh() {
   // 因此无需手动操作 cachedViews
   contentRefreshing.value = true;
 
-  nextTick(() => {
+  // 使用 setTimeout 而非 nextTick，确保浏览器完成所有 DOM 清理工作
+  // nextTick 太快，keep-alive 内组件的销毁（如 ElForm resize observer）可能还未完成
+  setTimeout(() => {
     contentRefreshing.value = false;
   });
 }
