@@ -9,7 +9,7 @@
 
       <!-- 刷新内容区按钮 -->
       <div v-if="widget.refresh" class="navbar-action" @click="handleRefresh">
-        <div :class="['i-svg:refresh', { 'is-spin': isRefreshing }]" />
+        <div :class="['i-svg:refresh', { 'is-spin': contentRefreshing }]" />
       </div>
 
       <!-- 面包屑 -->
@@ -111,14 +111,11 @@ const breadcrumb = computed(() => preferences.breadcrumb);
 // 注入设置面板可见性状态
 const settingsVisible = inject<Ref<boolean>>("settingsVisible", ref(false));
 
-// 注入内容区刷新 key
-const contentRefreshKey = inject<Ref<number>>("contentRefreshKey", ref(0));
+// 注入内容区刷新状态
+const contentRefreshing = inject<Ref<boolean>>("contentRefreshing", ref(false));
 
 // 侧边栏是否启用
 const isSidebarEnabled = computed(() => preferences.sidebar.enable);
-
-// 刷新状态
-const isRefreshing = ref(false);
 
 // ==================== 方法 ====================
 
@@ -131,8 +128,7 @@ function toggleSidebarVisibility() {
 
 /** 刷新内容区 */
 function handleRefresh() {
-  if (isRefreshing.value) return;
-  isRefreshing.value = true;
+  if (contentRefreshing.value) return;
 
   // 从缓存列表中移除当前路由，避免 keep-alive 缓存
   const { fullPath } = route;
@@ -144,12 +140,15 @@ function handleRefresh() {
     cachedViews.value.splice(idx, 1);
   }
 
-  // 通过修改 key 强制 router-view 重建
+  // 同时清理 wrapperMap，让组件完全重建
+  // wrapperMap 是 LayoutMain 内部的，通过销毁 router-view 来清理
+
+  // 第一步：设置 true 触发 v-if="!isRefreshing" 卸载 router-view
+  contentRefreshing.value = true;
+
+  // 第二步：等 DOM 卸载完成后，恢复 false 让 router-view 重新挂载
   nextTick(() => {
-    contentRefreshKey.value++;
-    nextTick(() => {
-      isRefreshing.value = false;
-    });
+    contentRefreshing.value = false;
   });
 }
 

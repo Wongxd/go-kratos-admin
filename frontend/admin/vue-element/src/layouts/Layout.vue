@@ -20,12 +20,12 @@ const { currentLayout } = useLayout();
 // 设置面板可见性（全局状态）
 const settingsVisible = ref(false);
 
-// 内容区刷新 key（修改此值强制重建 router-view）
-const contentRefreshKey = ref(0);
+// 内容区刷新状态（true 时 router-view 卸载，false 时重新挂载）
+const contentRefreshing = ref(false);
 
 // 提供给子组件使用
 provide("settingsVisible", settingsVisible);
-provide("contentRefreshKey", contentRefreshKey);
+provide("contentRefreshing", contentRefreshing);
 
 const currentLayoutComponent = computed(() => {
   const override = route.meta?.layout as LayoutType | undefined;

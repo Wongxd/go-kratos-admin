@@ -319,6 +319,9 @@ const showMaximize = computed(() => preferences.tabbar.showMaximize ?? true);
 const draggable = computed(() => preferences.tabbar.draggable ?? true);
 const tabHeight = computed(() => preferences.tabbar.height || 38);
 
+// 注入内容区刷新状态
+const contentRefreshing = inject<Ref<boolean>>("contentRefreshing", ref(false));
+
 // 最大化状态
 const isMaximized = ref(false);
 
@@ -542,9 +545,12 @@ const closeContextMenu = () => {
 const refreshSelectedTag = (tag: TagView | null) => {
   if (!tag) return;
   closeContextMenu();
+  // 先从 keep-alive 缓存中移除
   tagsViewStore.delCachedView(tag);
+  // 通过 v-if 卸载 router-view，再重建，避免 ElForm 宽度计算错误
+  contentRefreshing.value = true;
   nextTick(() => {
-    router.replace(tag.fullPath);
+    contentRefreshing.value = false;
   });
 };
 

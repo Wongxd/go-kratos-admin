@@ -1,6 +1,6 @@
 <template>
   <section class="app-main" :class="mainClass" :style="{ height: appMainHeight }">
-    <router-view :key="refreshKey">
+    <router-view v-if="!isRefreshing">
       <template #default="{ Component, route }">
         <transition :name="transitionName" mode="out-in">
           <keep-alive :include="cachedViews">
@@ -27,11 +27,18 @@ import Error404 from "@/views/core/error/404.vue";
 const { cachedViews } = toRefs(useTagsViewStore());
 const { tabbarPreferences } = usePreferences();
 
-// 注入刷新 key，当 key 变化时强制重建 router-view
-const refreshKey = inject<Ref<number>>("contentRefreshKey", ref(0));
+// 注入刷新状态
+const isRefreshing = inject<Ref<boolean>>("contentRefreshing", ref(false));
 
 // 当前组件
 const wrapperMap = new Map<string, Component>();
+
+// 刷新时清理 wrapperMap，确保组件完全重建
+watch(isRefreshing, (val) => {
+  if (val) {
+    wrapperMap.clear();
+  }
+});
 const currentComponent = (component: Component, route: RouteLocationNormalized) => {
   if (!component) return;
 
@@ -126,7 +133,9 @@ const mainClass = computed(() => {
   /* fade-slide */
   .fade-slide-leave-active,
   .fade-slide-enter-active {
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
   }
   .fade-slide-enter-from {
     opacity: 0;
@@ -140,7 +149,9 @@ const mainClass = computed(() => {
   /* fade-down */
   .fade-down-leave-active,
   .fade-down-enter-active {
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
   }
   .fade-down-enter-from {
     opacity: 0;
@@ -154,7 +165,9 @@ const mainClass = computed(() => {
   /* fade-up */
   .fade-up-leave-active,
   .fade-up-enter-active {
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
   }
   .fade-up-enter-from {
     opacity: 0;
