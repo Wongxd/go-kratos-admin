@@ -20,7 +20,7 @@
             <el-menu-item v-for="item in topMenuItems" :key="item.path" :index="item.path">
               <template v-if="item.meta">
                 <!-- eslint-disable-next-line vue/no-deprecated-filter -->
-                <MenuIcon :icon="item.meta.icon as string | undefined" />
+                <SvgIcon :icon="(item.meta.icon as string | undefined) || 'menu'" :size="18" />
                 <span v-if="item.meta.title" class="ml-1">
                   {{ translateRouteTitle(item.meta.title as string) }}
                 </span>
@@ -83,12 +83,12 @@
 <script setup lang="ts">
 import type { LocationQueryRaw, RouteRecordRaw } from "vue-router";
 import { useWindowSize } from "@vueuse/core";
-import { ElIcon } from "element-plus";
 
 import { useAccessStore } from "@/stores";
 import { isExternal } from "@/utils";
 import { translateRouteTitle } from "@/core/i18n";
 import { preferences, preferencesManager, usePreferences } from "@/core/preferences";
+import SvgIcon from "@/components/SvgIcon/index.vue";
 
 import variables from "@/styles/variables.module.scss";
 
@@ -101,29 +101,6 @@ import LayoutSidebarItem from "./components/LayoutSidebarItem.vue";
 import SidebarControlPanel from "./components/SidebarControlPanel.vue";
 
 import { useLayout } from "./useLayout";
-
-// 菜单图标渲染组件
-const MenuIcon = defineComponent({
-  props: { icon: String },
-  setup(props) {
-    const isElIcon = computed(() => props.icon?.startsWith("el-icon"));
-    const iconName = computed(() => props.icon?.replace("el-icon-", ""));
-
-    return () => {
-      if (!props.icon) {
-        return h("div", { class: "i-svg:menu" });
-      }
-
-      // Element Plus 图标
-      if (isElIcon.value) {
-        return h(ElIcon, null, () => h(resolveComponent(iconName.value!)));
-      }
-
-      // SVG 图标
-      return h("div", { class: `i-svg:${props.icon}` });
-    };
-  },
-});
 
 const route = useRoute();
 const router = useRouter();

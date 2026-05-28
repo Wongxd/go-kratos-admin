@@ -12,7 +12,7 @@
           :index="resolvePath(item.path)"
           :class="{ 'submenu-title-noDropdown': !isNest }"
         >
-          <MenuIcon :icon="getMetaIcon(item.meta)" />
+          <SvgIcon :icon="getMetaIcon(item.meta) || 'menu'" :size="18" />
           <span v-if="item.meta?.title" class="menu-title">
             {{ translateRouteTitle(getMetaTitle(item.meta)) }}
           </span>
@@ -24,7 +24,7 @@
     <el-sub-menu v-else :index="resolvePath(item.path)" :data-path="item.path" teleported>
       <template #title>
         <template v-if="item.meta">
-          <MenuIcon :icon="getMetaIcon(item.meta)" />
+          <SvgIcon :icon="getMetaIcon(item.meta) || 'menu'" :size="18" />
           <span v-if="item.meta.title" class="menu-title">
             {{ translateRouteTitle(getMetaTitle(item.meta)) }}
           </span>
@@ -52,14 +52,6 @@ import SvgIcon from "@/components/SvgIcon/index.vue";
 defineOptions({
   name: "LayoutSidebarItem",
   inheritAttrs: false,
-});
-
-// 菜单图标组件（使用统一 SvgIcon 组件）
-const MenuIcon = defineComponent({
-  props: { icon: String },
-  setup(props) {
-    return () => h(SvgIcon, { icon: props.icon || "menu", size: 18 });
-  },
 });
 
 const props = defineProps({
