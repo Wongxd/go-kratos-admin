@@ -1,111 +1,18 @@
 <template>
-  <!-- 图片模板 -->
-  <template v-if="col.cellType === 'image'">
-    <template v-if="field">
-      <template v-if="Array.isArray(row[field])">
-        <ElImage
-          v-for="(item, idx) in row[field]"
-          :key="idx"
-          :src="item"
-          :preview-src-list="row[field]"
-          :initial-index="Number(idx)"
-          :preview-teleported="true"
-          :style="`width: ${col.imageWidth ?? 40}px; height: ${col.imageHeight ?? 40}px`"
-        />
-      </template>
-      <template v-else>
-        <ElImage
-          :src="row[field]"
-          :preview-src-list="[row[field]]"
-          :preview-teleported="true"
-          :style="`width: ${col.imageWidth ?? 40}px; height: ${col.imageHeight ?? 40}px`"
-        />
-      </template>
-    </template>
-  </template>
-
-  <!-- 标签模板 -->
-  <template v-else-if="col.cellType === 'tag'">
-    <ElTag :type="getTagType(row[field], col)">
-      {{ (col.labelMap ?? {})[row[field]] ?? row[field] }}
-    </ElTag>
-  </template>
-
-  <!-- 开关模板 -->
-  <template v-else-if="col.cellType === 'switch'">
-    <ElSwitch
-      v-if="field"
-      v-model="row[field]"
-      :active-value="col.activeValue ?? 1"
-      :inactive-value="col.inactiveValue ?? 0"
-      :inline-prompt="true"
-      :active-text="col.activeText ?? ''"
-      :inactive-text="col.inactiveText ?? ''"
-      :validate-event="false"
-      @change="(val: any) => emit('modify', { row, field, value: val })"
-    />
-  </template>
-
-  <!-- 日期模板 -->
-  <template v-else-if="col.cellType === 'date'">
-    {{ row[field] ? useDateFormat(row[field], col.dateFormat ?? "YYYY-MM-DD HH:mm:ss").value : "" }}
-  </template>
-
-  <!-- 链接模板 -->
-  <template v-else-if="col.cellType === 'link'">
-    <ElLink type="primary" :href="row[field]" target="_blank">
-      {{ row[field] }}
-    </ElLink>
-  </template>
-
-  <!-- 价格模板 -->
-  <template v-else-if="col.cellType === 'price'">
-    {{ `${col.pricePrefix ?? ""}${row[field]}` }}
-  </template>
-
-  <!-- 百分比模板 -->
-  <template v-else-if="col.cellType === 'percent'">{{ row[field] }}%</template>
-
-  <!-- 图标模板 -->
-  <template v-else-if="col.cellType === 'icon'">
-    <ElIcon><component :is="row[field]" /></ElIcon>
-  </template>
-
-  <!-- 操作列模板 -->
-  <template v-else-if="col.cellType === 'tool'">
-    <template v-for="(btn, idx) in col.buttons" :key="idx">
-      <AccessControl
-        :codes="btn.auth ? (Array.isArray(btn.auth) ? btn.auth : [btn.auth]) : undefined"
-      >
-        <ElTooltip
-          v-if="btn.visible === undefined || btn.visible(row)"
-          :content="btn.label ?? btn.name"
-          placement="top"
-          :show-after="300"
-        >
-          <!-- 图标按钮 -->
-          <button
-            v-if="btn.icon"
-            class="table-icon-btn"
-            :class="`table-icon-btn--${getIconBtnVariant(btn)}`"
-            @click="emit('operate', { name: btn.name, row, $index: rowIndex })"
-          >
-            <SvgIcon :icon="btn.icon" :size="16" />
-          </button>
-          <!-- 文字按钮（兼容无 icon 的配置） -->
-          <ElButton
-            v-else
-            v-bind="{ link: true, size: 'small', ...btn.attrs }"
-            @click="emit('operate', { name: btn.name, row, $index: rowIndex })"
-          >
-            {{ btn.label ?? btn.name }}
-          </ElButton>
-        </ElTooltip>
-      </AccessControl>
-    </template>
-  </template>
-
-  <!-- 默认显示 -->
+  <!--
+    动态组件渲染：通过注册表查找 cellType 对应的渲染组件
+    未注册类型回退为纯文本显示
+  -->
+  <component
+    :is="renderer"
+    v-if="renderer"
+    :col="col"
+    :row="row"
+    :field="field"
+    :row-index="rowIndex"
+    @modify="(d: any) => emit('modify', d)"
+    @operate="(d: any) => emit('operate', d)"
+  />
   <template v-else>
     {{ field ? row[field] : "" }}
   </template>
@@ -113,10 +20,8 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useDateFormat } from "@vueuse/core";
-import { ElImage, ElTag, ElSwitch, ElLink, ElButton, ElIcon, ElTooltip } from "element-plus";
-import SvgIcon from "@/components/SvgIcon/index.vue";
-import { AccessControl } from "@/core/access";
+import type { Component } from "vue";
+import { getCellRenderer } from "./cellRendererRegistry";
 import type { ProTableColumn } from "./types";
 
 const props = defineProps<{
@@ -130,27 +35,12 @@ const emit = defineEmits<{
   operate: [data: { name: string; row: any; $index: number }];
 }>();
 
-// 确保 prop 始终为 string，避免 undefined 索引类型错误
 const field = computed(() => props.col.prop ?? "");
 
-function getTagType(
-  value: any,
-  col: ProTableColumn
-): "primary" | "success" | "warning" | "danger" | "info" {
-  // 优先使用 tagTypeMap 按值映射
-  if (col.tagTypeMap && value != null) {
-    return (col.tagTypeMap as Record<string, any>)[value] ?? "info";
-  }
-  if (col.tagType) return col.tagType as any;
-  return value ? "success" : "danger";
-}
-
-/** 根据 btn.attrs.type 映射图标按钮颜色变体 */
-function getIconBtnVariant(btn: Record<string, any>): string {
-  const type = btn.attrs?.type;
-  if (type === "danger") return "danger";
-  if (type === "success") return "success";
-  if (type === "warning") return "warning";
-  return "primary";
-}
+/** 从注册表查找 cellType 对应的渲染组件 */
+const renderer = computed<Component | undefined>(() => {
+  const type = props.col.cellType;
+  if (!type || type === "custom") return undefined;
+  return getCellRenderer(type);
+});
 </script>

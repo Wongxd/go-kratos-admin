@@ -224,46 +224,49 @@ function resolvePath(routePath: string) {
 }
 
 html.dark {
-  .el-menu-item:hover {
-    background-color: $menu-hover;
+  .el-menu-item:hover,
+  .el-sub-menu__title:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #cbd5e1 !important;
   }
 }
 
 html.sidebar-color-blue {
-  .el-menu-item:hover {
-    background-color: $menu-hover;
+  .el-menu-item:hover,
+  .el-sub-menu__title:hover {
+    background-color: var(--menu-hover) !important;
   }
 }
 
 // 父菜单激活状态样式 - 当子菜单激活时，父菜单显示激活状态
 .el-sub-menu {
-  // 当父菜单包含激活子菜单时的样式
+  // 亮色：仅文字变为主色，无背景，不抢子菜单焦点
   &.has-active-child > .el-sub-menu__title {
     color: var(--el-color-primary) !important;
-    background-color: var(--el-color-primary-light-9) !important;
+    font-weight: 500 !important;
 
     .menu-icon {
       color: var(--el-color-primary) !important;
     }
   }
 
-  // 深色主题下的父菜单激活状态"
+  // 暗色：同上，仅文字变色
   html.dark & {
     &.has-active-child > .el-sub-menu__title {
-      color: var(--el-color-primary-light-3) !important;
-      background-color: rgba(64, 128, 255, 0.15) !important;
+      color: var(--el-color-primary) !important;
+      font-weight: 500 !important;
 
       .menu-icon {
-        color: var(--el-color-primary-light-3) !important;
+        color: var(--el-color-primary) !important;
       }
     }
   }
 
-  // 深蓝色侧边栏配色下的父菜单激活状态"
+  // 深蓝色侧边栏
   html.sidebar-color-blue & {
     &.has-active-child > .el-sub-menu__title {
       color: var(--el-color-primary-light-3) !important;
-      background-color: rgba(64, 128, 255, 0.2) !important;
+      font-weight: 500 !important;
 
       .menu-icon {
         color: var(--el-color-primary-light-3) !important;

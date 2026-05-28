@@ -1,6 +1,6 @@
 import type { TableProps, ButtonProps } from "element-plus";
 
-/** 单元格渲染类型 */
+/** 单元格渲染类型（内置类型 | 自定义字符串，通过 registerCellRenderer 注册） */
 export type CellType =
   | "text"
   | "image"
@@ -13,7 +13,8 @@ export type CellType =
   | "percent"
   | "icon"
   | "tool"
-  | "custom";
+  | "custom"
+  | (string & {});
 
 /** 列特殊类型（复选框、序号、展开行） */
 export type TableColumnType = "default" | "selection" | "index" | "expand";

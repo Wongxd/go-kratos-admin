@@ -268,29 +268,37 @@ onMounted(() => {
 
 .layout__sidebar {
   .el-menu {
-    // 菜单项高度优化（企业后台黄金高度 44px）
+    // 菜单项全局统一规范：36px 高度，圆角 6px，柔和交互
     .el-menu-item,
     .el-sub-menu__title {
-      height: 44px !important;
-      line-height: 44px !important;
+      height: 36px !important;
+      line-height: 36px !important;
       padding: 0 16px !important;
-      margin: 0 !important;
+      margin: 4px 12px !important;
+      border-radius: 6px !important;
+      font-size: 13px !important;
+      font-weight: 400 !important;
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    // 图标与文字间距收缩（8-10px）
+    // 图标与文字间距
     .el-menu-item .el-icon,
     .el-sub-menu__title .el-icon {
-      margin-right: 8px !important;
+      margin-right: 10px !important;
       width: 18px !important;
       height: 18px !important;
       transition: color 0.2s ease;
     }
 
-    // 选中菜单项保持高度一致（只改背景色，不改高度）
+    // 选中菜单项：柔和背景 + 主色文字
     .el-menu-item.is-active {
-      height: 44px !important;
-      line-height: 44px !important;
+      background-color: var(--el-fill-color) !important;
+      color: var(--el-color-primary) !important;
+      font-weight: 500 !important;
+
+      .el-icon {
+        color: var(--el-color-primary) !important;
+      }
     }
 
     // 子菜单缩进
@@ -303,42 +311,45 @@ onMounted(() => {
     // 激活菜单项带圆角背景色
     // ============================================
     &.nav-style--rounded {
-      .el-menu-item,
-      .el-sub-menu__title {
-        margin: 0 8px !important;
-        border-radius: 8px;
-      }
-
       .el-menu-item.is-active {
-        background-color: var(--el-color-primary) !important;
-        color: #fff !important;
+        background-color: var(--el-color-primary-light-9) !important;
+        color: var(--el-color-primary) !important;
+        font-weight: 500 !important;
       }
     }
 
-    // 暗黑模式配色优化
+    // ============================================
+    // 暗黑模式
+    // ============================================
     html.dark & {
-      // 普通菜单文字
+      // 普通菜单文字：柔和色
       .el-menu-item,
       .el-sub-menu__title {
-        color: #c0c6d2 !important;
+        color: #94a3b8 !important;
       }
 
-      // 选中菜单：主色蓝 + 浅底色高亮
-      .el-menu-item.is-active {
-        background-color: rgba(64, 158, 255, 0.15) !important;
-        color: var(--el-color-primary) !important;
-      }
-
-      // 悬浮背景：柔和过渡
+      // hover 态：柔和反馈
       .el-menu-item:hover,
       .el-sub-menu__title:hover {
-        background-color: var(--menu-hover) !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #cbd5e1 !important;
+      }
+
+      // 选中菜单：柔和背景 + 主色文字
+      .el-menu-item.is-active {
+        background-color: var(--el-fill-color-light) !important;
+        color: var(--el-color-primary) !important;
+        font-weight: 500 !important;
+
+        .el-icon {
+          color: var(--el-color-primary) !important;
+        }
       }
 
       // rounded 风格暗黑模式
       &.nav-style--rounded .el-menu-item.is-active {
-        background-color: var(--el-color-primary) !important;
-        color: #fff !important;
+        background-color: var(--el-color-primary-light-9) !important;
+        color: var(--el-color-primary) !important;
       }
     }
   }
