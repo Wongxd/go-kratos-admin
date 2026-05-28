@@ -45,7 +45,6 @@ const drawerRef = ref();
 const fileSelectRef = ref();
 
 const pageConfig = computed<ProPageConfig>(() => ({
-
   search: {
     grid: true,
     fields: [

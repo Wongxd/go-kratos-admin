@@ -1647,12 +1647,16 @@ const toolbarActions = {
   redo: () => editor.value?.chain().focus().redo().run(),
   clearContent: async () => {
     try {
-      await ElMessageBox.confirm($t("common.editor.clear_content_confirm"), $t("common.title.confirm"), {
-        confirmButtonText: $t("common.confirm"),
-        cancelButtonText: $t("common.cancel"),
-        type: "warning",
-        icon: WarningFilled,
-      });
+      await ElMessageBox.confirm(
+        $t("common.editor.clear_content_confirm"),
+        $t("common.title.confirm"),
+        {
+          confirmButtonText: $t("common.confirm"),
+          cancelButtonText: $t("common.cancel"),
+          type: "warning",
+          icon: WarningFilled,
+        }
+      );
       editor.value?.commands.setContent("");
     } catch {
       // 用户取消操作

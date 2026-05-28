@@ -61,7 +61,13 @@ const visible = computed({
 const containerProps = computed(() =>
   props.config.component === "drawer"
     ? { destroyOnClose: true, appendToBody: true, lockScroll: false, ...props.config.drawer }
-    : { destroyOnClose: true, alignCenter: true, appendToBody: true, lockScroll: false, ...props.config.dialog }
+    : {
+        destroyOnClose: true,
+        alignCenter: true,
+        appendToBody: true,
+        lockScroll: false,
+        ...props.config.dialog,
+      }
 );
 const formProps = computed(() => ({
   labelWidth: "auto",

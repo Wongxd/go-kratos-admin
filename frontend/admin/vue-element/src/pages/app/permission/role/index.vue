@@ -22,7 +22,13 @@ import ProPage from "@/components/Pro/ProPage/index.vue";
 import type { ProPageConfig } from "@/components/Pro/ProPage/types";
 import RoleDrawer from "./role-drawer.vue";
 
-import { statusList, statusToColor, statusToName, fetchListRoles, useDeleteRole } from "@/api/composables";
+import {
+  statusList,
+  statusToColor,
+  statusToName,
+  fetchListRoles,
+  useDeleteRole,
+} from "@/api/composables";
 import { PaginationQuery } from "@/core/transport/rest";
 import { $t } from "@/core/i18n";
 
@@ -32,7 +38,6 @@ const pageRef = ref();
 const drawerRef = ref();
 
 const pageConfig = computed<ProPageConfig>(() => ({
-
   search: {
     grid: true,
     fields: [

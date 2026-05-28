@@ -4,6 +4,11 @@ import { BasicLayout, Layout } from "@/layouts";
 import { generateAccessible } from "@/core/router";
 import { preferences } from "@/core/preferences";
 import { fetchNavigation } from "@/api/composables";
+import type {
+  ComponentRecordType,
+  GenerateMenuAndRoutesOptions,
+  RouteRecordStringComponent,
+} from "@/core/router/types";
 
 import { i18n } from "@/core/i18n";
 

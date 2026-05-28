@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { type RouteLocationNormalized } from "vue-router";
-import { useTagsViewStore } from "@/stores";
+import { useTagsViewStore } from "./useTagsViewStore";
 import SvgIcon from "@/components/SvgIcon/index.vue";
 import { preferences, usePreferences } from "@/core/preferences";
 import variables from "@/styles/variables.module.scss";

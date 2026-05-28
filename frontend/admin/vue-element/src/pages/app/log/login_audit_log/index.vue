@@ -76,7 +76,6 @@ import { $t } from "@/core/i18n";
 const pageRef = ref();
 
 const pageConfig = computed<ProPageConfig>(() => ({
-
   search: {
     grid: true,
     fields: [

@@ -8,11 +8,7 @@
       :class="formClass"
     >
       <template v-for="(field, index) in fields" :key="field.field">
-        <ElFormItem
-          v-show="!isFieldHidden(index)"
-          :label="field.label"
-          :prop="String(field.field)"
-        >
+        <ElFormItem v-show="!isFieldHidden(index)" :label="field.label" :prop="String(field.field)">
           <template #label>
             <span class="flex items-center gap-1">
               {{ field.label }}
@@ -54,11 +50,7 @@
             <template v-if="['select', 'radio', 'checkbox'].includes(field.type ?? '')">
               <component
                 :is="
-                  field.type === 'select'
-                    ? ElOption
-                    : field.type === 'radio'
-                      ? ElRadio
-                      : ElCheckbox
+                  field.type === 'select' ? ElOption : field.type === 'radio' ? ElRadio : ElCheckbox
                 "
                 v-for="opt in field.options"
                 :key="opt.value"

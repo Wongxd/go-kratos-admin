@@ -55,7 +55,6 @@ onMounted(() => {
 });
 
 const pageConfig = computed<ProPageConfig>(() => ({
-
   search: {
     grid: true,
     fields: [

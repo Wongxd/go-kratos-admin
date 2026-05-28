@@ -2,7 +2,11 @@
  * 通知中心逻辑
  */
 import { ref, onMounted, onBeforeUnmount } from "vue";
-import { fetchListUserInbox, fetchGetInternalMessage, useMarkNotificationAsRead } from "@/api/composables";
+import {
+  fetchListUserInbox,
+  fetchGetInternalMessage,
+  useMarkNotificationAsRead,
+} from "@/api/composables";
 import { useAppUserStore } from "@/stores";
 import { PaginationQuery } from "@/core/transport/rest";
 import { router } from "@/router";

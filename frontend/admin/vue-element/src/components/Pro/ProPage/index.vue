@@ -261,7 +261,7 @@ function toggleSearch() {
 }
 
 // === 筛选处理（filter 由 ProToolbar 内部 ElPopover + columns checkbox 处理） ===
-function handleFilterChange(columns: any[]) {
+function handleFilterChange() {
   // 列配置已通过响应式更新，这里可以做额外处理
   // 比如保存到 localStorage 或后端
 }

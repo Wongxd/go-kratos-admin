@@ -1,6 +1,12 @@
 <template>
   <div class="app-container h-full flex flex-1 flex-col">
-    <ProPage ref="pageRef" :config="pageConfig" @add="handleAdd" @edit="handleEdit" @toolbar="handleToolbar">
+    <ProPage
+      ref="pageRef"
+      :config="pageConfig"
+      @add="handleAdd"
+      @edit="handleEdit"
+      @toolbar="handleToolbar"
+    >
       <!-- 状态 -->
       <template #status="scope: any">
         <ElTag size="small" effect="dark" round :color="statusToColor(scope.row.status)">
@@ -51,7 +57,6 @@ onMounted(() => {
 });
 
 const pageConfig = computed<ProPageConfig>(() => ({
-
   search: {
     fields: [
       {

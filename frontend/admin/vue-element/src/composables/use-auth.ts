@@ -91,7 +91,7 @@ async function fetchAccessCodes() {
 }
 
 async function login(
-  params: Recordable<any>,
+  params: Record<string, any>,
   onSuccess?: () => Promise<void> | void
 ): Promise<{ userInfo: null | UserInfo } | null> {
   let userInfo: null | UserInfo = null;

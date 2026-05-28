@@ -49,7 +49,6 @@ const props = defineProps({
 const pageRef = ref();
 
 const pageConfig = computed<ProPageConfig>(() => ({
-
   search: {
     grid: true,
     fields: [

@@ -1,5 +1,3 @@
-import type { Router, RouteRecordRaw } from "vue-router";
-
 import type { Component } from "vue";
 
 declare global {
@@ -106,41 +104,12 @@ declare global {
     /**
      * 菜单所携带的参数
      */
-    query?: Recordable;
+    query?: Record<string, any>;
     /**
      * 标题名称
      */
     title: string;
   }
-
-  // 定义递归类型以将 RouteRecordRaw 的 component 属性更改为 string
-  type RouteRecordStringComponent<T = string> = {
-    children?: RouteRecordStringComponent<T>[];
-    component: T;
-  } & Omit<RouteRecordRaw, "children" | "component">;
-
-  type ComponentRecordType = Record<string, () => Promise<Component>>;
-
-  interface GenerateMenuAndRoutesOptions {
-    fetchMenuListAsync?: () => Promise<RouteRecordStringComponent[]>;
-    forbiddenComponent?: RouteRecordRaw["component"];
-    layoutMap?: ComponentRecordType;
-    pageMap?: ComponentRecordType;
-    /** 用户角色码（来自 getMe().roles） */
-    roles?: string[];
-    /** 用户权限码（来自 GetMyPermissionCode） */
-    accessCodes?: string[];
-    router: Router;
-    routes: RouteRecordRaw[];
-  }
-
-  export type {
-    ComponentRecordType,
-    GenerateMenuAndRoutesOptions,
-    RouteMeta,
-    RouteRecordRaw,
-    RouteRecordStringComponent,
-  };
 }
 
 export {};

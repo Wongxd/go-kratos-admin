@@ -4,7 +4,9 @@
       <!-- 左侧按钮 -->
       <div class="toolbar-left flex gap-y-2.5 gap-x-2 md:gap-x-3 flex-wrap">
         <template v-for="btn in leftButtons" :key="btn.name">
-          <AccessControl :codes="btn.auth ? (Array.isArray(btn.auth) ? btn.auth : [btn.auth]) : undefined">
+          <AccessControl
+            :codes="btn.auth ? (Array.isArray(btn.auth) ? btn.auth : [btn.auth]) : undefined"
+          >
             <ElButton
               v-if="shouldShow(btn)"
               v-bind="btn.attrs"
@@ -23,7 +25,9 @@
       <!-- 右侧按钮 -->
       <div class="toolbar-right flex items-center gap-y-2.5 gap-x-2 md:gap-x-3 flex-wrap">
         <template v-for="btn in rightButtons" :key="'right-' + btn.name">
-          <AccessControl :codes="btn.auth ? (Array.isArray(btn.auth) ? btn.auth : [btn.auth]) : undefined">
+          <AccessControl
+            :codes="btn.auth ? (Array.isArray(btn.auth) ? btn.auth : [btn.auth]) : undefined"
+          >
             <ElButton
               v-if="shouldShow(btn)"
               v-bind="btn.attrs"
