@@ -264,4 +264,13 @@ defineExpose({
     margin-left: 0 !important;
   }
 }
+
+.toolbar-right {
+  // 圆形图标按钮：28px（介于 small 24px 和 default 32px 之间）
+  :deep(.el-button.is-circle) {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+  }
+}
 </style>

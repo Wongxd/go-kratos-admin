@@ -9,6 +9,7 @@
       :row-config="{ keyField: rowKey, isHover: true, isCurrent: true }"
       :column-config="{ resizable: true }"
       :custom-config="{ storage: !!tableId, checkMethod }"
+      stripe
       :data="data"
       class="w-full"
       v-bind="tableAttrs"
@@ -253,27 +254,11 @@ defineExpose({
 }
 
 // ======================== vxe-table 样式 ========================
+// 行高、背景色、斑马纹、选中行等由全局 _vxe-table.scss 和 _layouts.scss 统一控制
 :deep(.vxe-table) {
   border-radius: 6px;
   overflow: hidden;
   font-size: 13px;
-
-  // --- 表头 ---
-  .vxe-table--header-wrapper {
-    background-color: var(--el-fill-color-light);
-
-    .vxe-header--column {
-      height: 44px !important;
-
-      .vxe-cell {
-        height: 44px !important;
-        line-height: 44px !important;
-        font-weight: 600;
-        font-size: 13px;
-        color: var(--el-text-color-primary);
-      }
-    }
-  }
 
   // --- 去掉列间竖线 ---
   .vxe-body--column,
@@ -282,31 +267,11 @@ defineExpose({
     border-right: none !important;
   }
 
-  // --- 表体行 ---
-  .vxe-table--body-wrapper {
-    background-color: var(--el-bg-color);
-  }
-
-  .vxe-body--row {
-    background-color: var(--el-bg-color);
-    transition: background-color 0.15s ease;
-
-    .vxe-body--column {
-      height: 42px !important;
-
-      .vxe-cell {
-        height: 42px !important;
-        line-height: 42px !important;
-      }
-    }
-
-    &.row--hover {
-      background-color: var(--el-fill-color-light);
-    }
-
-    &.row--current {
-      background-color: var(--el-color-primary-light-9);
-    }
+  // --- 表头文字 ---
+  .vxe-table--header-wrapper .vxe-header--column .vxe-cell {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--el-text-color-primary);
   }
 
   // --- 单元格文本 ---
