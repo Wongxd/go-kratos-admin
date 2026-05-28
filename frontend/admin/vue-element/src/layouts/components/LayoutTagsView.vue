@@ -545,9 +545,7 @@ const closeContextMenu = () => {
 const refreshSelectedTag = (tag: TagView | null) => {
   if (!tag) return;
   closeContextMenu();
-  // 先从 keep-alive 缓存中移除
-  tagsViewStore.delCachedView(tag);
-  // 通过 v-if 卸载 router-view，再重建，避免 ElForm 宽度计算错误
+  // v-if 卸载 router-view 时 keep-alive 也一起被销毁，无需手动操作 cachedViews
   contentRefreshing.value = true;
   nextTick(() => {
     contentRefreshing.value = false;

@@ -127,6 +127,9 @@
     "logoutConfirmTitle": "Notice",
     "logoutConfirmMessage": "Are you sure you want to logout and exit the system?"
   },
+  "breadcrumb": {
+    "home": "Home"
+  },
   "fallback": {
     "unauthorized": "Unauthorized",
     "unauthorizedDesc": "You are not authorized to access this page. Please login and try again.",

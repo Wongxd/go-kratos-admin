@@ -262,7 +262,7 @@ onMounted(() => {
     .el-sub-menu__title {
       height: 44px !important;
       line-height: 44px !important;
-      padding: 0 16px !important;  // 减少左右内边距
+      padding: 0 16px !important; // 减少左右内边距
       margin: 0 !important;
     }
 

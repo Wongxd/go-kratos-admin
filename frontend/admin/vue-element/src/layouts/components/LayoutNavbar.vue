@@ -13,7 +13,7 @@
       </div>
 
       <!-- 面包屑 -->
-      <Breadcrumb v-if="breadcrumb.enable" />
+      <Breadcrumb />
     </div>
 
     <!-- ==================== 右侧区域 ==================== -->
@@ -85,7 +85,7 @@
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
-import { useAppUserStore, useTagsViewStore } from "@/stores";
+import { useAppUserStore } from "@/stores";
 import { useAuth } from "@/composables/use-auth";
 import { preferences, preferencesManager } from "@/core/preferences";
 
@@ -101,12 +101,9 @@ const route = useRoute();
 const router = useRouter();
 const userStore = useAppUserStore();
 const authStore = useAuth();
-const tagsViewStore = useTagsViewStore();
-const { cachedViews } = toRefs(tagsViewStore);
 
 // 偏好设置引用
 const widget = computed(() => preferences.widget);
-const breadcrumb = computed(() => preferences.breadcrumb);
 
 // 注入设置面板可见性状态
 const settingsVisible = inject<Ref<boolean>>("settingsVisible", ref(false));
@@ -130,23 +127,11 @@ function toggleSidebarVisibility() {
 function handleRefresh() {
   if (contentRefreshing.value) return;
 
-  // 从缓存列表中移除当前路由，避免 keep-alive 缓存
-  const { fullPath } = route;
-  const tag = tagsViewStore.visitedViews.find((v) => v.fullPath === fullPath);
-  if (tag) {
-    tagsViewStore.delCachedView(tag);
-  } else if (cachedViews.value.includes(fullPath)) {
-    const idx = cachedViews.value.indexOf(fullPath);
-    cachedViews.value.splice(idx, 1);
-  }
-
-  // 同时清理 wrapperMap，让组件完全重建
-  // wrapperMap 是 LayoutMain 内部的，通过销毁 router-view 来清理
-
-  // 第一步：设置 true 触发 v-if="!isRefreshing" 卸载 router-view
+  // v-if 卸载 router-view 时，keep-alive 也一起被销毁，所有缓存实例自动清除
+  // LayoutMain 的 watcher 会同步清理 wrapperMap，确保重新挂载时组件完全重建
+  // 因此无需手动操作 cachedViews
   contentRefreshing.value = true;
 
-  // 第二步：等 DOM 卸载完成后，恢复 false 让 router-view 重新挂载
   nextTick(() => {
     contentRefreshing.value = false;
   });

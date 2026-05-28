@@ -127,6 +127,9 @@
     "logoutConfirmTitle": "提示",
     "logoutConfirmMessage": "确定注销并退出系统吗？"
   },
+  "breadcrumb": {
+    "home": "首页"
+  },
   "fallback": {
     "unauthorized": "未授权",
     "unauthorizedDesc": "您没有权限访问此页面，请登录后再试。",
