@@ -96,19 +96,17 @@
   /*
    * ========== 表格行高配置（明暗双模式共用） ==========
    *
-   * 档位        表项行高  表头高度  适用场景
-   * 黄金平衡款   36px      40px     日常高频操作（推荐）
-   * 极致紧凑款   32px      36px     数据量极大的长列表
-   * 宽松舒适款   40px      44px     低数据量场景
+   * 表头高度 48px（16+16+16=48px），给文字和排序图标留出呼吸空间
+   * 表项行高 44px（14+16+14=44px），中后台黄金高度，信息密度与舒适度兼顾
    *
    * 行高 = row-height-medium（JS 程序化计算基准）
    * 视觉高度 = .vxe-cell padding-top + 内容(16px) + padding-bottom
    */
 
-  /* 黄金平衡款 — 表项行高 36px */
-  --vxe-ui-table-row-height-medium: 36px;
-  /* 表项 cell 内边距: 10+16+10 = 36px（body 行） */
-  --vxe-ui-table-cell-padding-medium: 10px;
+  /* 表项行高 44px */
+  --vxe-ui-table-row-height-medium: 44px;
+  /* 表项 cell 内边距: 14+16+14 = 44px（body 行） */
+  --vxe-ui-table-cell-padding-medium: 14px;
 
   /* 浅色模式配色 */
   --vxe-ui-table-header-background-color: #f5f7fa;
@@ -189,11 +187,11 @@ html.dark {
   // ============================================
 
   // --- vxe-table v4 --vxe-ui-* 变量 ---
-  --vxe-ui-table-header-background-color: #12151a !important; // 表头：比内容深一层
+  --vxe-ui-table-header-background-color: #212430 !important; // 比内容区略浅，极淡质感区分
   --vxe-ui-table-header-font-color: #e5eaf3 !important;
   --vxe-ui-table-body-background-color: #1a1d24 !important;   // 内容区
   --vxe-ui-table-row-striped-background-color: #1e2128 !important; // 暗色斑马纹
-  --vxe-ui-table-row-hover-background-color: #2a2f3a !important;
+  --vxe-ui-table-row-hover-background-color: #232735 !important; // 柔和悬停反馈
   --vxe-ui-table-border-color: #2c303a !important;
   --vxe-ui-table-header-border-color: #0e1014 !important;
   --vxe-ui-font-color: #cbd5e1 !important;
@@ -201,9 +199,9 @@ html.dark {
 
   // --- vxe-table v3 兼容变量 ---
   --vxe-table-border-color: #2c303a !important;
-  --vxe-table-header-background-color: #12151a !important;
+  --vxe-table-header-background-color: #212430 !important;
   --vxe-table-body-background-color: #1a1d24 !important;
-  --vxe-table-row-hover-background-color: #2a2f3a !important;
+  --vxe-table-row-hover-background-color: #232735 !important;
   --vxe-table-row-current-background-color: #2a2f3a !important;
   --vxe-table-row-hover-current-background-color: #2a2f3a !important;
   --vxe-table-header-font-color: #e5eaf3 !important;
@@ -254,12 +252,12 @@ html.dark {
 
   .vxe-table--header-wrapper {
     .vxe-header--column {
-      background-color: #12151a !important;
+      background-color: #212430 !important;
       color: #e5eaf3 !important;
       font-weight: 600 !important;
 
       .vxe-cell {
-        border-bottom: 1px solid #0e1014 !important;
+        border-bottom: 1px solid #2c303a !important;
       }
     }
   }
@@ -289,10 +287,10 @@ html.dark {
         }
       }
 
-      // hover 态
+      // hover 态：柔和的半透明反馈
       &:hover,
       &.row--hover {
-        background-color: #2a2f3a !important;
+        background-color: #232735 !important;
 
         > td {
           background-color: transparent !important;
@@ -330,12 +328,12 @@ html.dark {
 }
 
 // ============================================
-// 表头行高：40px（12+16+12=40px，比内容区高4px，标题稳重不臃肿）
+// 表头行高：48px（16+16+16=48px，文字和排序图标有充足呼吸空间）
 // 通过覆盖 .vxe-cell 的 padding 实现，不与 body 共用 padding 变量
 // ============================================
 
 .vxe-table {
   .size--medium .vxe-header--column.is--padding .vxe-cell {
-    padding: 12px !important;
+    padding: 16px !important;
   }
 }
