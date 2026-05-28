@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { useLayout } from "./useLayout";
-import { preferences, preferencesManager } from "@/core/preferences";
+import { preferences } from "@/core/preferences";
 import BaseLayout from "./BaseLayout.vue";
 import LayoutLogo from "./components/LayoutLogo.vue";
 import LayoutNavbar from "./components/LayoutNavbar.vue";
@@ -81,7 +81,7 @@ const sidebarExpandedWidth = computed(() => preferences.sidebar.width);
 
 // 侧边栏实际宽度
 const sidebarActualWidth = computed(() =>
-  isSidebarActuallyOpen.value ? sidebarExpandedWidth.value : SIDEBAR_COLLAPSED_WIDTH,
+  isSidebarActuallyOpen.value ? sidebarExpandedWidth.value : SIDEBAR_COLLAPSED_WIDTH
 );
 
 // =====================
@@ -89,8 +89,8 @@ const sidebarActualWidth = computed(() =>
 // =====================
 
 const sidebarClass = computed(() => ({
-  'layout__sidebar--collapsed': !isSidebarActuallyOpen.value,
-  'layout__sidebar--collapsed-show-title': collapsedShowTitle.value && !isSidebarActuallyOpen.value,
+  "layout__sidebar--collapsed": !isSidebarActuallyOpen.value,
+  "layout__sidebar--collapsed-show-title": collapsedShowTitle.value && !isSidebarActuallyOpen.value,
 }));
 
 // =====================
