@@ -88,10 +88,10 @@ import {
   useDeleteUser,
 } from "@/api/composables";
 import { PaginationQuery } from "@/core/transport/rest";
-import { $t } from '@/core/i18n';
+import { $t } from "@/core/i18n";
 import { router } from "@/router";
 import { getRandomColor } from "@/utils/color";
-import { useUserViewStore } from "@/pages/app/opm/user/user-view.state";
+import { useUserViewStore } from "./user-view.state";
 
 const { mutateAsync: deleteUser } = useDeleteUser();
 const userViewStore = useUserViewStore();
@@ -108,7 +108,6 @@ watch(
 );
 
 const pageConfig = computed<ProPageConfig>(() => ({
-
   search: {
     grid: true,
     fields: [

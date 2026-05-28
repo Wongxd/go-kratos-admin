@@ -106,10 +106,10 @@ import {
   ElDropdownItem,
 } from "element-plus";
 import { More, Search, Expand, Fold, CircleClose } from "@element-plus/icons-vue";
-import { $t } from '@/core/i18n';
+import { $t } from "@/core/i18n";
 
 import { type identityservicev1_OrgUnit as OrgUnit } from "@/api/generated/admin/service/v1";
-import { useUserViewStore } from "@/pages/app/opm/user/user-view.state";
+import { useUserViewStore } from "./user-view.state";
 
 const userViewStore = useUserViewStore();
 
