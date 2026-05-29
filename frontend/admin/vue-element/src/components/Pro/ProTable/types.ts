@@ -6,7 +6,7 @@ export interface ProTableConfig {
   rowKey?: string;
   rowHeight?: number;
   headerHeight?: number;
-  border?: boolean;
+  border?: boolean | "outer" | "inner" | "full" | "default";
   stripe?: boolean;
   borderRadius?: number;
   fontSize?: number;

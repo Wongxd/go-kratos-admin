@@ -240,45 +240,6 @@
 }
 
 // ============================================
-// 去除最后一行底边框（避免与表格底部边框重叠产生细线）
-// ============================================
-
-.vxe-table {
-  // 浅色模式 - 最后一行的所有单元格去掉底边框
-  [data-vxe-ui-theme="light"] & .vxe-body--row:last-child > .vxe-body--column {
-    border-bottom: none !important;
-  }
-
-  // 暗色模式 - 最后一行的所有单元格去掉底边框
-  [data-vxe-ui-theme="dark"] & .vxe-body--row:last-child > .vxe-body--column {
-    border-bottom: none !important;
-  }
-}
-
-// ============================================
-// 去除表格底部边框线（仅保留左右和顶部边框）
-// ============================================
-
-.vxe-table.vxe-table--border-line {
-  border-bottom: none !important;
-}
-
-// ============================================
-// 去除所有数据行的底边框（解决滚动时可视区边缘出现细线的问题）
-// ============================================
-
-.vxe-table .vxe-body--column {
-  border-bottom: none !important;
-  border-top: none !important;
-}
-
-// 去除单元格内容区域的底边框
-.vxe-table .vxe-body--column .vxe-cell {
-  border-bottom: none !important;
-  border-top: none !important;
-}
-
-// ============================================
 // 行高强制统一（明暗双模式）
 // 使用 vxe-table v4 属性选择器 + !important 兜底，确保不被内部样式覆盖
 // ============================================
