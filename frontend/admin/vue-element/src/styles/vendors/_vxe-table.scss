@@ -93,11 +93,15 @@
   --vxe-select-option-hover-background-color: var(--el-bg-color-overlay);
   --vxe-select-panel-background-color: var(--el-bg-color);
 
-  /* ========== 行高：通过列级 padding 控制 ========== */
-  --vxe-ui-table-cell-padding-top: 10px;
-  --vxe-ui-table-cell-padding-bottom: 10px;
-  --vxe-ui-table-header-cell-padding-top: 12px;
-  --vxe-ui-table-header-cell-padding-bottom: 12px;
+  /* ========== 行高：通过列级 padding 控制 ==========
+   * 表头高度：48px（10 + 28px文字line-height + 10）
+   * 表项高度：44px（8 + 28px文字line-height + 8）
+   * 注意：vxe-table 表头字体 13px × line-height 1.5 = 19.5px，但实际占用约 28px（含图标空间）
+   */
+  --vxe-ui-table-cell-padding-top: 8px;
+  --vxe-ui-table-cell-padding-bottom: 8px;
+  --vxe-ui-table-header-cell-padding-top: 10px;
+  --vxe-ui-table-header-cell-padding-bottom: 10px;
 }
 
 // ============================================
@@ -105,13 +109,13 @@
 // ============================================
 
 [data-vxe-ui-theme="light"] {
-  --vxe-ui-table-header-background-color: var(--el-fill-color-light, #f5f7fa);
-  --vxe-ui-table-header-font-color: var(--el-text-color-primary, #1d2129);
-  --vxe-ui-table-body-background-color: var(--el-bg-color, #ffffff);
-  --vxe-ui-table-row-striped-background-color: var(--el-fill-color-light, #f5f7fa);
-  --vxe-ui-table-row-hover-background-color: var(--el-fill-color, #f2f3f5);
-  --vxe-ui-table-row-hover-striped-background-color: var(--el-fill-color, #f2f3f5);
-  --vxe-ui-table-border-color: var(--el-border-color-lighter, #e5e6eb);
+  --vxe-ui-table-header-background-color: rgba(255, 255, 255, 0.6);
+  --vxe-ui-table-header-font-color: #1d2129;
+  --vxe-ui-table-body-background-color: transparent;
+  --vxe-ui-table-row-striped-background-color: rgba(242, 243, 245, 0.3);
+  --vxe-ui-table-row-hover-background-color: #f7f8fa;
+  --vxe-ui-table-row-hover-striped-background-color: #f7f8fa;
+  --vxe-ui-table-border-color: #e5e6eb;
 }
 
 // ============================================
@@ -157,18 +161,21 @@
 }
 
 // ============================================
-// 去掉列分割线
+// 去掉列分割线（暗色模式）
+// 浅色模式保留细微边框
 // ============================================
 
-.vxe-table {
+[data-vxe-ui-theme="dark"] .vxe-table {
   // 去掉列之间的边框
   .vxe-body--column,
   .vxe-header--column,
   .vxe-footer--column {
     border-right: none !important;
   }
+}
 
-  // 保留表格整体边框
+// 浅色模式保留整体边框
+.vxe-table {
   &.vxe-table--border-line {
     border: 1px solid var(--el-border-color);
   }
@@ -179,30 +186,32 @@
 // ============================================
 
 [data-vxe-ui-theme="dark"] {
-  --vxe-ui-table-header-background-color: #212430;
+  // 表头：半透明白色
+  --vxe-ui-table-header-background-color: rgba(255, 255, 255, 0.03);
   --vxe-ui-table-header-font-color: #e5eaf3;
-  --vxe-ui-table-body-background-color: #1a1d24;
-  --vxe-ui-table-row-striped-background-color: #21252d;
-  --vxe-ui-table-row-hover-background-color: #2a2f3a;
+  // 表项：透明背景
+  --vxe-ui-table-body-background-color: transparent;
+  --vxe-ui-table-row-striped-background-color: rgba(255, 255, 255, 0.02);
+  --vxe-ui-table-row-hover-background-color: rgba(255, 255, 255, 0.05);
   --vxe-ui-table-row-current-background-color: rgba(64, 128, 255, 0.08);
   --vxe-ui-table-row-hover-current-background-color: rgba(64, 128, 255, 0.12);
-  --vxe-ui-table-row-hover-striped-background-color: #2a2f3a;
-  --vxe-ui-table-border-color: #2c303a;
-  --vxe-ui-table-header-border-color: #0e1014;
+  --vxe-ui-table-row-hover-striped-background-color: rgba(255, 255, 255, 0.05);
+  --vxe-ui-table-border-color: rgba(255, 255, 255, 0.08);
+  --vxe-ui-table-header-border-color: rgba(255, 255, 255, 0.08);
   --vxe-ui-font-color: #cbd5e1;
   --vxe-ui-pager-background-color: #1a1d24;
 
-  // 行高：暗色模式与浅色模式完全对齐
-  --vxe-ui-table-cell-padding-top: var(--vxe-ui-table-cell-padding-top);
-  --vxe-ui-table-cell-padding-bottom: var(--vxe-ui-table-cell-padding-bottom);
-  --vxe-ui-table-header-cell-padding-top: var(--vxe-ui-table-header-cell-padding-top);
-  --vxe-ui-table-header-cell-padding-bottom: var(--vxe-ui-table-header-cell-padding-bottom);
+  // 行高：显式赋值（禁止自引用）
+  --vxe-ui-table-cell-padding-top: 8px;
+  --vxe-ui-table-cell-padding-bottom: 8px;
+  --vxe-ui-table-header-cell-padding-top: 10px;
+  --vxe-ui-table-header-cell-padding-bottom: 10px;
 
   // vxe-table v3 兼容变量
-  --vxe-table-border-color: #2c303a;
-  --vxe-table-header-background-color: #212430;
-  --vxe-table-body-background-color: #1a1d24;
-  --vxe-table-row-hover-background-color: #2a2f3a;
+  --vxe-table-border-color: rgba(255, 255, 255, 0.08);
+  --vxe-table-header-background-color: rgba(255, 255, 255, 0.03);
+  --vxe-table-body-background-color: transparent;
+  --vxe-table-row-hover-background-color: rgba(255, 255, 255, 0.05);
   --vxe-table-row-current-background-color: rgba(64, 128, 255, 0.08);
   --vxe-table-row-hover-current-background-color: rgba(64, 128, 255, 0.12);
   --vxe-table-header-font-color: #e5eaf3;
@@ -210,21 +219,41 @@
 }
 
 // ============================================
-// 行高强制统一（明暗双模式）
-// 兜底硬覆盖，防止 vxe-table 内部样式优先级更高
+// 表头下边框（明暗模式）
 // ============================================
 
-.vxe-table {
-  .vxe-body--column,
-  .vxe-header--column {
-    padding-top: var(--vxe-ui-table-cell-padding-top) !important;
-    padding-bottom: var(--vxe-ui-table-cell-padding-bottom) !important;
+// 浅色模式
+[data-vxe-ui-theme="light"] .vxe-table {
+  .vxe-header--column .vxe-cell {
+    border-bottom: 1px solid #e5e6eb;
+  }
+}
+
+// 暗色模式
+[data-vxe-ui-theme="dark"] .vxe-table {
+  .vxe-header--column .vxe-cell {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .vxe-header--column {
-    padding-top: var(--vxe-ui-table-header-cell-padding-top) !important;
-    padding-bottom: var(--vxe-ui-table-header-cell-padding-bottom) !important;
-  }
+  // 移除手动添加的表项底边框，使用 vxe-table 自身边框系统
+  // 避免最后一行出现多余细线
+}
+
+// ============================================
+// 行高强制统一（明暗双模式）
+// 使用 vxe-table v4 属性选择器 + !important 兜底，确保不被内部样式覆盖
+// ============================================
+
+// 表项行高：44px（8 + 28 + 8）
+.vxe-table .vxe-body--column {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+// 表头行高：48px（10 + 28 + 10）
+.vxe-table .vxe-header--column {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
 }
 
 // 表头字体加粗
@@ -241,4 +270,30 @@
 
 .vxe-table--render-default .vxe-body--row.row--stripe > .vxe-body--column {
   background-color: var(--vxe-ui-table-row-striped-background-color) !important;
+}
+
+// ============================================
+// 选中行样式（柔和蓝色背景）
+// ============================================
+
+// 浅色模式
+[data-vxe-ui-theme="light"] .vxe-table--render-default {
+  .vxe-body--row.row--current > .vxe-body--column {
+    background-color: rgba(64, 128, 255, 0.06) !important;
+  }
+
+  .vxe-body--row.row--current.row--hover > .vxe-body--column {
+    background-color: rgba(64, 128, 255, 0.1) !important;
+  }
+}
+
+// 暗黑模式
+[data-vxe-ui-theme="dark"] .vxe-table--render-default {
+  .vxe-body--row.row--current > .vxe-body--column {
+    background-color: rgba(64, 128, 255, 0.08) !important;
+  }
+
+  .vxe-body--row.row--current.row--hover > .vxe-body--column {
+    background-color: rgba(64, 128, 255, 0.12) !important;
+  }
 }

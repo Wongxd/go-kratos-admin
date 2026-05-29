@@ -182,8 +182,6 @@ const paginationConfig = computed(() => tableConfig.value.pagination!);
 const tableStyle = computed(() => ({
   "--pro-table-radius": `${tableConfig.value.borderRadius}px`,
   "--pro-table-font-size": `${tableConfig.value.fontSize}px`,
-  "--pro-table-row-height": `${tableConfig.value.rowHeight}px`,
-  "--pro-table-header-height": `${tableConfig.value.headerHeight}px`,
 }));
 
 const tableAttrs = computed(() => ({
@@ -275,21 +273,17 @@ defineExpose({
 
 :deep(.vxe-table) {
   border-radius: var(--pro-table-radius);
-  overflow: hidden;
+  overflow: auto; // 允许表格内容滚动
   font-size: var(--pro-table-font-size);
+  max-height: 100%; // 限制最大高度为父容器
 
-  .vxe-body--column,
-  .vxe-header--column,
-  .vxe-footer--column {
-    border-right: none !important;
-  }
-
-  .vxe-body--row {
-    height: var(--pro-table-row-height);
-  }
-
-  .vxe-header--row {
-    height: var(--pro-table-header-height);
+  // 暗色模式去掉列分割线
+  [data-vxe-ui-theme="dark"] & {
+    .vxe-body--column,
+    .vxe-header--column,
+    .vxe-footer--column {
+      border-right: none !important;
+    }
   }
 
   .vxe-table--header-wrapper .vxe-header--column .vxe-cell {
@@ -298,8 +292,21 @@ defineExpose({
     color: var(--el-text-color-primary);
   }
 
-  .vxe-cell {
+  // 表项单元格默认文本色
+  .vxe-body--column .vxe-cell {
     color: var(--el-text-color-regular);
+  }
+  
+  // 但操作列图标按钮需要保持自己的颜色
+  .vxe-body--column .table-icon-btn {
+    color: inherit; // 继承 .table-icon-btn 自己定义的颜色
+    
+    svg,
+    i,
+    .iconify {
+      color: inherit !important;
+      fill: currentColor !important;
+    }
   }
 
   .vxe-checkbox--icon,
@@ -321,8 +328,9 @@ defineExpose({
 
 :deep(.el-table) {
   border-radius: var(--pro-table-radius);
-  overflow: hidden;
+  overflow: auto; // 允许表格内容滚动
   font-size: var(--pro-table-font-size);
+  max-height: 100%; // 限制最大高度为父容器
 
   .el-table__header-wrapper th {
     height: var(--pro-table-header-height);

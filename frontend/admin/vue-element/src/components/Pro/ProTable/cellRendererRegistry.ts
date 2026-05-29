@@ -60,9 +60,14 @@ const ImageCell: FunctionalComponent<CellRendererContext> = ({ col, row, field }
 };
 
 const TagCell: FunctionalComponent<CellRendererContext> = ({ col, row, field }) => {
-  return h(ElTag, { type: getTagType(row[field], col) }, () => {
-    return col.labelMap?.[row[field]] ?? row[field];
-  });
+  const value = row[field];
+  const tagType = getTagType(value, col);
+  
+  // 获取标签文本
+  const label = col.labelMap?.[value] ?? value;
+  
+  // 根据类型返回不同颜色的 Tag
+  return h(ElTag, { type: tagType }, () => label);
 };
 
 const SwitchCell = defineComponent({
@@ -115,12 +120,17 @@ const ToolCell = defineComponent({
           const visible = btn.visible?.(props.row) ?? true;
           if (!visible) return null;
 
+          // 获取按钮颜色类型（优先使用 btn.type，其次使用 btn.attrs.type）
+          const btnType = btn.type || btn.attrs?.type;
+          const variant = btn.icon ? (btnType || "primary") : undefined;
+          const iconBtnClass = variant ? `table-icon-btn table-icon-btn--${variant}` : "table-icon-btn";
+
           const el = h(ElTooltip, { content: btn.label ?? btn.name, placement: "top" }, () =>
             btn.icon
               ? h(
                   "div",
                   {
-                    class: "table-icon-btn",
+                    class: iconBtnClass,
                     onClick: () =>
                       emit("operate", { name: btn.name, row: props.row, $index: props.rowIndex }),
                   },
