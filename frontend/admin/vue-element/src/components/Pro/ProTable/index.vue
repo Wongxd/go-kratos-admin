@@ -387,16 +387,8 @@ defineExpose({
   }
 
   // ======== 3. 表头底部横线（与表体分割） ========
-  .vxe-header--column {
-    border-bottom: 1px solid #dcdfe6 !important;
-  }
-
-  // 暗色模式表头横线
-  :global(html.dark) & {
-    .vxe-header--column {
-      border-bottom: 1px solid #3a3f47 !important;
-    }
-  }
+  // 分割线样式已移至全局 _vxe-table.scss，使用 vxe-table 主题变量，
+  // 避免 scoped + :global(html.dark) 编译不可靠的问题。
 
   // ======== 4. 表体行间横线 ========
   .vxe-body--column {
