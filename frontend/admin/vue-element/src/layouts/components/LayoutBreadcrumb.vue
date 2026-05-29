@@ -174,8 +174,14 @@ onBeforeMount(() => {
   }
 
   &__current {
-    // 当前页和非可跳转中间页的默认颜色，由 :last-child 规则覆盖当前页
+    // 非可跳转中间页的默认颜色
     color: #909399;
+  }
+
+  // 当前页（最后一项）的 .breadcrumb__current 也必须跟随深色
+  :deep(.el-breadcrumb__item:last-child .breadcrumb__current) {
+    color: #1d2129 !important;
+    font-weight: 600 !important;
   }
 
   &__icon,
@@ -193,13 +199,13 @@ onBeforeMount(() => {
     :deep(.el-breadcrumb__inner a) {
       color: #d9d9d9 !important;
     }
-  
-    // 当前页（最后一项）：纯白 + 更粗，强化“当前位置”视觉焦点
+
+    // 当前页（最后一项）：纯白 + 更粗，强化"当前位置"视觉焦点
     :deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
       color: #ffffff !important;
       font-weight: 600 !important;
     }
-  
+
     // 分隔符：较暗灰色，作为视觉分割不抢文字焦点
     :deep(.el-breadcrumb__separator) {
       color: #595959 !important;

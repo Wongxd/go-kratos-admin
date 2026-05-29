@@ -20,7 +20,13 @@
     >
       <template v-for="(col, colIdx) in resolvedColumns" :key="col.prop ?? col.type ?? colIdx">
         <vxe-column v-if="col.type === 'selection'" type="checkbox" width="50" align="center" />
-        <vxe-column v-else-if="col.type === 'index'" type="seq" :title="col.label" :width="col.width ?? 60" align="center" />
+        <vxe-column
+          v-else-if="col.type === 'index'"
+          type="seq"
+          :title="col.label"
+          :width="col.width ?? 60"
+          align="center"
+        />
         <vxe-column v-else-if="col.type === 'expand'" type="expand">
           <template #default="scope">
             <slot name="expand" v-bind="scope" />
@@ -97,7 +103,12 @@
           width="50"
           :reserve-selection="col.reserveSelection ?? true"
         />
-        <ElTableColumn v-else-if="col.type === 'index'" type="index" :label="col.label" :width="col.width ?? 60" />
+        <ElTableColumn
+          v-else-if="col.type === 'index'"
+          type="index"
+          :label="col.label"
+          :width="col.width ?? 60"
+        />
         <ElTableColumn v-else-if="col.type === 'expand'" type="expand">
           <template #default="scope">
             <slot name="expand" v-bind="scope" />

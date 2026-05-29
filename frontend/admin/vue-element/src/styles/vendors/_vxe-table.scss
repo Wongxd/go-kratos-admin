@@ -106,12 +106,12 @@
 // ============================================
 // 浅色模式配色
 [data-vxe-ui-theme="light"] {
-  --vxe-ui-table-header-background-color: #f5f7fa;
+  --vxe-ui-table-header-background-color: #EBEDF0;
   --vxe-ui-table-header-font-color: #1d2129;
   --vxe-ui-table-body-background-color: #ffffff;
-  --vxe-ui-table-row-striped-background-color: #fafafa;
-  --vxe-ui-table-row-hover-background-color: #f5f7fa;
-  --vxe-ui-table-row-hover-striped-background-color: #f5f7fa;
+  --vxe-ui-table-row-striped-background-color: #f8f9fb;
+  --vxe-ui-table-row-hover-background-color: #f0f2f5;
+  --vxe-ui-table-row-hover-striped-background-color: #f0f2f5;
   --vxe-ui-table-border-color: #e4e7ed;
 }
 

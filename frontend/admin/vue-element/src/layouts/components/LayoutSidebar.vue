@@ -85,7 +85,11 @@ const useDarkMenuColors = computed(() => {
 });
 const menuThemeProps = computed(() => {
   if (!useDarkMenuColors.value) {
-    return { backgroundColor: undefined, textColor: undefined, activeTextColor: undefined };
+    return {
+      backgroundColor: undefined,
+      textColor: undefined,
+      activeTextColor: "var(--el-color-primary)",
+    };
   }
   return {
     backgroundColor: variables["menu-background"],
@@ -297,11 +301,11 @@ onMounted(() => {
       background-color: #f5f7fa !important;
     }
 
-    // 选中菜单项：左侧亮色竖条 + 主色文字 + 加粗，与暗色模式一致
+    // 选中菜单项：左侧竖条 + 主色文字 + 加粗，与暗色模式一致
     .el-menu-item.is-active {
       background-color: var(--el-color-primary-light-9) !important;
       color: var(--el-color-primary) !important;
-      font-weight: 600 !important;
+      font-weight: 700 !important;
       box-shadow: inset 3px 0 0 0 var(--el-color-primary) !important;
 
       .el-icon {
@@ -322,7 +326,7 @@ onMounted(() => {
       .el-menu-item.is-active {
         background-color: var(--el-color-primary-light-9) !important;
         color: var(--el-color-primary) !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
         box-shadow: inset 3px 0 0 0 var(--el-color-primary) !important;
       }
     }
@@ -348,7 +352,7 @@ onMounted(() => {
       .el-menu-item.is-active {
         background-color: rgba(24, 144, 255, 0.15) !important;
         color: #ffffff !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
         box-shadow: inset 3px 0 0 0 var(--el-color-primary) !important;
 
         .el-icon {
@@ -360,7 +364,7 @@ onMounted(() => {
       &.nav-style--rounded .el-menu-item.is-active {
         background-color: rgba(24, 144, 255, 0.15) !important;
         color: #ffffff !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
         box-shadow: inset 3px 0 0 0 var(--el-color-primary) !important;
       }
     }
