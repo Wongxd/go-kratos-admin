@@ -5,7 +5,7 @@
       :id="tableId"
       ref="tableRef"
       v-loading="loading ?? false"
-      :row-config="{ keyField: rowKey, isHover: true, isCurrent: true }"
+      :row-config="{ keyField: rowKey, isHover: true, isCurrent: true, height: 'auto' }"
       :column-config="{ resizable: true }"
       :custom-config="{ storage: !!tableId, checkMethod }"
       :data="data"
@@ -275,7 +275,7 @@ defineExpose({
   border-radius: var(--pro-table-radius);
   overflow: auto; // 允许表格内容滚动
   font-size: var(--pro-table-font-size);
-  max-height: 100%; // 限制最大高度为父容器
+  // 移除 max-height 限制，让表格根据内容自适应高度
 
   // 暗色模式去掉列分割线
   [data-vxe-ui-theme="dark"] & {
@@ -284,6 +284,26 @@ defineExpose({
     .vxe-footer--column {
       border-right: none !important;
     }
+    
+    // 去除行的底边框
+    .vxe-body--row {
+      border-bottom: none !important;
+    }
+  }
+  
+  // 浅色模式也去除行的底边框
+  .vxe-body--row {
+    border-bottom: none !important;
+  }
+  
+  // 彻底去除所有单元格的边框（包括行分隔线）
+  .vxe-body--column {
+    border: none !important;
+  }
+  
+  // 去除单元格内容区域的边框
+  .vxe-body--column .vxe-cell {
+    border: none !important;
   }
 
   .vxe-table--header-wrapper .vxe-header--column .vxe-cell {
@@ -324,7 +344,7 @@ defineExpose({
   border-radius: var(--pro-table-radius);
   overflow: auto; // 允许表格内容滚动
   font-size: var(--pro-table-font-size);
-  max-height: 100%; // 限制最大高度为父容器
+  // 移除 max-height 限制，让表格根据内容自适应高度
 
   .el-table__header-wrapper th {
     height: var(--pro-table-header-height);
