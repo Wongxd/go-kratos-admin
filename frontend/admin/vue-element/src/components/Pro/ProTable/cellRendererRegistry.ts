@@ -17,10 +17,15 @@ function getTagType(
   value: any,
   col: ProTableColumn
 ): "primary" | "success" | "warning" | "danger" | "info" {
-  if (col.labelMap && value != null) {
-    return col.tagTypeMap?.[value] ?? "info";
+  // 优先使用 tagTypeMap（根据值映射颜色）
+  if (col.tagTypeMap && value != null) {
+    return col.tagTypeMap[value] ?? "info";
   }
+  
+  // 其次使用固定 tagType
   if (col.tagType) return col.tagType as any;
+  
+  // 默认：有值为 success，无值为 danger
   return value ? "success" : "danger";
 }
 
@@ -114,16 +119,15 @@ const ToolCell = defineComponent({
   setup(props, { emit }) {
     return () => {
       const buttons = props.col.buttons ?? [];
-      return h("div", { class: "flex items-center gap-1" }, [
+      return h("div", { class: "flex items-center justify-center gap-1" }, [
         buttons.map((btn: any) => {
           const codes = btn.auth ? (Array.isArray(btn.auth) ? btn.auth : [btn.auth]) : undefined;
           const visible = btn.visible?.(props.row) ?? true;
           if (!visible) return null;
 
-          // 获取按钮颜色类型（优先使用 btn.type，其次使用 btn.attrs.type）
-          const btnType = btn.type || btn.attrs?.type;
-          const variant = btn.icon ? (btnType || "primary") : undefined;
-          const iconBtnClass = variant ? `table-icon-btn table-icon-btn--${variant}` : "table-icon-btn";
+          // 获取按钮颜色类型（优先使用 btn.type，其次使用 btn.attrs.type，默认为 primary）
+          const btnType = btn.type ?? btn.attrs?.type ?? "primary";
+          const iconBtnClass = btn.icon ? `table-icon-btn table-icon-btn--${btnType}` : "table-icon-btn";
 
           const el = h(ElTooltip, { content: btn.label ?? btn.name, placement: "top" }, () =>
             btn.icon

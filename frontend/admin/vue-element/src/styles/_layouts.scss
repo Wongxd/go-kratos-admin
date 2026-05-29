@@ -215,31 +215,19 @@ html.sidebar-color-blue .layout-mix .layout__sidebar--left .el-menu {
   border-radius: 6px;
   cursor: pointer;
   background: transparent;
-  color: var(--el-text-color-regular) !important; // 默认使用 Element Plus 常规文本色
   transition: all 0.2s ease;
   vertical-align: middle;
 
-  // 确保 SVG 图标继承颜色
-  svg,
-  i,
-  .iconify {
-    color: inherit !important;
-    fill: currentColor !important;
-  }
-
-  &:hover {
-    background-color: var(--el-fill-color-light);
-    color: var(--el-text-color-primary) !important;
-  }
-
-  // 按钮之间间距 8px
-  & + .table-icon-btn {
-    margin-left: 8px;
-  }
-
   // ---- Primary（编辑/查看/下载/重启） ----
   &--primary {
-    color: var(--el-color-primary);
+    color: var(--el-color-primary) !important;
+
+    svg,
+    i,
+    .iconify {
+      color: inherit !important;
+      fill: currentColor !important;
+    }
 
     &:hover {
       background-color: rgba(64, 128, 255, 0.1);
@@ -248,7 +236,14 @@ html.sidebar-color-blue .layout-mix .layout__sidebar--left .el-menu {
 
   // ---- Danger（删除/停止） ----
   &--danger {
-    color: #f53f3f;
+    color: #f53f3f !important;
+
+    svg,
+    i,
+    .iconify {
+      color: inherit !important;
+      fill: currentColor !important;
+    }
 
     &:hover {
       background-color: rgba(245, 63, 63, 0.1);
@@ -257,7 +252,14 @@ html.sidebar-color-blue .layout-mix .layout__sidebar--left .el-menu {
 
   // ---- Success（启动） ----
   &--success {
-    color: #00b42a;
+    color: #00b42a !important;
+
+    svg,
+    i,
+    .iconify {
+      color: inherit !important;
+      fill: currentColor !important;
+    }
 
     &:hover {
       background-color: rgba(0, 180, 42, 0.1);
@@ -266,11 +268,40 @@ html.sidebar-color-blue .layout-mix .layout__sidebar--left .el-menu {
 
   // ---- Warning ----
   &--warning {
-    color: #ff7d00;
+    color: #ff7d00 !important;
+
+    svg,
+    i,
+    .iconify {
+      color: inherit !important;
+      fill: currentColor !important;
+    }
 
     &:hover {
       background-color: rgba(255, 125, 0, 0.1);
     }
+  }
+  
+  // 默认颜色（无修饰符类时）
+  &:not([class*="--"]) {
+    color: var(--el-text-color-regular) !important;
+    
+    svg,
+    i,
+    .iconify {
+      color: inherit !important;
+      fill: currentColor !important;
+    }
+
+    &:hover {
+      background-color: var(--el-fill-color-light);
+      color: var(--el-text-color-primary) !important;
+    }
+  }
+
+  // 按钮之间间距 8px
+  & + .table-icon-btn {
+    margin-left: 8px;
   }
 }
 

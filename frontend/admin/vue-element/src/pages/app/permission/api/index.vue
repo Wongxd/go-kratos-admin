@@ -21,7 +21,7 @@ import ProPage from "@/components/Pro/ProPage/index.vue";
 import type { ProPageConfig, ToolsButton } from "@/components/Pro/ProPage/types";
 import ApiDrawer from "./api-drawer.vue";
 
-import { methodList, fetchListApis, useDeleteApi, useSyncApisApi } from "@/api/composables";
+import { methodList, httpMethodTagTypeMap, fetchListApis, useDeleteApi, useSyncApisApi } from "@/api/composables";
 import { PaginationQuery } from "@/core/transport/rest";
 import { $t } from "@/core/i18n";
 
@@ -96,15 +96,7 @@ const pageConfig = computed<ProPageConfig>(() => ({
         label: $t("pages.api.method"),
         width: 100,
         cellType: "tag",
-        tagTypeMap: {
-          GET: "success",
-          POST: "primary",
-          PUT: "warning",
-          DELETE: "danger",
-          PATCH: "info",
-          HEAD: "info",
-          OPTIONS: "info",
-        },
+        tagTypeMap: httpMethodTagTypeMap,
       },
       { prop: "module", label: $t("pages.api.module"), minWidth: 120 },
       { prop: "moduleDescription", label: $t("pages.api.moduleDescription"), minWidth: 150 },

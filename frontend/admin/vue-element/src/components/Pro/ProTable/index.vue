@@ -297,16 +297,10 @@ defineExpose({
     color: var(--el-text-color-regular);
   }
   
-  // 但操作列图标按钮需要保持自己的颜色
-  .vxe-body--column .table-icon-btn {
-    color: inherit; // 继承 .table-icon-btn 自己定义的颜色
-    
-    svg,
-    i,
-    .iconify {
-      color: inherit !important;
-      fill: currentColor !important;
-    }
+  // 操作列按钮容器居中（针对 cellType: "tool"）
+  .vxe-body--column .flex.items-center.justify-center {
+    justify-content: center !important;
+    width: 100%;
   }
 
   .vxe-checkbox--icon,

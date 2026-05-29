@@ -66,6 +66,17 @@ export const methodList = [
   { value: "DELETE", label: "DELETE" },
 ];
 
+// HTTP 方法对应的 Tag 颜色类型
+export const httpMethodTagTypeMap: Record<string, "success" | "primary" | "warning" | "danger" | "info"> = {
+  GET: "success",
+  POST: "primary",
+  PUT: "warning",
+  DELETE: "danger",
+  PATCH: "info",
+  HEAD: "info",
+  OPTIONS: "info",
+};
+
 export const statusList = computed(() => [
   { value: "ON", label: $t("enum.status.ON") },
   { value: "OFF", label: $t("enum.status.OFF") },

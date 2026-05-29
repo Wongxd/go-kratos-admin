@@ -31,6 +31,7 @@ import type { ProPageConfig } from "@/components/Pro/ProPage/types";
 
 import {
   methodList,
+  httpMethodTagTypeMap,
   successStatusList,
   successToColor,
   successToNameWithStatusCode,
@@ -173,7 +174,13 @@ const pageConfig = computed<ProPageConfig>(() => ({
         slotName: "success",
       },
       { prop: "username", label: $t("pages.api_audit_log.username"), minWidth: 120 },
-      { prop: "httpMethod", label: $t("pages.api_audit_log.httpMethod"), width: 100 },
+      {
+        prop: "httpMethod",
+        label: $t("pages.api_audit_log.httpMethod"),
+        width: 100,
+        cellType: "tag",
+        tagTypeMap: httpMethodTagTypeMap,
+      },
       { prop: "path", label: $t("pages.api_audit_log.path"), minWidth: 200 },
       { prop: "latencyMs", label: $t("pages.api_audit_log.latencyMs"), width: 120 },
       {

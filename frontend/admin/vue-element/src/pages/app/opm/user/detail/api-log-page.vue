@@ -31,6 +31,7 @@ import type { ProPageConfig } from "@/components/Pro/ProPage/types";
 import { $t } from "@/core/i18n";
 import {
   methodList,
+  httpMethodTagTypeMap,
   successStatusList,
   successToColor,
   successToNameWithStatusCode,
@@ -202,6 +203,8 @@ const pageConfig = computed<ProPageConfig>(() => ({
         prop: "httpMethod",
         label: $t("pages.api_audit_log.httpMethod"),
         width: 90,
+        cellType: "tag",
+        tagTypeMap: httpMethodTagTypeMap,
       },
       {
         prop: "path",
