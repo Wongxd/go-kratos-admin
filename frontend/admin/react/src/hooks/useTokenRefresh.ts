@@ -85,7 +85,12 @@ function scheduleRefresh(): void {
       }
 
       // 执行刷新
-      await useAuthStore.getState().refreshToken();
+      const newToken = await useAuthStore.getState().refreshToken();
+
+      // token 刷新成功后，使用新 token 重连 SSE
+      if (newToken) {
+        reconnectSSEServer();
+      }
     } catch (error) {
       console.error('[TokenRefresh] 定时刷新失败:', error);
     } finally {
@@ -120,6 +125,31 @@ export function stopRefreshTimer(): void {
     globalThis.clearTimeout(refreshTimer);
     refreshTimer = null;
   }
+}
+
+/**
+ * 重连 SSE 服务器（使用最新的 access token）
+ * 在 token 刷新成功后调用，确保 SSE 连接携带新凭证
+ */
+export function reconnectSSEServer(): void {
+  const { accessToken } = useAuthStore.getState();
+
+  if (!accessToken) {
+    console.warn('[TokenRefresh] No access token, skip SSE reconnect');
+    return;
+  }
+
+  // 仅在当前已有 SSE 连接时才重连，避免无连接时意外建立连接
+  const currentStatus = globalSSEClient.getStatus();
+  if (currentStatus === 'disconnected') {
+    console.log('[TokenRefresh] SSE is disconnected, skip reconnect');
+    return;
+  }
+
+  const sseUrl = `${import.meta.env.VITE_APP_SSE_URL ?? '/api/sse'}?stream=${encodeURIComponent(accessToken)}`;
+  globalSSEClient.setHeaders({ Authorization: `Bearer ${accessToken}` });
+  globalSSEClient.reconnect(sseUrl);
+  console.log('[TokenRefresh] SSE reconnected with new token');
 }
 
 /**
