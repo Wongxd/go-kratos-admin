@@ -260,6 +260,9 @@ export const useAuthStore = defineStore('auth', () => {
       accessStore.setAccessToken(newAccessToken ?? null);
       accessStore.setRefreshToken(newRefreshToken ?? null);
 
+      // token 刷新成功后，使用新 token 重连 SSE
+      _reconnectSSEServer();
+
       return newAccessToken ?? '';
     } catch (error) {
       console.error('刷新 access token 失败', error);
@@ -469,6 +472,20 @@ export const useAuthStore = defineStore('auth', () => {
     const token = accessStore.accessToken ?? '';
     globalSSEClient.setHeaders({ Authorization: `Bearer ${token}` });
     globalSSEClient.connect(targetSseUrl);
+  }
+
+  /**
+   * 使用新 token 重连 SSE（关闭旧连接 → 更新凭证 → 重新连接）
+   * 适用于 token 刷新后 SSE 连接携带的凭证已过期的场景
+   */
+  function _reconnectSSEServer(): void {
+    const accessStore = useAccessStore();
+
+    const token = accessStore.accessToken ?? '';
+    const targetSseUrl = `${import.meta.env.VITE_GLOB_SSE_URL}?stream=${encodeURIComponent(token)}`;
+
+    globalSSEClient.setHeaders({ Authorization: `Bearer ${token}` });
+    globalSSEClient.reconnect(targetSseUrl);
   }
 
   function $reset() {
