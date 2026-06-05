@@ -216,7 +216,7 @@ function handleSettingsClick() {
     height: 40px;
   }
 
-  :deep([class^="i-svg:"]) {
+  :deep(.svg-local-icon) {
     font-size: 18px;
     line-height: 1;
     color: var(--el-text-color-regular);
@@ -228,7 +228,7 @@ function handleSettingsClick() {
     background: rgba(0, 0, 0, 0.04);
     transform: scale(1.05);
 
-    :deep([class^="i-svg:"]) {
+    :deep(.svg-local-icon) {
       color: var(--el-color-primary);
     }
   }
@@ -247,7 +247,7 @@ function handleSettingsClick() {
       transform: none;
       box-shadow: none;
 
-      :deep([class^="i-svg:"]) {
+      :deep(.svg-local-icon) {
         color: var(--el-text-color-secondary);
       }
     }
@@ -267,14 +267,14 @@ function handleSettingsClick() {
 
   // 暗黑模式 hover
   html.dark & {
-    :deep([class^="i-svg:"]) {
+    :deep(.svg-local-icon) {
       color: rgba(255, 255, 255, 0.75);
     }
 
     &:hover {
       background: rgba(255, 255, 255, 0.08);
 
-      :deep([class^="i-svg:"]) {
+      :deep(.svg-local-icon) {
         color: #ffffff;
       }
     }
@@ -282,21 +282,21 @@ function handleSettingsClick() {
 
   // 半深色顶栏 hover
   html.semi-dark-header & {
-    :deep([class^="i-svg:"]) {
+    :deep(.svg-local-icon) {
       color: rgba(255, 255, 255, 0.75);
     }
 
     &:hover {
       background: rgba(255, 255, 255, 0.08);
 
-      :deep([class^="i-svg:"]) {
+      :deep(.svg-local-icon) {
         color: #ffffff;
       }
     }
   }
 
   // 折叠按钮激活状态
-  .i-svg\:collapse {
+  .svg-local-icon--collapse {
     transition: transform 0.2s ease;
     transform: scaleX(-1);
 
@@ -306,7 +306,7 @@ function handleSettingsClick() {
   }
 
   // 刷新按钮旋转动画
-  .i-svg\:refresh {
+  .svg-local-icon--refresh {
     transition: transform 0.2s ease;
 
     &.is-spin {

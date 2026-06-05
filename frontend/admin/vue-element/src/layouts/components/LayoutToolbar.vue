@@ -185,17 +185,8 @@ function handleSettingsClick() {
       height: 44px;
     }
 
-    :deep(.i-svg\:language) {
-      flex-shrink: 0;
-      width: 18px;
-      height: 18px;
-      font-size: 18px;
-      line-height: 18px;
-      background-size: 18px 18px;
-    }
-
     // 图标样式
-    :deep([class^="i-svg:"]) {
+    :deep(.svg-local-icon) {
       font-size: 18px;
       line-height: 1;
       color: var(--el-text-color-regular);
@@ -207,7 +198,7 @@ function handleSettingsClick() {
       background: rgba(0, 0, 0, 0.04);
       transform: scale(1.05);
 
-      :deep([class^="i-svg:"]) {
+      :deep(.svg-local-icon) {
         color: var(--el-color-primary);
       }
     }
@@ -226,7 +217,7 @@ function handleSettingsClick() {
         transform: none;
         box-shadow: none;
 
-        :deep([class^="i-svg:"]) {
+        :deep(.svg-local-icon) {
           color: var(--el-text-color-secondary);
         }
       }
@@ -276,7 +267,7 @@ function handleSettingsClick() {
 // 白色文字样式（用于深色背景：暗黑主题、顶部布局、混合布局等）
 .navbar-actions--white-text {
   .navbar-actions__item {
-    :deep([class^="i-svg:"]) {
+    :deep(.svg-local-icon) {
       color: rgba(255, 255, 255, 0.75);
     }
 
@@ -284,7 +275,7 @@ function handleSettingsClick() {
       background: rgba(255, 255, 255, 0.08);
       transform: scale(1.05);
 
-      :deep([class^="i-svg:"]) {
+      :deep(.svg-local-icon) {
         color: #ffffff;
       }
     }
@@ -323,7 +314,7 @@ function handleSettingsClick() {
 // 深色文字样式（用于浅色背景：明亮主题下的左侧布局等）
 .navbar-actions--dark-text {
   .navbar-actions__item {
-    :deep([class^="i-svg:"]) {
+    :deep(.svg-local-icon) {
       color: var(--el-text-color-regular) !important;
     }
 
@@ -331,7 +322,7 @@ function handleSettingsClick() {
       background: rgba(0, 0, 0, 0.04);
       transform: scale(1.05);
 
-      :deep([class^="i-svg:"]) {
+      :deep(.svg-local-icon) {
         color: var(--el-color-primary) !important;
       }
     }
@@ -369,7 +360,7 @@ function handleSettingsClick() {
 
 // 确保下拉菜单中的图标不受影响
 ::v-deep(.el-dropdown-menu) {
-  [class^="i-svg:"] {
+  [class^="svg-local-icon"] {
     color: var(--el-text-color-regular) !important;
 
     &:hover {

@@ -5,21 +5,22 @@
   - `lucide:users`       → @iconify/vue 渲染 Lucide 图标
   - `ep:setting`         → @iconify/vue 渲染 Element Plus 图标
   - `fa:user`            → @iconify/vue 渲染 Font Awesome 图标
-  - `svg:menu`           → UnoCSS presetIcons 渲染本地 SVG
+  - `svg:menu`           → 内联 SVG 渲染本地 SVG 文件
   - `el-icon-Setting`    → 兼容旧格式，自动转为 `ep:setting`
   - `menu`               → 无前缀兜底，当作本地 SVG 处理
 
   扩展新图标集只需安装对应的 @iconify-json/xxx 包即可。
 -->
 <template>
-  <div v-if="isSvgIcon" :class="[cssClass, attrs.class]" :style="sizeStyle" />
+  <!-- 本地 SVG 图标：通过内联 SVG 渲染 -->
+  <span v-if="isSvgIcon" v-html="svgContent" :class="[attrs.class, 'svg-local-icon']" :style="svgStyle" />
   <!-- Iconify 图标：用 @iconify/vue 组件渲染 -->
   <Icon v-else :icon="resolvedIcon" :width="iconSize" :height="iconSize" :class="attrs.class" />
 </template>
 
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { computed } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 defineOptions({ inheritAttrs: false });
 
@@ -31,6 +32,13 @@ const props = defineProps<{
 }>();
 
 const attrs = useAttrs();
+
+// 预加载所有本地 SVG 文件（Vite raw import）
+const svgModules = import.meta.glob("../../assets/icons/*.svg", {
+  query: "?raw",
+  eager: true,
+  import: "default",
+}) as Record<string, string>;
 
 /**
  * 将旧格式图标名转为 Iconify 标准格式
@@ -49,26 +57,54 @@ const resolvedIcon = computed(() => {
     return props.icon;
   }
 
-  // 无前缀：本地 SVG 图标，通过 UnoCSS 渲染
+  // 无前缀：本地 SVG 图标
   return `svg:${props.icon}`;
 });
 
 /**
- * 判断是否使用 UnoCSS CSS 类方式渲染（本地 SVG）
- * 本地 SVG 图标通过 UnoCSS presetIcons 的 FileSystemIconLoader 加载，
- * 不走 @iconify/vue 组件
+ * 判断是否使用本地 SVG 方式渲染
  */
 const isSvgIcon = computed(() => {
   return resolvedIcon.value.startsWith("svg:");
 });
 
 /**
- * UnoCSS 图标类名
+ * 提取本地 SVG 名称
  */
-const cssClass = computed(() => {
+const svgName = computed(() => {
   if (!isSvgIcon.value) return "";
-  // svg:menu → i-svg:menu
-  return `i-${resolvedIcon.value}`;
+  return resolvedIcon.value.replace("svg:", "");
+});
+
+/**
+ * 从预加载的模块中获取 SVG 内容
+ */
+const svgRaw = computed(() => {
+  const name = svgName.value;
+  if (!name) return "";
+
+  // 匹配任意路径下的 {name}.svg
+  for (const [path, content] of Object.entries(svgModules)) {
+    if (path.endsWith(`/${name}.svg`)) {
+      return content as string;
+    }
+  }
+  return "";
+});
+
+/**
+ * SVG 内容：注入 width="1em" height="1em" 确保继承父容器尺寸
+ */
+const svgContent = computed(() => {
+  const raw = svgRaw.value;
+  if (!raw) return "";
+  // 统一设置 width="1em" height="1em"，确保 SVG 通过 font-size 控制尺寸
+  return raw
+    .replace(/<svg\b[^>]*>/, (match) => {
+      // 先移除已有的 width/height 属性，再统一注入
+      const cleaned = match.replace(/\s+(width|height)="[^"]*"/g, "");
+      return cleaned.replace(/<svg\b/, '<svg width="1em" height="1em"');
+    });
 });
 
 /**
@@ -78,10 +114,18 @@ const cssClass = computed(() => {
 const iconSize = computed(() => props.size || undefined);
 
 /**
- * 内联样式（仅显式传 size 时生效，避免覆盖 CSS 中的尺寸规则）
+ * 内联样式：通过 font-size 控制 SVG 尺寸（1em 基准），color 控制 SVG 颜色（currentColor）
  */
-const sizeStyle = computed(() => {
-  if (!props.size) return undefined;
-  return { width: `${props.size}px`, height: `${props.size}px` };
+const svgStyle = computed(() => {
+  const base: Record<string, string> = {
+    display: "inline-block",
+    verticalAlign: "middle",
+  };
+  if (props.size) {
+    base.width = `${props.size}px`;
+    base.height = `${props.size}px`;
+    base.fontSize = `${props.size}px`;
+  }
+  return base;
 });
 </script>

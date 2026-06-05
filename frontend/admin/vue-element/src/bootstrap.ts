@@ -5,7 +5,7 @@ import "element-plus/dist/index.css";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "vxe-table/lib/style.css";
 import "@/styles/index.scss";
-import "uno.css";
+import "@/styles/tailwind.css";
 import "animate.css";
 
 import { setupDirective } from "@/directives";

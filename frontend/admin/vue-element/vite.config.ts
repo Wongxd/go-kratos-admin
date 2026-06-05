@@ -7,7 +7,7 @@ import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 
 import { mockDevServerPlugin } from "vite-plugin-mock-dev-server";
 
-import UnoCSS from "unocss/vite";
+import tailwindcss from "@tailwindcss/vite";
 import pkg from "./package.json" with { type: "json" };
 
 // 平台的名称、版本、运行所需的 node 版本、依赖、构建时间的类型提示
@@ -55,7 +55,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     plugins: [
       vue(),
       ...(env.VITE_MOCK_DEV_SERVER === "true" ? [mockDevServerPlugin()] : []),
-      UnoCSS(),
+      tailwindcss(),
       // API 自动导入
       AutoImport({
         // 导入 Vue 函数，如：ref, reactive, toRef 等
@@ -185,8 +185,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         "element-plus/es/components/watermark/style/css",
         "element-plus/es/components/checkbox-button/style/css",
         "element-plus/es/components/space/style/css",
-        // UnoCSS 图标集预加载
-        "@iconify-json/lucide/icons.json",
+
       ],
     },
     // 构建配置

@@ -6,7 +6,7 @@
         <el-card shadow="hover" class="overview-card">
           <div class="overview-header">
             <div class="title">{{ item.title }}</div>
-            <div :class="item.icon" class="icon-svg" />
+            <SvgIcon :icon="item.icon" :size="28" class="icon-svg" />
           </div>
           <div class="value">{{ item.value.toLocaleString() }}</div>
           <div class="total-row">
@@ -76,6 +76,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
+import SvgIcon from "@/components/SvgIcon/index.vue";
 import { $t } from "@/core/i18n";
 
 import AnalyticsTrends from "./analytics-trends.vue";
@@ -95,28 +96,28 @@ interface OverviewItem {
 
 const overviewItems = ref<OverviewItem[]>([
   {
-    icon: "i-svg:color_card",
+    icon: "svg:color_card",
     title: $t("pages.dashboard.currentUserCount"),
     totalTitle: $t("pages.dashboard.totalUserCount"),
     totalValue: 120_000,
     value: 2000,
   },
   {
-    icon: "i-svg:color_cake",
+    icon: "svg:color_cake",
     title: $t("pages.dashboard.currentAccessCount"),
     totalTitle: $t("pages.dashboard.totalAccessCount"),
     totalValue: 500_000,
     value: 20_000,
   },
   {
-    icon: "i-svg:color_download",
+    icon: "svg:color_download",
     title: $t("pages.dashboard.currentDownloadCount"),
     totalTitle: $t("pages.dashboard.totalDownloadCount"),
     totalValue: 120_000,
     value: 8000,
   },
   {
-    icon: "i-svg:color_bell",
+    icon: "svg:color_bell",
     title: $t("pages.dashboard.currentUsageCount"),
     totalTitle: $t("pages.dashboard.totalUsageCount"),
     totalValue: 50_000,

@@ -153,7 +153,7 @@ const handleInputKeydown: (evt: KeyboardEvent | Event) => any = (evt) => {
   align-items: center;
 }
 
-.command-palette-trigger__left :deep([class^="i-svg:"]) {
+.command-palette-trigger__left :deep(.svg-local-icon) {
   color: var(--el-text-color-secondary) !important;
 }
 
@@ -203,12 +203,12 @@ const handleInputKeydown: (evt: KeyboardEvent | Event) => any = (evt) => {
   align-items: center;
 }
 
-.command-palette-input__suffix :deep([class^="i-svg:"]) {
+.command-palette-input__suffix :deep(.svg-local-icon) {
   font-size: 16px;
   color: var(--el-text-color-secondary);
 }
 
-.command-palette-input__suffix :deep([class^="i-svg:"]):hover {
+.command-palette-input__suffix :deep(.svg-local-icon):hover {
   color: var(--el-color-primary);
 }
 
@@ -282,7 +282,7 @@ const handleInputKeydown: (evt: KeyboardEvent | Event) => any = (evt) => {
   border-radius: 8px;
 }
 
-.command-palette-hint__key :deep([class^="i-svg:"]) {
+.command-palette-hint__key :deep(.svg-local-icon) {
   font-size: 14px;
   color: var(--el-text-color-secondary);
 }
