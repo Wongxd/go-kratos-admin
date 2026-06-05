@@ -26,8 +26,8 @@
   --el-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', Helvetica, sans-serif !important;
-  // 亮色正文：450 介于常规400和加粗500之间，笔画够厚不笨重
-  --el-font-weight-primary: 450;
+  // 统一正文 500（明暗一致，消除非标准字重导致的中文渲染差异）
+  --el-font-weight-primary: 500;
   // 亮色文字加深，不用浅灰，避免发虚
   --el-text-color-primary: #1F2937;
   --el-text-color-regular: #374151;
@@ -35,15 +35,16 @@
   --el-font-weight-bold: 600;
 }
 
-// 针对 Element Plus 全局布局强制开启硬件级渲染优化
-// 扩展到核心文字容器：表单标签、输入框、下拉选项、Tiptap 编辑器
+// 针对 Element Plus 全局布局强制开启抗锯齿
+// 注意：text-rendering 使用 auto 而非 geometricPrecision
+// geometricPrecision 对非标准字重（如 450/500）的中文小字号有已知渲染 bug
 html, body, #app,
 .el-overlay, .el-drawer, .el-main,
 .el-form-item__label, .el-input__inner, .el-select-dropdown__item,
 .tiptap {
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
-  text-rendering: geometricPrecision !important;
+  text-rendering: auto !important;
 }
 
 // ============================================
@@ -72,7 +73,7 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: geometricPrecision;
+  text-rendering: auto;
 }
 
 ul,

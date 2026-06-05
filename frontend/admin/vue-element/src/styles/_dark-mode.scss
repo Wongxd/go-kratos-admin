@@ -531,9 +531,6 @@ html.dark {
 
   // 按钮样式优化（Pro 组件区域单独处理，不覆盖其柔和风格）
   .el-button:not(.pro-toolbar .el-button):not(.pro-search__actions .el-button) {
-    // 按钮文字统一字重 500（与亮色模式 .el-button { font-weight: 500 } 一致）
-    font-weight: 500 !important;
-
     // 主按钮
     &.el-button--primary {
       background-color: var(--dark-primary) !important;
@@ -587,13 +584,9 @@ html.dark {
   .pro-search__actions .el-button {
     height: 32px !important;
     border-radius: 6px !important;
-    padding: 0 14px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    font-family: var(--el-font-family) !important;
-    -webkit-font-smoothing: antialiased !important;
-    -moz-osx-font-smoothing: grayscale !important;
-    text-rendering: geometricPrecision !important;
+    padding: 0 16px !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
 
     // 主按钮（搜索）— 白色文字确保对比度
     &.el-button--primary {
@@ -605,7 +598,7 @@ html.dark {
     &:not(.el-button--primary):not(.el-button--danger):not(.el-button--success):not(.el-button--warning):not(.el-button--info) {
       background-color: rgba(255, 255, 255, 0.06) !important;
       border: 1px solid rgba(255, 255, 255, 0.15) !important;
-      color: var(--el-text-color-primary) !important; // 改用 primary 提高对比度
+      color: var(--el-text-color-primary) !important;
 
       &:hover,
       &:focus {
@@ -624,13 +617,14 @@ html.dark {
   .pro-toolbar .toolbar-right .el-button {
     height: 32px !important;
     border-radius: 6px !important;
-    padding: 0 14px !important;
-    font-size: 13px !important;
+    padding: 0 16px !important;
+    font-size: 14px !important;
     font-weight: 500 !important;
+    line-height: 1 !important;
     font-family: var(--el-font-family) !important;
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
-    text-rendering: geometricPrecision !important;
+    text-rendering: auto !important;
 
     // 重置/default 按钮 — 使用亮色模式相同的设计语言，颜色适配暗色背景
     // stylelint-disable-next-line selector-max-universal

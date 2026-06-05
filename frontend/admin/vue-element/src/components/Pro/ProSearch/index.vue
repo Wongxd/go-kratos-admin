@@ -398,9 +398,9 @@ defineExpose({
   .el-button {
     height: 32px;
     border-radius: 6px;
-    padding: 0 14px;
-    font-size: 13px;
-    font-weight: 500;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 1;
     transition: all 0.2s ease;
     cursor: pointer;
 
