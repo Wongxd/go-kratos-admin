@@ -200,6 +200,7 @@ function handleSettingsClick() {
   border-radius: 8px;
   transition: all 0.2s ease;
   background: transparent;
+  margin-top: 2px; // 微调按钮位置，与面包屑视觉对齐
 
   > * {
     display: flex;
