@@ -1,27 +1,23 @@
 <template>
   <div
-    class="flex items-center justify-between px-3 py-1 text-xs"
+    class="absolute bottom-3 right-4 flex items-center gap-2 text-xs select-none pointer-events-none"
     :class="
       isDark
-        ? 'text-[#94a3b8] bg-[#1e293b] border-t border-[#334155]'
-        : 'text-[#64748b] bg-[#f8fafc] border-t border-[#e5e7eb]'
+        ? 'text-[#626773]'
+        : 'text-[#94a3b8]'
     "
   >
-    <div class="flex gap-2 items-center">
-      <span>{{ statusInfo.words }} {{ $t("common.editor.words") }}</span>
-      <span :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'">|</span>
-      <span>{{ statusInfo.chars }} {{ $t("common.editor.chars") }}</span>
-      <span :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'">|</span>
-      <span>Ln {{ statusInfo.cursor }}</span>
-    </div>
-    <div>
-      <span
-        class="px-2 py-0.5 text-[11px] rounded"
-        :class="isDark ? 'text-[#94a3b8] bg-[#334155]' : 'text-[#475569] bg-[#e2e8f0]'"
-      >
-        {{ isDark ? `🌙 ${$t("preferences.theme.dark")}` : `☀️ ${$t("preferences.theme.light")}` }}
-      </span>
-    </div>
+    <span>{{ statusInfo.words }} {{ $t("common.editor.words") }}</span>
+    <span :class="isDark ? 'text-[var(--tte-toolbar-border)]' : 'text-[#cbd5e1]'">|</span>
+    <span>{{ statusInfo.chars }} {{ $t("common.editor.chars") }}</span>
+    <span :class="isDark ? 'text-[var(--tte-toolbar-border)]' : 'text-[#cbd5e1]'">|</span>
+    <span>Ln {{ statusInfo.cursor }}</span>
+    <span
+      class="px-2 py-0.5 text-[11px] rounded"
+      :class="isDark ? 'text-[#626773] bg-[rgba(255,255,255,0.06)]' : 'text-[#94a3b8] bg-[#f1f5f9]'"
+    >
+      MD
+    </span>
   </div>
 </template>
 

@@ -107,20 +107,35 @@ html.dark {
   // 统一抽屉宽度
   --el-drawer-width-primary: var(--gowind-drawer-width);
 
+  // Drawer 整体使用 flex 列布局，确保 Header/Footer 固定，Body 滚动
+  display: flex;
+  flex-direction: column;
+
+  // 亮色模式：赋予立体层级感，左侧精细分割线 + 温润漫反射投影
+  border-left: 1px solid #e2e8f0 !important;
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.05) !important;
+
   .el-drawer__header {
+    flex-shrink: 0; // 不被压缩
     padding: 16px 20px;
     margin: 0;
     color: inherit;
     border-bottom: $border;
+    font-weight: 600;
   }
 
   .el-drawer__body {
-    padding: 20px;
+    flex: 1; // 占据剩余空间
+    min-height: 0; // 允许内容溢出时正确滚动
+    padding: 24px 20px; // 增加上下内边距，提升呼吸感
+    overflow-y: auto; // 独立滚动
   }
 
   .el-drawer__footer {
+    flex-shrink: 0; // 不被压缩
     padding: 16px 20px;
-    border-top: $border;
+    border-top: 1px solid #f1f5f9;
+    background: #ffffff;
   }
 }
 
@@ -286,6 +301,12 @@ html.dark {
 .el-form--default .el-form-item,
 .el-form .el-form-item {
   margin-bottom: var(--gowind-form-item-margin-bottom);
+}
+
+/* 表单 Label 亮色模式加深，增强可读性 */
+.el-form-item__label {
+  color: #475569 !important;
+  font-weight: 550 !important;
 }
 
 /* ---------- 消息弹窗精致化 ---------- */

@@ -10,7 +10,7 @@
       <router-view />
     </el-watermark>
     <!-- Vue Query Devtools（仅开发环境） -->
-    <TanstackQueryDevtools v-if="isDev" />
+    <TanstackQueryDevtools v-if="isDev" :button-position="'bottom-left'" />
   </el-config-provider>
 </template>
 

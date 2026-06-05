@@ -29,7 +29,7 @@
       />
     </div>
 
-    <!-- Status Bar -->
+    <!-- Status Bar (绝对定位) -->
     <TiptapStatusBar
       v-if="showStatusBar"
       :is-dark="isDark"

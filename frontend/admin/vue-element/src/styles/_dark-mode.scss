@@ -13,11 +13,32 @@ html.dark {
   // CSS 变量定义（暗色模式专用）
   // ============================================
   
+  // ---- 字体渲染优化：消除纯白炫光导致的发虚 ----
+  // 将 Element Plus 默认纯白字体微调为温润的亮灰，消除光晕散光效应
+  --el-text-color-primary: #e3e6eb !important;     // 主要文字（标题、正文）
+  --el-text-color-regular: #babbc0 !important;     // 常规文字（表单 Label、提示）
+  --el-text-color-placeholder: #6c7280 !important; // 占位符文字（调亮一点，防止看不清）
+  
+  // 暗黑模式下给文本增加极微小的字间距，强迫 Windows 浏览器重新对齐像素点
+  letter-spacing: 0.02em !important;
+  
   // 1. 核心对比度优化(先解决“看得见”的问题)
   --dark-bg-primary: #0C0E13;      // 页面主背景(微压暗基底,暗黑质感更高级)
   --dark-bg-table: #14171C;         // 表格容器/输入框背景(比背景亮 2 个灰度层级,模块边界瞬间清晰)
   --dark-bg-hover: #1A1E26;         // 悬浮态/展开态/表头/行 hover(hover 态微高亮,给用户明确的交互反馈)
   --dark-border: #23272F;           // 输入框边框/分割线/表格边框(微加深,列边界更清晰)
+    
+  // Drawer 专属层级（比页面主背景亮 3 个灰度层级，配合环境光投影，让抽屉「浮」起来）
+  --dark-bg-drawer: #1e2026;         // Drawer 主背景（偏暖色调，比页面底色明显提亮，拉开层级距离）
+  --dark-bg-drawer-header: #1a1c22;  // Drawer Header 背景（微暗于 body，标题区与内容区形成自然分割）
+  --dark-bg-drawer-footer: #1a1c22;  // Drawer Footer 背景（与 header 统一，锚定操作区）
+  --dark-bg-drawer-input: #14161a;   // Drawer 内输入框背景（比 body 暗，形成「凹入」深度感）
+  --dark-drawer-border: rgba(255, 255, 255, 0.06); // Drawer 分割线（微透明白，现代半透明分割感）
+  --dark-drawer-input-border: #313540; // Drawer 内输入框边框（比全局边框更亮，提升可辨识度）
+  --dark-drawer-shadow: 
+    -8px 0 32px rgba(0, 0, 0, 0.5),          // 主投影：左侧深黑阴影
+    -2px 0 8px rgba(0, 0, 0, 0.3),            // 近投影：贴近边缘的紧凑阴影
+    -1px 0 1px rgba(100, 120, 200, 0.08);     // 环境光：极淡蓝紫微光，赋予空间深度
   
   // 奇偶行背景色(核心解决生硬割裂问题)
   --dark-row-odd: #0F1218;          // 奇数行背景(微提亮,和偶数行形成 1 个灰度级区分,不破坏暗黑基底)
@@ -137,18 +158,82 @@ html.dark {
     }
   }
 
-  // Drawer/Dialog 主背景
-  .el-drawer,
-  .el-dialog {
-    background-color: var(--dark-bg-primary) !important;
-    border-color: var(--dark-border) !important;
+  // Drawer/Dialog — 现代高质感暗黑模式
+  .el-drawer {
+    // 暗黑模式去掉左侧边框，由 box-shadow 提供层级分离（避免白线刺眼）
+    border-left: none !important;
+    // 主背景使用专属层级变量，拉开与页面底色的距离
+    background-color: var(--dark-bg-drawer) !important;
+    // 环境光投影：多层级阴影，赋予空间深度
+    box-shadow: var(--dark-drawer-shadow) !important;
 
-    .el-drawer__header,
-    .el-dialog__header {
-      border-bottom-color: var(--dark-border) !important;
+    .el-drawer__header {
+      background-color: var(--dark-bg-drawer-header) !important;
+      border-bottom: 1px solid var(--dark-drawer-border) !important;
+      // 微弱底部分割线渐变，增强边界柔和感
+      background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.15)) !important;
       
-      // 模块标题：增加字号、字重，用高亮色突出
-      .el-drawer__title,
+      .el-drawer__title {
+        color: var(--dark-text-primary) !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.01em !important;
+      }
+
+      // 关闭按钮
+      .el-drawer__close-btn {
+        color: var(--dark-text-secondary) !important;
+
+        &:hover {
+          color: var(--dark-text-primary) !important;
+          background-color: rgba(255, 255, 255, 0.06) !important;
+        }
+      }
+    }
+
+    .el-drawer__body {
+      background-color: var(--dark-bg-drawer) !important;
+
+
+      // 暗黑模式下 Drawer body 滚动条优化
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.18);
+        }
+      }
+    }
+
+    .el-drawer__footer {
+      background-color: var(--dark-bg-drawer-footer) !important;
+      border-top: 1px solid var(--dark-drawer-border) !important;
+      // 微弱顶部分割线渐变，增强边界柔和感
+      background-image: linear-gradient(to top, transparent, rgba(0, 0, 0, 0.15)) !important;
+    }
+  }
+
+  .el-dialog {
+    background-color: var(--dark-bg-drawer) !important;
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      0 0 1px rgba(100, 120, 200, 0.1) !important;
+    border: 1px solid var(--dark-drawer-border) !important;
+
+    .el-dialog__header {
+      background-color: var(--dark-bg-drawer-header) !important;
+      border-bottom: 1px solid var(--dark-drawer-border) !important;
+      
       .el-dialog__title {
         color: var(--dark-text-primary) !important;
         font-size: 18px !important;
@@ -156,9 +241,13 @@ html.dark {
       }
     }
 
-    .el-drawer__body,
     .el-dialog__body {
-      background-color: var(--dark-bg-primary) !important;
+      background-color: var(--dark-bg-drawer) !important;
+    }
+
+    .el-dialog__footer {
+      background-color: var(--dark-bg-drawer-footer) !important;
+      border-top: 1px solid var(--dark-drawer-border) !important;
     }
   }
 
@@ -177,6 +266,98 @@ html.dark {
         color: var(--dark-error) !important;
       }
     }
+
+    // 表单项间距增加呼吸感
+    .el-form-item {
+      margin-bottom: 22px !important;
+    }
+  }
+
+  // Drawer/Dialog 内的 ElDivider 分隔线适配
+  .el-drawer .el-divider,
+  .el-dialog .el-divider {
+    border-color: var(--dark-drawer-border) !important;
+
+    .el-divider__text {
+      color: var(--dark-text-secondary) !important;
+      background-color: var(--dark-bg-drawer) !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.02em !important;
+    }
+  }
+
+  // ============================================
+  // Drawer/Dialog 内专属输入控件覆盖
+  // 参考现代暗黑模式设计：输入框凹入 + 更亮边框 + 呼吸灯聚焦
+  // ============================================
+  .el-drawer .el-form,
+  .el-dialog .el-form {
+    // 输入框 & 文本域 — 背景凹入、边框提亮
+    .el-input__wrapper,
+    .el-textarea__inner {
+      background-color: var(--dark-bg-drawer-input) !important;
+      border-color: var(--dark-drawer-input-border) !important;
+      box-shadow: 0 0 0 1px var(--dark-drawer-input-border) inset !important;
+      border-radius: 6px !important;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+
+      // 占位符
+      input::placeholder,
+      textarea::placeholder {
+        color: var(--dark-text-placeholder) !important;
+      }
+
+      // hover 态：边框微亮
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.2) !important;
+      }
+
+      // 聚焦态：呼吸灯外发光
+      &.is-focus {
+        border-color: var(--dark-primary) !important;
+        box-shadow: 0 0 0 1px var(--dark-primary) inset,
+                    0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+      }
+
+      // 错误态
+      &.is-error {
+        border-color: var(--dark-error) !important;
+        box-shadow: 0 0 0 1px var(--dark-error) inset !important;
+      }
+    }
+
+    // Select 组件
+    .el-select {
+      .el-input__wrapper {
+        background-color: var(--dark-bg-drawer-input) !important;
+        border-color: var(--dark-drawer-input-border) !important;
+        box-shadow: 0 0 0 1px var(--dark-drawer-input-border) inset !important;
+        border-radius: 6px !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+      }
+
+      &:hover .el-input__wrapper {
+        border-color: rgba(255, 255, 255, 0.2) !important;
+      }
+
+      &.is-focus .el-input__wrapper,
+      .el-input__wrapper.is-focus {
+        border-color: var(--dark-primary) !important;
+        box-shadow: 0 0 0 1px var(--dark-primary) inset,
+                    0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+      }
+    }
+
+    // InputNumber / DatePicker / TreeSelect / Cascader
+    .el-input-number .el-input__wrapper,
+    .el-date-editor .el-input__wrapper,
+    .el-tree-select .el-input__wrapper,
+    .el-cascader .el-input__wrapper {
+      background-color: var(--dark-bg-drawer-input) !important;
+      border-color: var(--dark-drawer-input-border) !important;
+      box-shadow: 0 0 0 1px var(--dark-drawer-input-border) inset !important;
+    }
   }
 
   // 输入框专项优化
@@ -191,6 +372,7 @@ html.dark {
       box-shadow: 0 0 0 1px var(--dark-border) inset, 
                   inset 0 1px 2px rgba(255, 255, 255, 0.05) !important; // 1px 内阴影，替代纯边框，更有“浮起”的层级感
       color: var(--dark-text-primary) !important;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease !important; // 平滑过渡动画
   
       // 占位符文本
       input::placeholder,
@@ -200,7 +382,7 @@ html.dark {
   
       // hover 态：背景色微亮，提升交互反馈
       &:hover {
-        border-color: var(--dark-primary) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
         background-color: var(--dark-bg-hover) !important;
       }
   
@@ -208,7 +390,7 @@ html.dark {
       &.is-focus {
         border-color: var(--dark-primary) !important;
         box-shadow: 0 0 0 1px var(--dark-primary) inset,
-                    0 0 0 3px rgba(22, 93, 255, 0.2) !important;
+                    0 0 0 3px rgba(22, 93, 255, 0.15) !important;
         background-color: var(--dark-bg-hover) !important;
       }
   
@@ -283,6 +465,15 @@ html.dark {
     }
   }
 
+  // ---- 输入框文字渲染优化 ----
+  // 略微加深微调字重，让微软雅黑在暗色底上不至于因为被吃字而显得太细、发虚
+  .el-input__inner,
+  .el-textarea__inner,
+  .tiptap {
+    -webkit-font-smoothing: antialiased !important;
+    font-weight: 450 !important;
+  }
+
   // 下拉选择框展开态
   .el-select-dropdown {
     background-color: var(--dark-bg-hover) !important; // 展开态背景比输入框再亮一级
@@ -336,6 +527,10 @@ html.dark {
 
   // 按钮样式优化（Pro 组件区域单独处理，不覆盖其柔和风格）
   .el-button:not(.pro-toolbar .el-button):not(.pro-search__actions .el-button) {
+    // 按钮文字微调：增加字间距 + 统一字重，消除高饱和背景上白字的发胀感
+    letter-spacing: 0.03em !important;
+    font-weight: 500 !important;
+
     // 主按钮
     &.el-button--primary {
       background-color: var(--dark-primary) !important;
@@ -658,6 +853,9 @@ html.dark {
   .el-tag {
     border-radius: 3px !important; // 暗黑模式再小一点，和按钮的 6px 明显区分
     cursor: default !important; // 不可点击，和按钮区分
+    // Tag 文字微调：笔画变细一丁点，让小字号在深色底上内部空隙露出来
+    font-weight: 450 !important;
+    letter-spacing: 0.02em !important;
 
     // 主色调（蓝）
     &.el-tag--primary {
@@ -715,5 +913,87 @@ html.dark {
         font-weight: 500 !important;
       }
     }
+  }
+
+  // ============================================
+  // 全页面全局 UI 审计重构
+  // ============================================
+
+  // ---- 1. ProSearch 筛选区域卡片边界强化 ----
+  // ProSearch 组件 scoped 样式使用 var(--el-bg-color) / var(--el-border-color-lighter)
+  // 通过覆盖 CSS 变量来改变暗色模式表现
+  .pro-search {
+    // 赋予独立的深色底色，从页面背景中“浮”出来
+    background-color: var(--dark-bg-table) !important;
+    border-color: #262933 !important;
+    box-shadow: none !important;
+  }
+
+  // ---- 2. ProPage 内容区卡片边界强化 ----
+  .pro-page__content {
+    background-color: var(--dark-bg-table) !important;
+    border-color: #262933 !important;
+    box-shadow: none !important;
+  }
+
+  // ---- 3. 表头视觉统治力重塑（vxe-table 暗色模式） ----
+  // 暗色模式下表头需要更深的背景色和柔和的文字色，起到视觉锚点作用
+  [data-vxe-ui-theme="dark"] {
+    --vxe-ui-table-header-background-color: #111419 !important;
+    --vxe-ui-table-header-font-color: #8a94a6 !important;
+    --vxe-ui-table-header-border-color: #1e2128 !important;
+    // vxe-table v3 兼容
+    --vxe-table-header-background-color: #111419 !important;
+    --vxe-table-header-font-color: #8a94a6 !important;
+  }
+
+  // 表头文字增加 letter-spacing，增强高级感
+  .vxe-table--render-default .vxe-table--header-wrapper .vxe-header--column .vxe-cell {
+    letter-spacing: 0.03em !important;
+  }
+
+  // ---- 4. 操作列图标柔化降噪 ----
+  // 降低高纯度色彩的刺眼感，用柔化色彩替代
+  .table-icon-btn {
+    // Primary（编辑/查看）：降为柔和蓝
+    &--primary {
+      color: #5094ff !important; // 比原色 var(--el-color-primary) 更柔
+
+      &:hover {
+        background-color: rgba(80, 148, 255, 0.1) !important;
+      }
+    }
+
+    // Danger（删除）：降为柔粉色
+    &--danger {
+      color: #f87171 !important; // 比原色更柔和的红
+
+      &:hover {
+        background-color: rgba(248, 113, 113, 0.1) !important;
+      }
+    }
+
+    // Success（启动）：柔化绿
+    &--success {
+      color: #6ee7b7 !important;
+
+      &:hover {
+        background-color: rgba(110, 231, 183, 0.1) !important;
+      }
+    }
+
+    // Warning：柔化橙
+    &--warning {
+      color: #fbbf24 !important;
+
+      &:hover {
+        background-color: rgba(251, 191, 36, 0.1) !important;
+      }
+    }
+  }
+
+  // ---- 5. vxe-table 行 hover 微亮呼吸反馈 ----
+  .vxe-table--render-default .vxe-body--row.row--hover > .vxe-body--column {
+    transition: background-color 0.2s ease;
   }
 }

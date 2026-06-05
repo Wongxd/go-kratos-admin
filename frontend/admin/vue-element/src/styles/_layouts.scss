@@ -358,6 +358,20 @@ html.dark .table-icon-btn {
   background-color: var(--el-bg-color-page);
 }
 
+// ============================================
+// 面包屑垂直间距呼吸感
+// ============================================
+
+.breadcrumb {
+  margin-bottom: 16px;
+  padding-left: 4px;
+}
+
+// 暗色模式下，面包屑与筛选区拉开更多间距
+html.dark .breadcrumb {
+  margin-bottom: 20px;
+}
+
 // 搜索栏卡片化：样式已在 ProSearch scoped 中统一设置
 // 白色背景 + 边框 + 圆角 + 淡投影，与内容卡片风格一致
 
