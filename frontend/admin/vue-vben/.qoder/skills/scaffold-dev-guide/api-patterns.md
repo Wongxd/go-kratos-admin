@@ -1,0 +1,300 @@
+# API 三层架构详细模板
+
+## 架构总览
+
+```
+generated/  →  service/  →  composables/  →  views/stores
+(自动生成)     (纯异步函数)   (Vue Query hooks)
+```
+
+**依赖方向**: `views/stores → composables → service → generated`
+
+---
+
+## 第 1 层：service 层模板
+
+文件路径: `src/api/service/{module-name}.ts`
+
+```typescript
+import {
+  createXxxServiceClient,
+  type xxxservicev1_CreateXxxRequest,
+  type xxxservicev1_DeleteXxxRequest,
+  type xxxservicev1_GetXxxRequest,
+  type xxxservicev1_UpdateXxxRequest,
+} from '#/api/generated/admin/service/v1';
+import { type PaginationQuery, requestApi } from '#/transport/rest';
+
+// 延迟初始化单例 Client
+let _instance: null | ReturnType<typeof createXxxServiceClient> = null;
+
+function getXxxService() {
+  if (!_instance) {
+    _instance = createXxxServiceClient(requestApi);
+  }
+  return _instance;
+}
+
+// 列表查询
+export async function listXxxs(query: PaginationQuery) {
+  return getXxxService().List(query.toRawParams());
+}
+
+// 获取详情
+export async function getXxx(request: xxxservicev1_GetXxxRequest) {
+  return getXxxService().Get(request);
+}
+
+// 创建
+export async function createXxx(request: xxxservicev1_CreateXxxRequest) {
+  return getXxxService().Create(request);
+}
+
+// 更新
+export async function updateXxx(request: xxxservicev1_UpdateXxxRequest) {
+  return getXxxService().Update(request);
+}
+
+// 删除
+export async function deleteXxx(request: xxxservicev1_DeleteXxxRequest) {
+  return getXxxService().Delete(request);
+}
+```
+
+**注册导出** — 在 `src/api/service/index.ts` 中添加：
+```typescript
+export * from './xxx';
+```
+
+---
+
+## 第 2 层：composables 层模板
+
+文件路径: `src/api/composables/{module-name}.ts`
+
+```typescript
+import type {
+  xxxservicev1_GetXxxRequest,
+  xxxservicev1_ListXxxResponse,
+  xxxservicev1_Xxx,
+  xxxservicev1_Xxx_Status as Xxx_Status,
+} from '#/api/generated/admin/service/v1';
+
+import { computed } from 'vue';
+import { i18n } from '@vben/locales';
+import {
+  useMutation,
+  type UseMutationOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/vue-query';
+
+import {
+  createXxx,
+  deleteXxx,
+  getXxx,
+  listXxxs,
+  updateXxx,
+} from '#/api/service/xxx';
+import { queryClient } from '#/plugins/vue-query';
+import { makeUpdateMask, type PaginationQuery } from '#/transport/rest';
+
+const t = i18n.global.t;
+
+// ==============================
+// 列表查询 — 组件内 hook
+// ==============================
+export function useListXxxs(
+  query: PaginationQuery,
+  options?: UseQueryOptions<xxxservicev1_ListXxxResponse, Error>,
+) {
+  return useQuery({
+    queryKey: ['listXxxs', query],
+    queryFn: () => listXxxs(query),
+    ...options,
+  });
+}
+
+// ==============================
+// 列表查询 — Store / 外部调用
+// ==============================
+export async function fetchListXxxs(params: PaginationQuery) {
+  return queryClient.fetchQuery({
+    queryKey: ['listXxxs', params],
+    queryFn: () => listXxxs(params),
+    retry: 0,
+  });
+}
+
+// ==============================
+// 详情查询 — 组件内 hook
+// ==============================
+export function useGetXxx(
+  req: xxxservicev1_GetXxxRequest,
+  options?: UseQueryOptions<xxxservicev1_Xxx, Error>,
+) {
+  return useQuery({
+    queryKey: ['getXxx', req],
+    queryFn: () => getXxx(req),
+    ...options,
+  });
+}
+
+// ==============================
+// 详情查询 — Store / 外部调用
+// ==============================
+export async function fetchXxx(params: xxxservicev1_GetXxxRequest) {
+  return queryClient.fetchQuery({
+    queryKey: ['getXxx', params],
+    queryFn: () => getXxx(params),
+    retry: 0,
+  });
+}
+
+// ==============================
+// 创建
+// ==============================
+export function useCreateXxx(
+  options?: UseMutationOptions<
+    object,
+    Error,
+    { data: xxxservicev1_Xxx }
+  >,
+) {
+  return useMutation({
+    mutationFn: ({ data }) => createXxx({ data }),
+    ...options,
+  });
+}
+
+// ==============================
+// 更新（自动生成 updateMask）
+// ==============================
+export function useUpdateXxx(
+  options?: UseMutationOptions<
+    object,
+    Error,
+    { id: number; values: Record<string, any> }
+  >,
+) {
+  return useMutation({
+    mutationFn: ({ id, values }: { id: number; values: Record<string, any> }) =>
+      updateXxx({
+        id,
+        data: { ...values } as any,
+        updateMask: makeUpdateMask(Object.keys(values ?? {})),
+      }),
+    ...options,
+  });
+}
+
+// ==============================
+// 删除
+// ==============================
+export function useDeleteXxx(
+  options?: UseMutationOptions<object, Error, number>,
+) {
+  return useMutation({
+    mutationFn: (id) => deleteXxx({ id }),
+    ...options,
+  });
+}
+
+// ==============================
+// 枚举与工具函数
+// ==============================
+
+export const xxxStatusList = computed(() => [
+  { value: 'ON', label: t('enum.xxx.status.ON') },
+  { value: 'OFF', label: t('enum.xxx.status.OFF') },
+]);
+
+const XXX_STATUS_COLOR_MAP: Record<string, string> = {
+  ON: '#52C41A',
+  OFF: '#909399',
+  DEFAULT: '#86909C',
+};
+
+export function xxxStatusToColor(status: Xxx_Status) {
+  return XXX_STATUS_COLOR_MAP[status as string] ?? XXX_STATUS_COLOR_MAP.DEFAULT ?? '#86909C';
+}
+
+export function xxxStatusToName(status?: Xxx_Status) {
+  const map: Record<string, string> = {
+    ON: t('enum.xxx.status.ON'),
+    OFF: t('enum.xxx.status.OFF'),
+  };
+  return map[status as string] ?? '';
+}
+```
+
+**注册导出** — 在 `src/api/composables/index.ts` 中添加：
+```typescript
+export * from './xxx';
+```
+
+---
+
+## Query Key 命名约定
+
+| 操作 | Query Key 格式               | 示例                       |
+|----|----------------------------|--------------------------|
+| 列表 | `["list{Entity}s", query]` | `["listUsers", query]`   |
+| 详情 | `["get{Entity}", req]`     | `["getUser", { id: 1 }]` |
+| 创建 | mutation（无 query key）      | —                        |
+| 更新 | mutation（无 query key）      | —                        |
+| 删除 | mutation（无 query key）      | —                        |
+
+## PaginationQuery 使用模式
+
+```typescript
+import { PaginationQuery } from '#/api';
+
+// 基础分页
+const query = new PaginationQuery({
+  paging: { page: 1, pageSize: 20 },
+});
+
+// 带搜索条件
+const query = new PaginationQuery({
+  paging: { page: 1, pageSize: 20 },
+  formValues: { status: 'ON', name: '关键词' },
+});
+
+// 带排序
+const query = new PaginationQuery({
+  orderBy: ['-created_at', 'name'],
+});
+
+// 不分页（获取全量）
+const query = new PaginationQuery({
+  formValues: { status: 'ON' },
+  // 不传 paging 即全量
+});
+
+// 只返回指定字段
+const query = new PaginationQuery({
+  fieldMask: 'id,name,status',
+});
+```
+
+## Vue Query 全局配置
+
+| 配置                     | 值     | 说明            |
+|------------------------|-------|---------------|
+| `staleTime`            | 60s   | 数据在 60 秒内视为新鲜 |
+| `retry`                | false | 失败不自动重试       |
+| `refetchOnWindowFocus` | false | 窗口聚焦不刷新       |
+| `refetchOnReconnect`   | false | 网络重连不刷新       |
+
+## API 导入规范
+
+```typescript
+// ✅ 正确 — 通过 #/api 统一入口
+import { useListUsers, fetchListUsers, PaginationQuery } from '#/api';
+import { type identityservicev1_User as User } from '#/api';
+
+// ❌ 错误 — 禁止直接引用 generated 路径
+import { useListUsers } from '#/api/composables/user';
+import type { User } from '#/api/generated/admin/service/v1';
+```
