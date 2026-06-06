@@ -20,8 +20,8 @@ export interface ProModalConfig<T = any> {
   colon?: boolean;
   /** 行数据主键字段名 */
   rowKey?: string;
-  /** 表单字段配置 */
-  fields: ProFormField<T>[];
+  /** 表单字段配置（使用 default slot 自定义内容时可不传） */
+  fields?: ProFormField<T>[];
   /** 提交网络请求函数 */
   submitAction?: (data: T) => Promise<any>;
   /** 提交前处理回调 */

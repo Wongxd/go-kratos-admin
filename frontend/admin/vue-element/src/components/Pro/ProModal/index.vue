@@ -1,22 +1,30 @@
 <template>
   <component
-    :is="props.config.component === 'drawer' ? 'ElDrawer' : 'ElDialog'"
+    :is="containerComponent"
     v-model="visible"
     v-bind="containerProps"
     @close="handleClose"
   >
-    <ProForm
-      ref="formRef"
-      :model-value="formData"
-      :fields="fields"
-      :disabled="mode === 'view'"
-      :colon="config.colon"
-      v-bind="formProps"
-    >
-      <template v-for="(_, name) in $slots" #[name]="slotProps">
-        <slot :name="name" v-bind="slotProps" />
-      </template>
-    </ProForm>
+    <!-- 内容区域（支持 v-loading） -->
+    <div v-loading="loading">
+      <!-- 自定义内容模式：default slot 替代 ProForm -->
+      <slot v-if="$slots.default" />
+
+      <!-- ProForm 配置化模式 -->
+      <ProForm
+        v-else
+        ref="formRef"
+        :model-value="formData as any"
+        :fields="fields as any"
+        :disabled="mode === 'view'"
+        :colon="config.colon"
+        v-bind="formProps"
+      >
+        <template v-for="(_, name) in $slots" :key="name" #[name]="slotProps">
+          <slot :name="name" v-bind="slotProps" />
+        </template>
+      </ProForm>
+    </div>
 
     <template #footer>
       <slot name="footer">
@@ -31,7 +39,7 @@
 
 <script setup lang="ts" generic="T extends Record<string, any>">
 import { computed, ref } from "vue";
-import { ElButton } from "element-plus";
+import { ElButton, ElDrawer, ElDialog } from "element-plus";
 import { useI18n } from "@/core/i18n";
 import ProForm from "../ProForm/index.vue";
 import type { ProModalConfig, ModalMode } from "./types";
@@ -43,9 +51,13 @@ const props = withDefaults(
     visible: boolean;
     mode?: ModalMode;
     config: ProModalConfig<T>;
-    formData: T;
+    formData?: T;
+    /** 内容区域 loading 状态（异步加载数据时使用） */
+    loading?: boolean;
+    /** 弹窗标题（优先级高于 config.drawer/dialog 中的 title） */
+    title?: string;
   }>(),
-  { mode: "add" }
+  { mode: "add", loading: false }
 );
 const emit = defineEmits<{
   "update:visible": [boolean];
@@ -58,24 +70,33 @@ const visible = computed({
   get: () => props.visible,
   set: (v) => emit("update:visible", v),
 });
-const containerProps = computed(() =>
-  props.config.component === "drawer"
-    ? { destroyOnClose: true, appendToBody: true, lockScroll: false, ...props.config.drawer }
-    : {
-        destroyOnClose: true,
-        alignCenter: true,
-        appendToBody: true,
-        lockScroll: false,
-        ...props.config.dialog,
-      }
-);
+const formRef = ref<any>(null);
+const containerProps = computed(() => {
+  const base =
+    props.config.component === "drawer"
+      ? { destroyOnClose: true, appendToBody: true, lockScroll: false, ...props.config.drawer }
+      : {
+          destroyOnClose: true,
+          alignCenter: true,
+          appendToBody: true,
+          lockScroll: false,
+          ...props.config.dialog,
+        };
+  // title prop 优先级最高
+  if (props.title) {
+    return { ...base, title: props.title };
+  }
+  return base;
+});
 const formProps = computed(() => ({
   labelWidth: "auto",
   ...props.config.form,
 }));
-const fields = computed(() => props.config.fields);
+const fields = computed(() => props.config.fields ?? []);
 
-const formRef = ref<any>(null);
+const containerComponent = computed(() =>
+  props.config.component === "drawer" ? ElDrawer : ElDialog
+);
 const submitting = ref(false);
 
 function handleClose() {
@@ -89,9 +110,9 @@ async function handleSubmit() {
     await formRef.value?.validate();
     submitting.value = true;
     if (typeof props.config.beforeSubmit === "function") {
-      props.config.beforeSubmit(props.formData);
+      props.config.beforeSubmit(props.formData!);
     }
-    await props.config.submitAction?.(props.formData);
+    await props.config.submitAction?.(props.formData!);
     emit("submit");
     visible.value = false;
   } finally {
