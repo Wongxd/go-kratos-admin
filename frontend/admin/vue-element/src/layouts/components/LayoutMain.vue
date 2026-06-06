@@ -1,25 +1,28 @@
 <template>
   <section class="app-main" :class="mainClass" :style="{ height: appMainHeight }">
     <router-view>
-      <template #default="{ Component, route }">
-        <transition :name="transitionName" mode="out-in" :duration="150" @before-leave="onBeforeLeave" @after-enter="onAfterEnter">
+      <template #default="{ Component, route: slotRoute }">
+        <transition
+          :name="transitionName"
+          mode="out-in"
+          :duration="150"
+          @before-leave="onBeforeLeave"
+          @after-enter="onAfterEnter"
+        >
           <keep-alive :include="cachedViews">
             <component
-              :is="currentComponent(Component, route)"
-              :key="contentRefreshKey ? `${route.fullPath}__${contentRefreshKey}` : route.fullPath"
+              :is="currentComponent(Component, slotRoute)"
+              :key="
+                contentRefreshKey
+                  ? `${slotRoute.fullPath}__${contentRefreshKey}`
+                  : slotRoute.fullPath
+              "
             />
           </keep-alive>
         </transition>
 
         <!-- 页面切换骨架屏 -->
-        <div v-if="showSkeleton" class="page-skeleton">
-          <div class="skeleton-line skeleton-line--title" />
-          <div class="skeleton-line skeleton-line--long" />
-          <div class="skeleton-line skeleton-line--medium" />
-          <div class="skeleton-line skeleton-line--short" />
-          <div class="skeleton-line skeleton-line--long" />
-          <div class="skeleton-line skeleton-line--medium" />
-        </div>
+        <PageSkeleton :visible="showSkeleton" :type="skeletonType" />
       </template>
     </router-view>
 
@@ -31,15 +34,18 @@
 </template>
 
 <script setup lang="ts">
-import { type RouteLocationNormalized } from "vue-router";
+import { type RouteLocationNormalized, useRoute } from "vue-router";
 import { useTagsViewStore } from "./useTagsViewStore";
 import SvgIcon from "@/components/SvgIcon/index.vue";
+import PageSkeleton from "@/components/PageSkeleton/index.vue";
+import { resolveSkeletonType } from "@/components/PageSkeleton/index.vue";
 import { preferences, usePreferences } from "@/core/preferences";
 import variables from "@/styles/variables.module.scss";
 import Error404 from "@/pages/core/error/404.vue";
 
 const { cachedViews } = toRefs(useTagsViewStore());
 const { tabbarPreferences } = usePreferences();
+const route = useRoute();
 
 // 注入刷新状态
 const contentRefreshing = inject<Ref<boolean>>("contentRefreshing", ref(false));
@@ -90,10 +96,11 @@ const currentComponent = (component: Component, route: RouteLocationNormalized) 
 
 // 页面切换骨架屏状态
 const showSkeleton = ref(false);
+const skeletonType = ref<"table" | "dashboard">("table");
 
 function onBeforeLeave() {
-  // 只在首次加载时显示骨架屏（非 keep-alive 缓存页面）
   if (preferences.transition.enable) {
+    skeletonType.value = resolveSkeletonType(route.fullPath);
     showSkeleton.value = true;
   }
 }
@@ -132,47 +139,6 @@ const mainClass = computed(() => {
   background-color: var(--el-bg-color-page);
   width: 100%;
   min-width: 0;
-}
-
-// 页面切换骨架屏
-.page-skeleton {
-  position: absolute;
-  inset: 0;
-  padding: 24px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.skeleton-line {
-  height: 16px;
-  border-radius: 4px;
-  margin-bottom: 16px;
-  background: linear-gradient(90deg, var(--el-fill-color-light) 25%, var(--el-fill-color) 37%, var(--el-fill-color-light) 63%);
-  background-size: 400% 100%;
-  animation: skeleton-pulse 1.4s ease infinite;
-
-  &--title {
-    width: 30%;
-    height: 24px;
-    margin-bottom: 24px;
-  }
-
-  &--long {
-    width: 100%;
-  }
-
-  &--medium {
-    width: 60%;
-  }
-
-  &--short {
-    width: 40%;
-  }
-}
-
-@keyframes skeleton-pulse {
-  0% { background-position: 100% 50%; }
-  100% { background-position: 0 50%; }
 }
 
 // 紧凑模式：限制最大宽度并居中
