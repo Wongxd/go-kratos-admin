@@ -11,12 +11,12 @@ import CryptoJS from 'crypto-js';
 import { defineStore } from 'pinia';
 
 import {
-  login as apiLogin,
-  logout as apiLogout,
-  refreshToken as apiRefreshToken,
-  getMe,
-  getMyPermissionCode,
-} from '#/api';
+  fetchMyPermissionCode,
+  fetchUserProfile,
+  loginMutation,
+  logoutMutation,
+  refreshTokenMutation,
+} from '#/api/composables';
 import { $t } from '#/locales';
 import { router } from '#/router';
 import { globalSSEClient } from '#/transport/sse';
@@ -84,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       loginLoading.value = true;
 
-      const resp = await apiLogin({
+      const resp = await loginMutation.execute({
         username: params.username,
         password: encryptPassword(params.password),
         grant_type: 'password',
@@ -182,7 +182,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout(redirect: boolean = true) {
     try {
       if (accessStore.accessToken !== null && accessStore.accessToken !== '') {
-        await apiLogout();
+        await logoutMutation.execute(undefined);
       }
     } catch {
       // 忽略错误
@@ -234,7 +234,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     try {
-      const resp = await apiRefreshToken(accessStore.refreshToken ?? '');
+      const resp = await refreshTokenMutation.execute(
+        accessStore.refreshToken ?? '',
+      );
 
       const newAccessToken = (resp as any).access_token;
       const newRefreshToken = (resp as any).refresh_token;
@@ -310,7 +312,7 @@ export const useAuthStore = defineStore('auth', () => {
    */
   async function fetchUserInfo() {
     try {
-      return (await getMe()) as unknown as UserInfo;
+      return (await fetchUserProfile()) as unknown as UserInfo;
     } catch (error) {
       console.error('fetchUserInfo failed:', error);
       await _doLogout();
@@ -322,7 +324,7 @@ export const useAuthStore = defineStore('auth', () => {
    * 获取用户权限码
    */
   async function fetchAccessCodes() {
-    return await getMyPermissionCode();
+    return await fetchMyPermissionCode();
   }
 
   /**
