@@ -1,20 +1,24 @@
 # GoWindAdmin (GoWind Admin System)
 
-> GoWindAdmin — **Efficiently build enterprise-grade admin systems, making development as smooth as the wind.**
+> **Efficiently build enterprise-grade admin systems, making development as smooth as the wind.**
 
-An out-of-the-box Golang full-stack admin system. The backend is based on the GO microservice
-framework [go-kratos](https://go-kratos.dev/), and the frontend is based on the Vue microservice
-framework [Vben Admin](https://doc.vben.pro/).
+GoWindAdmin is an out-of-the-box enterprise-grade Golang full-stack admin system scaffold.
 
-Although both use microservice frameworks, the frontend and backend can be developed and deployed as monoliths.
+The backend is based on the GO microservice framework [go-kratos](https://go-kratos.dev/), and the frontend offers three versions: `Vue3 Vben`, `Vue3 Element Plus`, and `React Antd`, balancing microservice scalability with monolithic deployment convenience.
 
-Easy to get started, feature-rich, suitable for rapid development of enterprise admin systems.
+Although built on a microservice framework, both the frontend and backend support monolithic architecture for development and deployment, flexibly adapting to different team sizes and project complexity requirements.
+
+Easy to get started, feature-rich, deeply adapted to enterprise scenarios, helping developers quickly deliver various enterprise management system projects and significantly improve development efficiency.
 
 **English** | [中文](./README.md) | [日本語](./README.ja-JP.md)
 
 ## Demo
 
-> Frontend: <https://demo.admin.gowind.cloud>
+> Demo Portal: <https://demo.admin.gowind.cloud>
+>
+> Vue3 Vben Demo: <https://vben.admin.gowind.cloud>
+> Vue3 Element Plus Demo: <https://ele.admin.gowind.cloud>
+> React Demo: <https://react.admin.gowind.cloud>
 >
 > Backend Swagger: <https://api.demo.admin.gowind.cloud/docs/>
 >
@@ -22,32 +26,89 @@ Easy to get started, feature-rich, suitable for rapid development of enterprise 
 
 ## Tech Stack
 
--
-Backend: [Golang](https://go.dev/) + [go-kratos](https://go-kratos.dev/) + [wire](https://github.com/google/wire) + [ent](https://entgo.io/docs/getting-started/)
--
-Frontend: [Vue](https://vuejs.org/) + [TypeScript](https://www.typescriptlang.org/) + [Ant Design Vue](https://antdv.com/) + [Vben Admin](https://doc.vben.pro/)
+Adhering to the philosophy of efficient, stable, and scalable technology selection:
+
+- **Backend**: `Golang`, `go-kratos`, `Wire`, `Ent ORM` / `Gorm`, `MySQL`, `Redis`, `Docker`
+- **Common Infrastructure**: `JWT Authentication`, `Casbin` / `OPA` / `Zanzibar` Authorization, `SSE Push`, `Swagger API Docs`
+- **Vue Vben Edition**: `Vue3` + `TypeScript` + `Vite` + `Ant Design Vue` + `Vben Admin`
+- **Vue Element Edition**: `Vue3` + `TypeScript` + `Vite` + `Element Plus` (lightweight pure version)
+- **React Edition**: `React19` + `TypeScript` + `Vite` + `React Router` + `Zustand` + `Ant Design V6` + `@ant-design/pro-components` (**No UMI framework**)
 
 ## Quick Start
 
-1. Install Docker and Go (see `backend/script/prepare_ubuntu.sh`, `backend/script/prepare_centos.sh`,
-   `backend/script/prepare_rocky.sh`)
-2. Go to the `backend` directory and run the following commands to compile the backend service `kratos-admin`, build
-   Docker images and start services along with required dependent Docker services:
-    ```bash
-    make init
-    make docker
-    make compose-up
-    ```
-3. Install npm and pnpm (installation instructions can be requested from AI)
-4. Go to the `frontend` directory and run the following commands to build and start the frontend (development mode):
-    ```bash
-    pnpm install
-    pnpm dev
-    ```
-5. Access for testing
+### Environment Scripts
 
-- Frontend: <http://localhost:5666>, login: `admin` / `admin`
-- Backend: <http://localhost:7788/docs/openapi.yaml>
+- Linux / macOS Development: `scripts/env/install_unix_dev.sh`
+- Linux / macOS Production: `scripts/env/install_unix_prod.sh`
+- Windows Development: `scripts/env/install_windows_dev.ps1`
+
+### Docker Deployment Modes
+
+- **full_deploy**: Starts middleware + backend application, suitable for one-click demo or production deployment.
+- **libs_only (Recommended)**: Starts middleware only, run application locally in IDE for daily development.
+
+### Backend Startup
+
+#### Linux / macOS
+
+```shell
+# Grant script execution permissions
+chmod +x scripts/**/*.sh
+
+# Development (Recommended)
+./scripts/env/install_unix_dev.sh
+./scripts/docker/libs_only.sh
+gow run admin
+
+# Production
+./scripts/env/install_unix_prod.sh
+./scripts/docker/full_deploy.sh
+
+# PM2 Process Management (Advanced Production)
+./scripts/deploy/pm2_service.sh
+```
+
+#### Windows (PowerShell Administrator)
+
+```powershell
+# Allow script execution (only needed once)
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Initialize environment
+.\scripts\env\install_windows_dev.ps1
+
+# Local development
+.\scripts\docker\libs_only.ps1
+gow run admin
+
+# One-click full deployment
+.\scripts\docker\full_deploy.ps1
+```
+
+### Frontend Startup
+
+Frontend projects are located in the `frontend/admin` directory. Dependency installation is unified, but startup commands differ:
+
+- React: Directory `frontend/admin/react`, command `pnpm dev`, port: `7000`
+- Vue Element: Directory `frontend/admin/vue-element`, command `pnpm dev`, port: `3000`
+- Vue Vben: Directory `frontend/admin/vue-vben`, command `pnpm dev:antd`, port: `5666`
+
+```shell
+# Install dependencies
+pnpm install
+
+# React Edition
+cd frontend/admin/react
+pnpm dev
+
+# Vue3 Element Edition
+cd frontend/admin/vue-element
+pnpm dev
+
+# Vue3 Vben Edition
+cd frontend/admin/vue-vben
+pnpm dev:antd
+```
 
 ## Features
 
@@ -59,7 +120,8 @@ Frontend: [Vue](https://vuejs.org/) + [TypeScript](https://www.typescriptlang.or
 | Permission Management   | Manage permission groups, menus, and permission points; supports tree-view listing.                                                                                                                                                                                                 |
 | Organization Management | Manage organizations with tree-view listing.                                                                                                                                                                            |
 | Department Management   | Manage departments with tree-view listing.                                                                                                                                                                              |
-| Permission Management   | Manage permission groups, menus, permission points with tree-view listing.                                                                                                                                              |
+| Permission Management   | Manage permission groups, menus, and permission points; supports tree-view listing.                                                                                                                                    |
+| Position Management     | Manage user positions; positions can serve as user labels.                                                                                                                               |
 | API Management          | Manage APIs, support API synchronization (mainly for selecting interfaces when adding permission points), tree-view listing, configure operation log request parameters and responses.                                  |
 | Menu Management         | Configure system menus, operation and button permission identifiers, including directories, menus, and buttons.                                                                                                                                                                                         |
 | Dictionary Management   | Manage dictionary categories and entries, support category-linked entries, server-side multi-column sorting, data import/export.                                                                                        |

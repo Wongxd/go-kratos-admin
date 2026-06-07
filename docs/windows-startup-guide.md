@@ -10,7 +10,7 @@
 
 | 软件 | 版本要求 | 用途 |
 |------|---------|------|
-| Go | 1.25.7+ | 后端编译运行 |
+| Go | 1.22+ | 后端编译运行 |
 | Docker Desktop | 最新版 | 运行 PostgreSQL、Redis、MinIO |
 | Node.js | >= 20.10.0 | 前端编译运行 |
 | pnpm | >= 10.19.0 | Vue 前端包管理（`packageManager` 锁定版本） |
@@ -234,16 +234,26 @@ make run
 
 ---
 
-## 第六步：启动 Vue 前端
+## 第六步：启动前端
+
+前端统一存放于 `frontend/admin` 目录，有三个版本可选：
+
+| 版本 | 目录 | 启动命令 | 本地端口 |
+|------|------|---------|--------|
+| Vue Vben | `frontend/admin/vue-vben` | `pnpm dev:antd` | 5666 |
+| Vue Element | `frontend/admin/vue-element` | `pnpm dev` | 3000 |
+| React | `frontend/admin/react` | `pnpm dev` | 7000 |
+
+以 Vue Vben 版本为例：
 
 ```bash
-cd frontend/admin/vue
+cd frontend/admin/vue-vben
 
 # 安装依赖
 pnpm install
 
 # 启动开发服务器
-pnpm dev
+pnpm dev:antd
 ```
 
 启动成功后访问 http://localhost:5666
@@ -279,7 +289,9 @@ pnpm install
 
 | 服务 | URL | 说明 |
 |------|-----|------|
-| Vue 前端 | http://localhost:5666 | Vite 开发服务器 |
+| Vue Vben 前端 | http://localhost:5666 | Vite 开发服务器（Vben 版） |
+| Vue Element 前端 | http://localhost:3000 | Vite 开发服务器（Element 版） |
+| React 前端 | http://localhost:7000 | Vite 开发服务器（React 版） |
 | 后端 REST API | http://localhost:7788 | HTTP 接口 |
 | 后端 SSE | http://localhost:7789/events | 服务端推送事件 |
 | MinIO Console | http://localhost:9001 | 对象存储管理界面 |
@@ -293,7 +305,7 @@ pnpm install
 ```
 终端 1：cd backend && docker compose -f docker-compose.libs.yaml up -d
 终端 2：cd backend/app/admin/service && go run ./cmd/server -c ./configs
-终端 3：cd frontend/admin/vue && pnpm dev
+终端 3：cd frontend/admin/vue-vben && pnpm dev:antd
 ```
 
 代码生成命令速查（在 `backend/` 目录下执行）：

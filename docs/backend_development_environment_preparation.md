@@ -10,7 +10,7 @@
 - [Docker](https://www.docker.com/)
 - [Go](https://go.dev/)
 - [protobuf-compiler](https://grpc.io/docs/protoc-installation/)
-- [Make](https://www.make.com/en)
+- [Make](https://www.gnu.org/software/make/)
 - [Buf](https://buf.build/)
 - [gawk](https://www.gnu.org/software/gawk/)
 - [grep](https://www.gnu.org/software/grep/)

@@ -274,8 +274,8 @@ const { hasAccessByRoles } = useAccess();
 
 ## 项目代码
 
-* [kratos-admin Gitee](https://gitee.com/tx7do/kratos-admin)
-* [kratos-admin Github](https://github.com/tx7do/kratos-admin)
+* [go-wind-admin Gitee](https://gitee.com/tx7do/go-wind-admin)
+* [go-wind-admin Github](https://github.com/tx7do/go-wind-admin)
 
 ## 参考资料
 

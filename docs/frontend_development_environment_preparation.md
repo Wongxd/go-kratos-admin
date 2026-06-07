@@ -31,18 +31,11 @@ brew install --cask visual-studio-code webstorm
 
 ## 安装插件
 
-前端需要的插件主要是Protobuf的插件：
+前端需要的插件主要是 Protobuf 的 TypeScript 代码生成插件：
 
 - [ts-proto](https://github.com/stephenh/ts-proto)
-- [Dart plugin for protobuf compiler](https://pub.dev/packages/protoc_plugin)
 
 安装方法：
-
-### Dart
-
-```shell
-flutter pub global activate protoc_plugin
-```
 
 ### TypeScript
 

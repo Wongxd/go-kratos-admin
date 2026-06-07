@@ -2,89 +2,113 @@
 
 > **中台開発を風のように自由に — GoWind Admin**
 
-風行（GoWind Admin）は、箱から出してすぐ使える企業向けのGolangフルスタック管理システムです。
+風行（GoWind Admin）は、箱から出してすぐ使える企業向けのGolangフルスタック管理システムスキャフォールドです。
 
-バックエンドはGOマイクロサービスフレームワークの [go-kratos](https://go-kratos.dev/) を基盤とし、フロントエンドは Vue ベースのマイクロフロントフレームワーク [Vben Admin](https://doc.vben.pro/) を採用しています。マイクロサービスの拡張性と単体デプロイの利便性の両方に対応します。
+バックエンドはGOマイクロサービスフレームワークの [go-kratos](https://go-kratos.dev/) を基盤とし、フロントエンドは`Vue3 Vben`、`Vue3 Element Plus`、`React Antd`の3つのバージョンを提供し、マイクロサービスの拡張性と単体デプロイの利便性の両方に対応します。
 
-システムはマイクロサービス設計を前提としつつ、前後とも単体（モノリシック）構成での開発・デプロイをサポートし、チーム規模やプロジェクトの複雑性に合わせて柔軟に運用できます。
+マイクロサービス設計を前提としつつ、前後とも単体（モノリシック）構成での開発・デプロイをサポートし、チーム規模やプロジェクトの複雑性に合わせて柔軟に運用できます。
 
-主要機能が揃っており、企業向け要件に最適化されているため、迅速なプロジェクト立ち上げと開発効率向上に貢献します。
+主要機能が揃っており、企業向けシナリオに深く適合しているため、各種エンタープライズ管理システムプロジェクトの迅速な立ち上げと開発効率の大幅向上に貢献します。
 
 [English](./README.en-US.md) | [中文](./README.md) | **日本語**
 
 ## デモ
 
-- フロントエンド: <https://demo.admin.gowind.cloud>
-- バックエンド Swagger: <https://api.demo.admin.gowind.cloud/docs/>
-- デフォルトユーザー: `admin` / `admin`
+> デモポータル：<https://demo.admin.gowind.cloud>
+>
+> Vue3 Vben デモ：<https://vben.admin.gowind.cloud>
+> Vue3 Element Plus デモ：<https://ele.admin.gowind.cloud>
+> React デモ：<https://react.admin.gowind.cloud>
+>
+> バックエンド Swagger：<https://api.demo.admin.gowind.cloud/docs/>
+>
+> デフォルトユーザー: `admin` / `admin`
 
 ## コア技術スタック
 
-- バックエンド: [Golang](https://go.dev/) + [go-kratos](https://go-kratos.dev/) + [wire](https://github.com/google/wire) + [ent](https://entgo.io/docs/getting-started/)
-- フロントエンド: [Vue](https://vuejs.org/) + [TypeScript](https://www.typescriptlang.org/) + [Ant Design Vue](https://antdv.com/) + [Vben Admin](https://doc.vben.pro/)
+効率的で安定したスケーラブルな技術選択の理念に基づき、システムのコア技術スタックは以下の通りです：
+
+- **バックエンド**：`Golang`、`go-kratos`、`Wire`、`Ent ORM` / `Gorm`、`MySQL`、`Redis`、`Docker`
+- **共通基盤**：`JWT 認証`、`Casbin` / `OPA` / `Zanzibar` 認可、`SSE プッシュ`、`Swagger API ドキュメント`
+- **Vue Vben 版**：`Vue3` + `TypeScript` + `Vite` + `Ant Design Vue` + `Vben Admin`
+- **Vue Element 版**：`Vue3` + `TypeScript` + `Vite` + `Element Plus`（軽量ピュア版）
+- **React 版**：`React19` + `TypeScript` + `Vite` + `React Router` + `Zustand` + `Ant Design V6` + `@ant-design/pro-components`（**UMI フレームワーク不使用**）
 
 ## クイックスタート
 
-### バックエンド
+### 環境スクリプト選択
 
-必要な前提ソフトウェア（golang, docker など）を一括インストール：
+- Linux / macOS 開発環境：`scripts/env/install_unix_dev.sh`
+- Linux / macOS 本番環境：`scripts/env/install_unix_prod.sh`
+- Windows 開発環境：`scripts/env/install_windows_dev.ps1`
 
-```bash
-# Ubuntu
-./backend/script/prepare_ubuntu.sh
+### Docker 2つのデプロイモード
 
-# Centos
-./backend/script/prepare_centos.sh
+- **full_deploy 完全モード**：ミドルウェア+バックエンドアプリを同時起動、ワンクリックデモ・本番デプロイに適用。
+- **libs_only 依存モード（推奨）**：ミドルウェアのみ起動、アプリはローカルIDEで実行・デバッグ、日常開発に適用。
 
-# Rocky
-./backend/script/prepare_rocky.sh
+### バックエンド起動コマンド
 
-# Windows
-./backend/script/env/install_windows_dev.ps1
+#### Linux / macOS
 
-# MacOS
-./backend/script/prepare_macos.sh
+```shell
+# スクリプトに実行権限を付与
+chmod +x scripts/**/*.sh
+
+# 開発環境（推奨）
+./scripts/env/install_unix_dev.sh
+./scripts/docker/libs_only.sh
+gow run admin
+
+# 本番環境
+./scripts/env/install_unix_prod.sh
+./scripts/docker/full_deploy.sh
+
+# PM2 プロセス管理（本番上級）
+./scripts/deploy/pm2_service.sh
 ```
 
-依存サービスと go-wind-admin を一括でインストール：
+#### Windows（PowerShell 管理者）
 
-```bash
-./backend/script/docker_compose_install.sh
+```powershell
+# スクリプト実行ポリシーの許可（初回のみ1回実行）
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# 環境初期化
+.\scripts\env\install_windows_dev.ps1
+
+# ローカル開発
+.\scripts\docker\libs_only.ps1
+gow run admin
+
+# ワンクリック完全デプロイ
+.\scripts\docker\full_deploy.ps1
 ```
 
-### フロントエンド
+### フロントエンド起動説明
 
-#### Node.js のインストール（npm は Node.js に同梱）：
+フロントエンドは `frontend/admin` ディレクトリに統一して配置されています。依存関係のインストールコマンドは共通ですが、起動コマンドは異なります：
 
-Node.js 公式ダウンロードページ：<https://nodejs.org/> にアクセスし、対応するシステム（Windows/macOS/Linux）の LTS 安定版をダウンロードしてインストールします。
+- React：ディレクトリ `frontend/admin/react`、起動コマンド `pnpm dev`、ローカルポート：`7000`
+- Vue Element：ディレクトリ `frontend/admin/vue-element`、起動コマンド `pnpm dev`、ローカルポート：`3000`
+- Vue Vben：ディレクトリ `frontend/admin/vue-vben`、起動コマンド `pnpm dev:antd`、ローカルポート：`5666`
 
-インストール完了後、ターミナル / コマンドプロンプトを開き、以下のコマンドでインストールの成功を確認します：
-
-```bash
-node -v  # Node.jsのバージョン番号が表示されれば成功
-npm -v   # npmのバージョン番号が表示されれば成功
-```
-
-#### 2. pnpm のインストール：
-
-```bash
-npm install -g pnpm
-```
-
-#### 3. フロントエンドサービスの起動：
-
-frontend ディレクトリに移動し、以下のコマンドを実行して、フロントエンドの依存関係のインストール、コンパイル、開発モードの起動を完了します：
-bash
-
-```bash
+```shell
+# 依存関係のインストール
 pnpm install
+
+# React版
+cd frontend/admin/react
 pnpm dev
+
+# Vue3 Element版
+cd frontend/admin/vue-element
+pnpm dev
+
+# Vue3 Vben版
+cd frontend/admin/vue-vben
+pnpm dev:antd
 ```
-
-### アクセステスト
-
-- フロントエンドアドレス：<http://localhost:5666>， ログインアカウント：`admin`，パスワード：`admin`
-- バックエンドドキュメントアドレス：<http://localhost:7788/docs/openapi.yaml>
 
 ## 風行・核心機能リスト
 
